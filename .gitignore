@@ -1,0 +1,43 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+*.pyo
+*.pyd
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Other
+project_example/
+.claude/
+CLAUDE.md
+.kiro*
+
+# Test coverage
+.coverage
+htmlcov/
+.tox/

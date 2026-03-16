@@ -1,0 +1,152 @@
+{
+  "main_menu": [
+    {
+      "text": "หน้าหลัก",
+      "url": "https://www.finansiahero.com/",
+      "is_external": false
+    },
+    {
+      "text": "Popular Feature",
+      "url": "https://www.finansiahero.com/popular-feature/",
+      "is_external": false
+    },
+    {
+      "text": "ข่าวสาร",
+      "url": "https://www.finansiahero.com/media/",
+      "is_external": false
+    },
+    {
+      "text": "HERO SCHOOL",
+      "url": "https://www.finansiahero.com/#",
+      "is_external": false
+    },
+    {
+      "text": "คู่มือ",
+      "url": "https://www.finansiahero.com/#",
+      "is_external": false
+    },
+    {
+      "text": "ดาวน์โหลด",
+      "url": "https://www.finansiahero.com/download/",
+      "is_external": false
+    },
+    {
+      "text": "กระดานสนทนา",
+      "url": "https://smartaccess.fnsyrus.com/open-board/",
+      "is_external": true
+    },
+    {
+      "text": "ติดต่อเรา",
+      "url": "https://www.finansiahero.com/contact-finansia-hero/",
+      "is_external": false
+    }
+  ],
+  "dropdown_menus": {
+    "Popular Feature": [
+      {
+        "text": "HERO Strong Trend",
+        "url": "https://www.finansiahero.com/popular-feature/chart/hero-strong-trend/"
+      },
+      {
+        "text": "HERO Sequential",
+        "url": "https://www.finansiahero.com/popular-feature/chart/hero-sequential/"
+      },
+      {
+        "text": "HERO Trend Ribbon",
+        "url": "https://www.finansiahero.com/popular-feature/chart/hero-trend-ribbon/"
+      },
+      {
+        "text": "Volume by Price",
+        "url": "https://www.finansiahero.com/popular-feature/chart/volume-by-price/"
+      },
+      {
+        "text": "Backtest",
+        "url": "https://www.finansiahero.com/popular-feature/chart/backtest/"
+      },
+      {
+        "text": "Financial Chart",
+        "url": "https://www.finansiahero.com/popular-feature/chart/financial-chart/"
+      },
+      {
+        "text": "HERO Real-time Pick",
+        "url": "https://www.finansiahero.com/popular-feature/stock-scanner/hero-real-time-pick/"
+      },
+      {
+        "text": "DIY Conditional Search",
+        "url": "https://www.finansiahero.com/popular-feature/stock-scanner/diy-conditional-search/"
+      },
+      {
+        "text": "Stop Order",
+        "url": "https://www.finansiahero.com/popular-feature/order/stop-order/"
+      },
+      {
+        "text": "Trailing Stop",
+        "url": "https://www.finansiahero.com/popular-feature/order/trailing-stop/"
+      },
+      {
+        "text": "Overnight Order",
+        "url": "https://www.finansiahero.com/popular-feature/order/overnight-order/"
+      },
+      {
+        "text": "Quick Order",
+        "url": "https://www.finansiahero.com/popular-feature/order/quick-order/"
+      },
+      {
+        "text": "Quote Order Plus",
+        "url": "https://www.finansiahero.com/popular-feature/order/quote-order-plus/"
+      },
+      {
+        "text": "Buy & Auto Sell and Sell & Auto Buy",
+        "url": "https://www.finansiahero.com/popular-feature/order/buy-auto-sell-and-sell-auto-buy/"
+      }
+    ],
+    "ข่าวสาร": [
+      {
+        "text": "ข่าวสาร",
+        "url": "https://www.finansiahero.com/media/"
+      },
+      {
+        "text": "ประชาสัมพันธ์",
+        "url": "https://www.finansiahero.com/pressroom/"
+      },
+      {
+        "text": "สัมมนา",
+        "url": "https://www.fnsyrus.com/mc03/seminar/seminar.aspx"
+      },
+      {
+        "text": "รีวิวจากผู้ใช้งาน",
+        "url": "https://www.finansiahero.com/testimonials/"
+      },
+      {
+        "text": "บทความ",
+        "url": "https://www.finansiahero.com/article/"
+      }
+    ],
+    "HERO SCHOOL": [
+      {
+        "text": "วิธีใช้งาน Finansia Hero (มือถือ)",
+        "url": "https://www.finansiahero.com/hero-school-vd-01-mts/"
+      },
+      {
+        "text": "วิธีใช้งาน Finansia Hero (PC)",
+        "url": "https://www.finansiahero.com/hero-school-vd-02-hts/"
+      },
+      {
+        "text": "วิธีใช้งาน Finansia Hero Turn Pro",
+        "url": "https://www.finansiahero.com/hero-school-vd-03-pro/"
+      }
+    ],
+    "คู่มือ": [
+      {
+        "text": "วิธีใช้งานอย่างง่าย",
+        "url": "https://www.finansiahero.com/วิธีใช้งานอย่างย่อ-e-books/"
+      },
+      {
+        "text": "คู่มือฉบับละเอียด",
+        "url": "https://www.finansiahero.com/คู่มือฉบับละเอียด/"
+      }
+    ]
+  },
+  "footer_menu": [],
+  "extraction_timestamp": "2025-09-10T14:53:35.743595"
+}

@@ -1,0 +1,18 @@
+HERO Bot Test Document
+
+This is a test document for the Finansia Hero Trading Platform.
+
+Key Features:
+- Advanced trading tools
+- Real-time market data
+- Risk management systems
+- Technical analysis charts
+- Order management interface
+
+Platform Navigation:
+1. Login to your account
+2. Access the trading dashboard
+3. Use the order placement panel
+4. Monitor your portfolio
+
+This document is used to test the RAG system functionality.

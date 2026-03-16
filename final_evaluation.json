@@ -1,0 +1,45 @@
+{
+  "summary": {
+    "total": 5,
+    "successful": 0,
+    "success_rate": 0.0,
+    "avg_response_time": 0
+  },
+  "results": [
+    {
+      "query": "ใช้ stop loss ยังไง",
+      "category": "order_management",
+      "success": false,
+      "error": "HTTP 500",
+      "response_time": 5.51
+    },
+    {
+      "query": "วิธีเปิดบัญชี",
+      "category": "account",
+      "success": false,
+      "error": "HTTP 500",
+      "response_time": 5.3
+    },
+    {
+      "query": "Moving Average คืออะไร",
+      "category": "technical_analysis",
+      "success": false,
+      "error": "HTTP 500",
+      "response_time": 2.82
+    },
+    {
+      "query": "HERO Strong Trend",
+      "category": "features",
+      "success": false,
+      "error": "HTTP 500",
+      "response_time": 5.32
+    },
+    {
+      "query": "Volume by Price",
+      "category": "features",
+      "success": false,
+      "error": "HTTP 500",
+      "response_time": 5.27
+    }
+  ]
+}
