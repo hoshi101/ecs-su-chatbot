@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-03-27T04:37:59.439251+00:00",
+  "sources": [
+    {
+      "key": "department_contact",
+      "url": "https://ee-eng.su.ac.th/ContactUs.aspx",
+      "category": "contact",
+      "parser": "contact",
+      "title": "Department Contact Information",
+      "description": "Official department contact page with address, phone numbers, and Facebook page."
+    },
+    {
+      "key": "department_lecturers",
+      "url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty",
+      "parser": "staff",
+      "title": "Department Academic Staff",
+      "description": "Official lecturer directory for the department."
+    },
+    {
+      "key": "department_support_staff",
+      "url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
+      "category": "staff",
+      "parser": "staff",
+      "title": "Department Support Staff",
+      "description": "Official support staff directory for the department."
+    },
+    {
+      "key": "program_ecs",
+      "url": "https://ee-eng.su.ac.th/Program.aspx?Course=ElectronicsAndComputerSystemsEngineering",
+      "category": "academic",
+      "parser": "program",
+      "title": "Electronics and Computer Systems Engineering Program",
+      "description": "Bachelor program page for Electronics and Computer Systems Engineering."
+    },
+    {
+      "key": "program_electrical_communications",
+      "url": "https://ee-eng.su.ac.th/Program.aspx?Course=ElectricalCommunicationsEngineering",
+      "category": "academic",
+      "parser": "program",
+      "title": "Electrical Communications Engineering Program",
+      "description": "Bachelor program page for Electrical Communications Engineering."
+    },
+    {
+      "key": "program_master_ece",
+      "url": "https://ee-eng.su.ac.th/Program.aspx?Course=ElectricalAndComputerEngineering",
+      "category": "academic",
+      "parser": "program",
+      "title": "Electrical and Computer Engineering Master's Program",
+      "description": "Master's program page for Electrical and Computer Engineering."
+    },
+    {
+      "key": "faculty_department_overview",
+      "url": "https://eng2.su.ac.th/department_electrical_engineering.php",
+      "category": "overview",
+      "parser": "faculty_overview",
+      "title": "Faculty Department Overview",
+      "description": "Faculty website overview page for the department, including history and curriculum summary."
+    }
+  ],
+  "results": [
+    {
+      "key": "department_contact",
+      "title": "Department Contact Information",
+      "category": "contact",
+      "source_url": "https://ee-eng.su.ac.th/ContactUs.aspx",
+      "scraped_at": "2026-03-27T04:37:52.543073+00:00",
+      "raw_html_path": "data/web/raw/department_contact.html",
+      "markdown_path": "data/web/clean/department_contact.md",
+      "json_path": "data/web/clean/department_contact.json",
+      "downloaded_files": []
+    },
+    {
+      "key": "department_lecturers",
+      "title": "Department Academic Staff",
+      "category": "faculty",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "scraped_at": "2026-03-27T04:37:52.666833+00:00",
+      "raw_html_path": "data/web/raw/department_lecturers.html",
+      "markdown_path": "data/web/clean/department_lecturers.md",
+      "json_path": "data/web/clean/department_lecturers.json",
+      "downloaded_files": []
+    },
+    {
+      "key": "department_support_staff",
+      "title": "Department Support Staff",
+      "category": "staff",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
+      "scraped_at": "2026-03-27T04:37:52.755671+00:00",
+      "raw_html_path": "data/web/raw/department_support_staff.html",
+      "markdown_path": "data/web/clean/department_support_staff.md",
+      "json_path": "data/web/clean/department_support_staff.json",
+      "downloaded_files": []
+    },
+    {
+      "key": "program_ecs",
+      "title": "Electronics and Computer Systems Engineering Program",
+      "category": "academic",
+      "source_url": "https://ee-eng.su.ac.th/Program.aspx?Course=ElectronicsAndComputerSystemsEngineering",
+      "scraped_at": "2026-03-27T04:37:52.833530+00:00",
+      "raw_html_path": "data/web/raw/program_ecs.html",
+      "markdown_path": "data/web/clean/program_ecs.md",
+      "json_path": "data/web/clean/program_ecs.json",
+      "downloaded_files": [
+        "data/web/downloads/E0_B8_AB_E0_B8_A5_E0_B8_B1_E0_B8_81_E0_B8_AA_E0_B8_98834b00e3.pdf",
+        "data/web/downloads/WebFl_2023729138714853592_e5933c4db5.pdf",
+        "data/web/downloads/WebFl_20237291351981908292_a9a750b2e1.pdf"
+      ]
+    },
+    {
+      "key": "program_electrical_communications",
+      "title": "Electrical Communications Engineering Program",
+      "category": "academic",
+      "source_url": "https://ee-eng.su.ac.th/Program.aspx?Course=ElectricalCommunicationsEngineering",
+      "scraped_at": "2026-03-27T04:37:53.452992+00:00",
+      "raw_html_path": "data/web/raw/program_electrical_communications.html",
+      "markdown_path": "data/web/clean/program_electrical_communications.md",
+      "json_path": "data/web/clean/program_electrical_communications.json",
+      "downloaded_files": [
+        "data/web/downloads/E0_B8_AB_E0_B8_A5_E0_B8_B1_E0_B8_81_E0_B8_AA_E0_B8_b5d75250a9.pdf"
+      ]
+    },
+    {
+      "key": "program_master_ece",
+      "title": "Electrical and Computer Engineering Master's Program",
+      "category": "academic",
+      "source_url": "https://ee-eng.su.ac.th/Program.aspx?Course=ElectricalAndComputerEngineering",
+      "scraped_at": "2026-03-27T04:37:53.838911+00:00",
+      "raw_html_path": "data/web/raw/program_master_ece.html",
+      "markdown_path": "data/web/clean/program_master_ece.md",
+      "json_path": "data/web/clean/program_master_ece.json",
+      "downloaded_files": [
+        "data/web/downloads/E0_B8_AB_E0_B8_A5_E0_B8_B1_E0_B8_81_E0_B8_AA_E0_B8_ad0b32309a.pdf"
+      ]
+    },
+    {
+      "key": "faculty_department_overview",
+      "title": "Faculty Department Overview",
+      "category": "overview",
+      "source_url": "https://eng2.su.ac.th/department_electrical_engineering.php",
+      "scraped_at": "2026-03-27T04:37:53.996750+00:00",
+      "raw_html_path": "data/web/raw/faculty_department_overview.html",
+      "markdown_path": "data/web/clean/faculty_department_overview.md",
+      "json_path": "data/web/clean/faculty_department_overview.json",
+      "downloaded_files": [
+        "data/web/downloads/ojuuu_ojuuu_Branch_4_49_6172e76640.pdf",
+        "data/web/downloads/ojuuu_ojuuu_Branch_4_52_3a07c9cd99.pdf",
+        "data/web/downloads/ojuuu_ojuuu_Branch_4_63_6cd66cdf5e.pdf",
+        "data/web/downloads/ojuuu_ojuuu_Branch_4_64_a4d05d8db3.pdf"
+      ]
+    }
+  ],
+  "failures": []
+}

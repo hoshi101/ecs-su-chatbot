@@ -1,0 +1,138 @@
+{
+  "kind": "staff_directory",
+  "title": "Department Academic Staff",
+  "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+  "category": "faculty",
+  "scraped_at": "2026-03-27T04:37:52.666833+00:00",
+  "entries": [
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. โสภณ ผู้มีจรรยา",
+      "role": "หัวหน้าภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "phumeechanya_s@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. กัณธิดา พันธุ์เจริญ",
+      "role": "รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการศึกษาวิเทศสัมพันธ์และสหกิจ",
+      "email": "pancharoen_k@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ กิตติธัช พาพลเพ็ญ",
+      "role": "รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการกิจการงานทั่วไป",
+      "email": "paponpen_k@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. ภมร ศิลาพันธ์",
+      "role": "รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายการจัดการและนักศึกษา/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์",
+      "email": "silapan_p@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. ระพีพันธ์ แก้วอ่อน",
+      "role": "รองอธิการบดีพระราชวังสนามจันทร์/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าสื่อสาร",
+      "email": "kaewon_r@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. ยุทธนา เจวจินดา",
+      "role": "ประธานหลักสูตรวิศวกรรมศาสตรมหาบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์",
+      "email": "jewajinda_y@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "รองศาสตราจารย์ ดร. ชูเกียรติ สอดศรี",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "sodsri_c@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. ณัฐพงศ์ วงศ์พร้อมมูล",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "wongprommoon_n@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "ผู้ช่วยศาสตราจารย์ ดร. จิรัฏฐ์ เหมือนชู",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "mearnchu_j@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ ดร. อรทัย วัชรกฤชกรณ์",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "watcharakitchak_o@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ ดร. ศักดิ์ระพี ไพศาลนันทน์",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "paisalnan_s@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ ดร. พลอยบุศรา โกมาสังข์",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "gomasang_p@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ พรชัย เปลี่ยมทรัพย์",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "pliamsup_p@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ ดร. ชัยวุฒ ชูรักษ์",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "choorak_c@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ ดร. ปาริฉัตร เสริมวุฒิสาร",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "sermwuthisarn_p@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    },
+    {
+      "name": "อาจารย์ ดร. คุณานนต์  คะระวานิช",
+      "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+      "email": "karawanich_k@su.ac.th",
+      "detail_url": "",
+      "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
+      "category": "faculty"
+    }
+  ],
+  "markdown": "# Department Academic Staff\n\nSource URL: https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer\n\n## Directory\n\n### ผู้ช่วยศาสตราจารย์ ดร. โสภณ ผู้มีจรรยา\n- Role: หัวหน้าภาควิชาวิศวกรรมไฟฟ้า\n- Email: phumeechanya_s@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. กัณธิดา พันธุ์เจริญ\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการศึกษาวิเทศสัมพันธ์และสหกิจ\n- Email: pancharoen_k@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ กิตติธัช พาพลเพ็ญ\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการกิจการงานทั่วไป\n- Email: paponpen_k@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ภมร ศิลาพันธ์\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายการจัดการและนักศึกษา/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์\n- Email: silapan_p@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ระพีพันธ์ แก้วอ่อน\n- Role: รองอธิการบดีพระราชวังสนามจันทร์/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าสื่อสาร\n- Email: kaewon_r@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ยุทธนา เจวจินดา\n- Role: ประธานหลักสูตรวิศวกรรมศาสตรมหาบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์\n- Email: jewajinda_y@su.ac.th\n\n### รองศาสตราจารย์ ดร. ชูเกียรติ สอดศรี\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sodsri_c@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ณัฐพงศ์ วงศ์พร้อมมูล\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: wongprommoon_n@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. จิรัฏฐ์ เหมือนชู\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: mearnchu_j@su.ac.th\n\n### อาจารย์ ดร. อรทัย วัชรกฤชกรณ์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: watcharakitchak_o@su.ac.th\n\n### อาจารย์ ดร. ศักดิ์ระพี ไพศาลนันทน์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: paisalnan_s@su.ac.th\n\n### อาจารย์ ดร. พลอยบุศรา โกมาสังข์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: gomasang_p@su.ac.th\n\n### อาจารย์ พรชัย เปลี่ยมทรัพย์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: pliamsup_p@su.ac.th\n\n### อาจารย์ ดร. ชัยวุฒ ชูรักษ์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: choorak_c@su.ac.th\n\n### อาจารย์ ดร. ปาริฉัตร เสริมวุฒิสาร\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sermwuthisarn_p@su.ac.th\n\n### อาจารย์ ดร. คุณานนต์  คะระวานิช\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: karawanich_k@su.ac.th\n"
+}

@@ -95,6 +95,9 @@ cp .env.example .env
 ### 2. Process Documents (First Run)
 
 ```bash
+# Optional but recommended: scrape official department/faculty pages first
+python scripts/scrape_department_sources.py
+
 # Process documents and populate vector database
 python scripts/process_documents.py
 ```
@@ -147,6 +150,20 @@ cd src/frontend && streamlit run app.py
 - **Configurable Search**: Enable/disable web search as needed
 
 ## Development
+
+### Knowledge Base Collection
+
+For this project, official department and faculty pages should be collected into
+the local knowledge base instead of relying on live web search for every query.
+
+Use:
+
+```bash
+python scripts/scrape_department_sources.py
+```
+
+This writes raw HTML, cleaned Markdown/JSON, and discovered downloads into
+`data/web/`. See [docs/guides/WEB_SCRAPING_GUIDE.md](/home/hoshi/hoshi/side-project/university-project/extracted_folder/ecs-chatbot/docs/guides/WEB_SCRAPING_GUIDE.md).
 
 ### Project Structure Benefits
 
