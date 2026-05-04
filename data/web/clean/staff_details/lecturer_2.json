@@ -1,0 +1,27 @@
+{
+  "kind": "staff_detail",
+  "title": "ผู้ช่วยศาสตราจารย์ ดร.โสภณ ผู้มีจรรยา",
+  "source_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=2&Type=Lecturer",
+  "category": "faculty",
+  "scraped_at": "2026-03-27T05:01:12.657241+00:00",
+  "name": "ผู้ช่วยศาสตราจารย์ ดร.โสภณ ผู้มีจรรยา",
+  "position": "หัวหน้าภาควิชาวิศวกรรมไฟฟ้า",
+  "email": "phumeechanya_s@su.ac.th",
+  "phone": "",
+  "research_interests": "Deformable models, Pattern recognition, 3D image reconstruction",
+  "education": [
+    "ปริญญาตรี วศ.บ. วิศวกรรมอิเล็กทรอนิกส์และโทรคมนาคม (เกียรตินิยม อันดับ 1) มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2548",
+    "ปริญญาโท วศ.ม. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2550",
+    "ปริญญาเอก วศ.ด. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2553"
+  ],
+  "research_publications": [
+    "ระดับนานาชาติ",
+    "[1] Patsakorn Akephachaisawat, Sopon Phumeechanya (2022). “A Self-Augmentation Transfer Learning Network for Image Deraining.” The 6th International Conference on Information Technology (InCIT 2022), pp 386-391, Panyapiwat Institute of Management (PIM), Nonthaburi, Thailand, 10 – 11 November 2022.",
+    "[2] Jirasak Wongbongkotpaisan and Sopon Phumeechanya (2021) \"Plant Leaf Disease Classification using Local-Based Image Augmentation and Convolutional Neural Network\", International Conference on Electrical Engineering/Electronics, Computer, Telecommunications and Information Technology (ECTI-CON), pp. 1023-1027.",
+    "ระดับชาติ",
+    "[1] กฤตเมธ มนเทียรกุล, วนิชพร มาสมบูรณ์, ศุภสุดา สุดประเสริฐ และ โสภณ ผู้มีจรรยา. (2565) “การจับคู่ข้อความโดยใช้ค่าคะแนน BLEU สำหรับระบบสั่งอาหารด้วยเสียงพูด (Text Matching using BLEU Score for Voice-based Food Ordering System).” The 18th National Conference on Computing and Information Technology. Online Conference ไทย. 19 พฤษภาคม 2565 - 20พฤษภาคม 2565. หน้าที่ 430-435.",
+    "[2] จิรศักดิ์ วงษ์บงกชไพศาล และ โสภณ ผู้มีจรรยา (2564) \"การตรวจจับบริเวณโรคพืชบนใบโดยใช้เทคนิคซุปเปอร์พิกเซลและโครงข่ายประสาทแบบคอนโวโลชัน (Leaf Disease Region Detection using Super-pixel Technique and Convolutional Neural Network),\" การประชุมวิชาการทางวิศวกรรมไฟฟ้า ครั้งที่ 44 (EECON44), 17-19 พฤศจิกายน 2564, จังหวัดน่าน",
+    "[3] โสภณ ผู้มีจรรยา, และ ปาริฉัตร เสริมวุฒิสาร. (2563). “วิธีการชักตัวอย่างภาพแบบทำซ้ำสองทิศทางสำหรับตรวจหาบริเวณที่เบลอ.” วารสารเทคโนโลยีสารสนเทศ, ปีที่ 16, ฉบับที่ 1 (มกราคม-มิถุนายน 2563): 81-90. (ฐานข้อมูล TCI กลุ่ม 1)"
+  ],
+  "markdown": "# ผู้ช่วยศาสตราจารย์ ดร.โสภณ ผู้มีจรรยา\n\nSource URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=2&Type=Lecturer\n\n- Position: หัวหน้าภาควิชาวิศวกรรมไฟฟ้า\n- Email: phumeechanya_s@su.ac.th\n- Research Interests: Deformable models, Pattern recognition, 3D image reconstruction\n\n## Education\n\n- ปริญญาตรี วศ.บ. วิศวกรรมอิเล็กทรอนิกส์และโทรคมนาคม (เกียรตินิยม อันดับ 1) มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2548\n- ปริญญาโท วศ.ม. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2550\n- ปริญญาเอก วศ.ด. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2553\n\n## Research Publications\n\n- ระดับนานาชาติ\n- [1] Patsakorn Akephachaisawat, Sopon Phumeechanya (2022). “A Self-Augmentation Transfer Learning Network for Image Deraining.” The 6th International Conference on Information Technology (InCIT 2022), pp 386-391, Panyapiwat Institute of Management (PIM), Nonthaburi, Thailand, 10 – 11 November 2022.\n- [2] Jirasak Wongbongkotpaisan and Sopon Phumeechanya (2021) \"Plant Leaf Disease Classification using Local-Based Image Augmentation and Convolutional Neural Network\", International Conference on Electrical Engineering/Electronics, Computer, Telecommunications and Information Technology (ECTI-CON), pp. 1023-1027.\n- ระดับชาติ\n- [1] กฤตเมธ มนเทียรกุล, วนิชพร มาสมบูรณ์, ศุภสุดา สุดประเสริฐ และ โสภณ ผู้มีจรรยา. (2565) “การจับคู่ข้อความโดยใช้ค่าคะแนน BLEU สำหรับระบบสั่งอาหารด้วยเสียงพูด (Text Matching using BLEU Score for Voice-based Food Ordering System).” The 18th National Conference on Computing and Information Technology. Online Conference ไทย. 19 พฤษภาคม 2565 - 20พฤษภาคม 2565. หน้าที่ 430-435.\n- [2] จิรศักดิ์ วงษ์บงกชไพศาล และ โสภณ ผู้มีจรรยา (2564) \"การตรวจจับบริเวณโรคพืชบนใบโดยใช้เทคนิคซุปเปอร์พิกเซลและโครงข่ายประสาทแบบคอนโวโลชัน (Leaf Disease Region Detection using Super-pixel Technique and Convolutional Neural Network),\" การประชุมวิชาการทางวิศวกรรมไฟฟ้า ครั้งที่ 44 (EECON44), 17-19 พฤศจิกายน 2564, จังหวัดน่าน\n- [3] โสภณ ผู้มีจรรยา, และ ปาริฉัตร เสริมวุฒิสาร. (2563). “วิธีการชักตัวอย่างภาพแบบทำซ้ำสองทิศทางสำหรับตรวจหาบริเวณที่เบลอ.” วารสารเทคโนโลยีสารสนเทศ, ปีที่ 16, ฉบับที่ 1 (มกราคม-มิถุนายน 2563): 81-90. (ฐานข้อมูล TCI กลุ่ม 1)\n"
+}

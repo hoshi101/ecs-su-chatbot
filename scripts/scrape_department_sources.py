@@ -16,7 +16,7 @@ from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -27,6 +27,8 @@ DATA_ROOT = PROJECT_ROOT / "data" / "web"
 RAW_ROOT = DATA_ROOT / "raw"
 CLEAN_ROOT = DATA_ROOT / "clean"
 DOWNLOAD_ROOT = DATA_ROOT / "downloads"
+RAW_STAFF_DETAIL_ROOT = RAW_ROOT / "staff_details"
+CLEAN_STAFF_DETAIL_ROOT = CLEAN_ROOT / "staff_details"
 INDEX_PATH = DATA_ROOT / "index.json"
 
 USER_AGENT = (
@@ -115,6 +117,8 @@ def ensure_directories() -> None:
     RAW_ROOT.mkdir(parents=True, exist_ok=True)
     CLEAN_ROOT.mkdir(parents=True, exist_ok=True)
     DOWNLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+    RAW_STAFF_DETAIL_ROOT.mkdir(parents=True, exist_ok=True)
+    CLEAN_STAFF_DETAIL_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 def create_session() -> requests.Session:
@@ -177,6 +181,47 @@ def trim_footer(lines: List[str]) -> List[str]:
 
 def find_emails(text: str) -> List[str]:
     return re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
+
+
+def split_publications(text: str) -> List[str]:
+    normalized = " ".join(text.split())
+    normalized = normalized.replace("ระดับนานาชาติ", "||ระดับนานาชาติ").replace("ระดับชาติ", "||ระดับชาติ")
+    segments = [segment.strip() for segment in normalized.split("||") if segment.strip()]
+
+    publications: List[str] = []
+    for segment in segments:
+        matches = re.split(r"(?=\[\d+\])", segment)
+        for match in matches:
+            item = match.strip()
+            if item:
+                publications.append(item)
+    return publications
+
+
+def extract_person_id(card) -> Optional[str]:
+    for value in [card.get("id", ""), card.get("href", "")]:
+        match = re.search(r"ucPerson_(\d+)", value)
+        if match:
+            return match.group(1)
+        match = re.search(r"PersonID=(\d+)", value)
+        if match:
+            return match.group(1)
+    return None
+
+
+def build_staff_detail_url(source: SourceSpec, person_id: str) -> str:
+    parsed = urlparse(source.url)
+    params = parse_qs(parsed.query)
+    staff_type = params.get("Type", ["Lecturer"])[0]
+    return f"{parsed.scheme}://{parsed.netloc}/StaffDetail.aspx?PersonID={person_id}&Type={staff_type}"
+
+
+def fetch_soup(session: requests.Session, url: str) -> tuple[str, BeautifulSoup]:
+    response = session.get(url, timeout=REQUEST_TIMEOUT)
+    response.raise_for_status()
+    response.encoding = response.apparent_encoding or response.encoding
+    html = response.text
+    return html, BeautifulSoup(html, "html.parser")
 
 
 def parse_contact_page(soup: BeautifulSoup, source: SourceSpec) -> Dict:
@@ -269,11 +314,8 @@ def parse_staff_page(soup: BeautifulSoup, source: SourceSpec) -> Dict:
         if not name:
             continue
 
-        href = card.get("href", "").strip()
-        detail_url = None
-        match = re.search(r"StaffDetail\.aspx\?PersonID=\d+&amp;Type=[A-Za-z]+", href)
-        if match:
-            detail_url = urljoin(source.url, match.group(0).replace("&amp;", "&"))
+        person_id = extract_person_id(card)
+        detail_url = build_staff_detail_url(source, person_id) if person_id else ""
 
         full_name = " ".join(
             part.strip()
@@ -292,7 +334,8 @@ def parse_staff_page(soup: BeautifulSoup, source: SourceSpec) -> Dict:
                 "name": full_name,
                 "role": role.get_text(" ", strip=True) if role else "",
                 "email": email_matches[0] if email_matches else "",
-                "detail_url": detail_url or "",
+                "person_id": person_id or "",
+                "detail_url": detail_url,
                 "source_url": source.url,
                 "category": source.category,
             }
@@ -312,6 +355,8 @@ def parse_staff_page(soup: BeautifulSoup, source: SourceSpec) -> Dict:
             markdown_lines.append(f"- Role: {entry['role']}")
         if entry["email"]:
             markdown_lines.append(f"- Email: {entry['email']}")
+        if entry["detail_url"]:
+            markdown_lines.append(f"- Detail URL: {entry['detail_url']}")
         markdown_lines.append("")
 
     return {
@@ -321,6 +366,79 @@ def parse_staff_page(soup: BeautifulSoup, source: SourceSpec) -> Dict:
         "category": source.category,
         "scraped_at": get_timestamp(),
         "entries": entries,
+        "markdown": "\n".join(markdown_lines).strip() + "\n",
+    }
+
+
+def parse_staff_detail_page(soup: BeautifulSoup, detail_url: str, category: str) -> Dict:
+    name = soup.find(id="cphData_ucStaffDetail_lbName")
+    position = soup.find(id="cphData_ucStaffDetail_lbPosition")
+    email = soup.find(id="cphData_ucStaffDetail_lbEmail")
+    phone = soup.find(id="cphData_ucStaffDetail_lbTel")
+    research = soup.find(id="cphData_ucStaffDetail_lbResearch")
+    table = soup.find(id="cphData_ucStaffDetail_ucDispStaffDetail_tbList")
+
+    education_entries: List[str] = []
+    publication_entries: List[str] = []
+
+    if table:
+        rows = [
+            " ".join(row.get_text(" ", strip=True).split())
+            for row in table.find_all("tr")
+        ]
+        rows = [row for row in rows if row]
+
+        current_section = None
+        for row in rows:
+            if row == "ประวัติการศึกษา":
+                current_section = "education"
+                continue
+            if row == "ผลงานวิจัย":
+                current_section = "research_publications"
+                continue
+            if current_section == "education":
+                education_entries.append(row)
+            elif current_section == "research_publications":
+                publication_entries.extend(split_publications(row))
+
+    name_text = name.get_text(" ", strip=True) if name else ""
+    markdown_lines = [
+        f"# {name_text or 'Staff Detail'}",
+        "",
+        f"Source URL: {detail_url}",
+        "",
+    ]
+
+    if position and position.get_text(" ", strip=True):
+        markdown_lines.append(f"- Position: {position.get_text(' ', strip=True)}")
+    if email and email.get_text(" ", strip=True):
+        markdown_lines.append(f"- Email: {email.get_text(' ', strip=True)}")
+    if phone and phone.get_text(" ", strip=True):
+        markdown_lines.append(f"- Phone: {phone.get_text(' ', strip=True)}")
+    if research and research.get_text(" ", strip=True):
+        markdown_lines.append(f"- Research Interests: {research.get_text(' ', strip=True)}")
+
+    if education_entries:
+        markdown_lines.extend(["", "## Education", ""])
+        markdown_lines.extend(f"- {entry}" for entry in education_entries)
+
+    if publication_entries:
+        markdown_lines.extend(["", "## Research Publications", ""])
+        markdown_lines.extend(f"- {entry}" for entry in publication_entries)
+
+    return {
+        "kind": "staff_detail",
+        "title": name_text or "Staff Detail",
+        "source_url": detail_url,
+        "category": category,
+        "scraped_at": get_timestamp(),
+        "name": name_text,
+        "position": position.get_text(" ", strip=True) if position else "",
+        "email": email.get_text(" ", strip=True) if email else "",
+        "phone": phone.get_text(" ", strip=True) if phone else "",
+        "research_interests": research.get_text(" ", strip=True) if research else "",
+        "education": education_entries,
+        "research_publications": publication_entries,
         "markdown": "\n".join(markdown_lines).strip() + "\n",
     }
 
@@ -462,6 +580,51 @@ def save_outputs(source: SourceSpec, html: str, parsed: Dict, session: requests.
         if local_path:
             downloaded_files.append(local_path)
 
+    detail_files: List[Dict[str, str]] = []
+    if source.parser == "staff" and source.category == "faculty":
+        for entry in parsed.get("entries", []):
+            detail_url = entry.get("detail_url", "")
+            person_id = entry.get("person_id", "")
+            if not detail_url or not person_id:
+                continue
+
+            detail_html, detail_soup = fetch_soup(session, detail_url)
+            detail_parsed = parse_staff_detail_page(detail_soup, detail_url, source.category)
+
+            slug = f"lecturer_{person_id}"
+            detail_raw_path = RAW_STAFF_DETAIL_ROOT / f"{slug}.html"
+            detail_raw_path.write_text(detail_html, encoding="utf-8")
+
+            detail_markdown_path = CLEAN_STAFF_DETAIL_ROOT / f"{slug}.md"
+            detail_markdown_path.write_text(detail_parsed["markdown"], encoding="utf-8")
+
+            detail_json_path = CLEAN_STAFF_DETAIL_ROOT / f"{slug}.json"
+            detail_json_path.write_text(
+                json.dumps(detail_parsed, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            entry["detail_raw_html_path"] = str(detail_raw_path.relative_to(PROJECT_ROOT))
+            entry["detail_markdown_path"] = str(detail_markdown_path.relative_to(PROJECT_ROOT))
+            entry["detail_json_path"] = str(detail_json_path.relative_to(PROJECT_ROOT))
+            entry["detail_summary"] = {
+                "research_interests": detail_parsed["research_interests"],
+                "education_count": len(detail_parsed["education"]),
+                "research_publication_count": len(detail_parsed["research_publications"]),
+            }
+
+            detail_files.append(
+                {
+                    "name": entry.get("name", ""),
+                    "detail_url": detail_url,
+                    "raw_html_path": entry["detail_raw_html_path"],
+                    "markdown_path": entry["detail_markdown_path"],
+                    "json_path": entry["detail_json_path"],
+                }
+            )
+
+        json_path.write_text(json.dumps(parsed, ensure_ascii=False, indent=2), encoding="utf-8")
+
     return {
         "key": source.key,
         "title": source.title,
@@ -472,18 +635,15 @@ def save_outputs(source: SourceSpec, html: str, parsed: Dict, session: requests.
         "markdown_path": str(markdown_path.relative_to(PROJECT_ROOT)),
         "json_path": str(json_path.relative_to(PROJECT_ROOT)),
         "downloaded_files": downloaded_files,
+        "detail_files": detail_files,
     }
 
 
 def scrape_source(session: requests.Session, source: SourceSpec) -> Dict:
     parser = PARSERS[source.parser]
-    response = session.get(source.url, timeout=REQUEST_TIMEOUT)
-    response.raise_for_status()
-    response.encoding = response.apparent_encoding or response.encoding
-
-    soup = BeautifulSoup(response.text, "html.parser")
+    html, soup = fetch_soup(session, source.url)
     parsed = parser(soup, source)
-    return save_outputs(source, response.text, parsed, session)
+    return save_outputs(source, html, parsed, session)
 
 
 def main() -> None:

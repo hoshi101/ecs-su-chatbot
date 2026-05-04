@@ -1,0 +1,37 @@
+# ผู้ช่วยศาสตราจารย์ ดร.ระพีพันธ์ แก้วอ่อน
+
+Source URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=1&Type=Lecturer
+
+- Position: รองอธิการบดีพระราชวังสนามจันทร์/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าสื่อสาร
+- Email: kaewon_r@su.ac.th
+- Phone: 034-241971
+- Research Interests: Optical Interferometry, Optical Testing, Optical Measurements, Optical Instrumentation, Applied Optics, Optical Engineering, and Antenna Engineering
+
+## Education
+
+- ปริญญาตรี วศ.บ. วิศวกรรมโทรคมนาคม สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง ปีที่จบการศึกษา 2548
+- ปริญญาโท วศ.ม. วิศวกรรมไฟฟ้า สถาบันเทคโนโลยีพระจอมเกล้าพระนครเหนือ ปีที่จบการศึกษา 2550
+- ปริญญาเอก วศ.ด. เทคโนโลยีวิศวกรรมไฟฟ้าและสารสนเทศ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2561
+
+## Research Publications
+
+- ระดับนานาชาติ
+- [1] R. Keawon and Vech vivek and Prayoot Aketalin.(2007). “An ultra-wideband CPW-Fed,Elliptical Loop slot Antenna”, Electrical Engineering, Electronics, Computer, Telecommunication and Information Technology (ECTI) International Conference, May 2007, Changrai, Thailand.
+- [2] N. Fugto, R. Kaewon and S. Sirivisoot. 2015. “A Comparison of Various Patch Sizes and Feed Point Positions of Graphene Microstrip Antenna for Orthopedic Implants” In Proceeding of the 2015 Biomedical Engineering International Conference (BMEiCON-2015), Pattaya,Thailand, pp. 1-5. November 25-27, 2015.
+- [3] R. Kaewon, C.Pawong, R. Chitaree, and A. Bhatranand, 2018, "Polarization Phase-shifting Technique for the Determination of a Transparent Thin Film’s Thickness Using a Modified Sagnac Interferometer", Current Optics and Photonics Vol. 2, Issue 5, pp. 474-481 (2018)
+- [4] R. Kaewon, A. Bhatranand, Y.Jiraraksopakun, E. Siwapornsathain, C.Pawong, and R. Chitaree, 2014 "Generation of the rotating linearly polarized light using the triangular cyclic interferometer", ITC-CSCC 29th International Conferences (Engineering Sciences Society and Electronics Society), July, Thailand, pp. 546-549
+- [5] R. Kaewon, C.Pawong, R. Chitaree, and A. Bhatranand, 2014 "Fast and Effective Method to Distinguish the Polarizing Components Using a Polarizing Triangular Cyclic Interferometer", Asia Communication Photonics, OSA Technical Digest (online), November 11-14, Shanghai, ATh3A.41.
+- [6] R. Kaewon, C.Pawong, R. Chitaree, and A. Bhatranand, 2015, "Polarizing triangular cyclic interferometer for characterizing optical samples with birefringent properties", International Conference on Photonics Solutions, July 6-8, Huahin, Thailand, pp.96590 L1-L6.
+- [7] C.Pawong, R. Kaewon, R. Chitaree, and A. Bhatranand, 2016, "Measurement of phase retardation in a liquid crystal variable wave retarder using a polarizing triangular interferometer", 15th International Conference on Optical Communications and Networks (ICOCN), September 24-27, Hangzhou, China.
+- [8] P. Phonkitiphan, R. Kaewon, K. Pancharoen, P. Silapan, and R. Chitaree (2019) “Design of Graphene Annular Ring Microstrip Antenna using Short-pin Technique for 2.4 GHz Bands” International Journal of Electrical and Electronic Engineering & Telecommunications (IJEETC, ISSN: 2319-2518), vol. 8, no. 5, pp. 1-4. Sept. 2019, (ฐานข้อมูล Scopus)
+- [9] R. Kaewon, C.Pawong, R. Chitaree, A. Bhatranand, and T. Lertvanithphol, "Utilization of the cyclic interferometer in polarization phase-shifting technique to determine the thickness of transparent thin-films", Optical Applicata, no. 1, vol. 50, 2020.
+- [10] P. Phonkitiphan, R. Kaewon, K. Pancharoen, P. Silapan, and O. Watcharakitchakorn. "Design of Graphene-Based Annular Ring Microstrip Antenna Using Short-Pin Technique for Dual Band Applications” International Journal of Electrical and Electronic Engineering & Telecommunications (IJEETC, ISSN: 2319-2518), March 5, 2020, (ฐานข้อมูล Scopus)
+- [11] Abdullahi Usman, Apichai Bhatranand, Yuttapong Jiraraksopakun, Rapeepan Kaewon, and Chutchai Pawong "Real-Time Double-Layer Thin Film Thickness Measurements Using Modified Sagnac Interferometer with Polarization Phase Shifting Approach." photonics Vol. 8 Issue/No. 12 (November 2021). pages 1-13. Article No. 529.
+- ระดับชาติ
+- [1] ระพีพันธ์ แก้วอ่อน และนิรุทธ์ พรหมบุตร (2553). “การศึกษาสายอากาศลูปวงรีที่ป้อนด้วยสายนำสัญญาณระนาบร่วมแบบแถบความถี่กว้าง”, สหวิทยาการเพื่อการพัฒนาอย่างยั่งยืน, 18-27 มกราคม 2553, สุราษฎร์ธานี
+- [2] ระพีพันธ์ แก้วอ่อน และนิรุทธ์ พรหมบุตร. (2554). “การเพิ่มแบนด์วิดท์ของสายอากาศความถี่กว้างมากแบบไมโครสตริปด้วยการปรับระนาบกราวด์”, การประชุมวิชาการวิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีราชมงคล ครั้งที่ 3,มีนาคม 295-298, นนทบุรี
+- [3] ระพีพันธ์ แก้วอ่อน, นิรุทธ์ พรหมบุตร และภูมินทร์ กิระวณิช. (2554). “การออกแบบสายอากาศความถี่กว้างมากที่มีอัตราขยายสูง”, การประชุมวิชาการวิศวกรรมไฟฟ้า ครั้งที่ 34, 28-30 ตุลาคม 2554, ชลบุรี
+- [4] คุณานนท์ สมคำ, ชนกันต์ ใจเย็น, ธรรมนูญ หวานชะเอม, ระพีพันธ์ แก้วอ่อน, ชัยวุฒ ชูรักษ์, และพรชัย เปลี่ยมทรัพย์. (2561) “การพัฒนาศักยภาพการอ่านสำหรับผู้พิการทางสายตาโดยใช้สื่ออิเล็กทรอนิกส์มาตรฐาน EPUB 3.” ใน Proceeding การประชุมวิชาการ
+- ระดับชาติงานวิจัยและพัฒนาเชิงประยุกต์ ครั้งที่ 11 หน้า 37 อุบลราชธานี 4-7 มิถุนายน 2561
+- [5] จิรศักดิ์ วงษ์บงกชไพศาล, รัตนาพร อังคณารุ่งรัตน์, อรณิชา แซ่ตั้ง, ระพีพันธ์ แก้วอ่อน, ชัยวุฒ ชูรักษ์, พรชัย เปลี่ยมทรัพย์, และ กิตติธัช พาพลเพ็ญ. (2561) “โปรแกรมทดสอบอุณหภูมิและความชื้นในดินสำหรับโรงเรือนอัจฉริยะเพื่อใช้ปลูกผักออร์แกนิค” ใน Proceeding การประชุมวิชาการ
+- ระดับชาติงานวิจัยและพัฒนาเชิงประยุกต์ ครั้งที่ 11 หน้า 43 อุบลราชธานี 4-7 มิถุนายน 2561

@@ -1,0 +1,11 @@
+id,category,subcategory,expected_route,query,expected_keywords,reference_source,notes
+O01,out_of_scope,weather,end,วันนี้ฝนจะตกไหม,"นอกขอบเขต; สภาพอากาศ",SESSION_MANAGEMENT.md,ทดสอบคำถามพยากรณ์อากาศ
+O02,out_of_scope,creative,end,ช่วยแต่งกลอนวันสงกรานต์ให้หน่อย,"นอกขอบเขต; งานสร้างสรรค์ทั่วไป",SESSION_MANAGEMENT.md,ทดสอบคำขอเชิงสร้างสรรค์
+O03,out_of_scope,finance,end,ช่วยวิเคราะห์หุ้นให้หน่อย,"นอกขอบเขต; ไม่ใช่ข้อมูลภาควิชา",SESSION_MANAGEMENT.md,ทดสอบคำถามการเงิน
+O04,out_of_scope,medical,end,ปวดหัวควรกินยาอะไร,"นอกขอบเขต; คำแนะนำทางการแพทย์",SESSION_MANAGEMENT.md,ทดสอบคำถามการแพทย์
+O05,out_of_scope,travel,end,ช่วยหาที่เที่ยวในกรุงเทพให้หน่อย,"นอกขอบเขต; การท่องเที่ยว",SESSION_MANAGEMENT.md,ทดสอบคำถามท่องเที่ยว
+O06,out_of_scope,personal,end,คุณคิดว่าฉันควรคบกับแฟนต่อไหม,"นอกขอบเขต; เรื่องส่วนตัว",SESSION_MANAGEMENT.md,ทดสอบคำถามเรื่องส่วนตัว
+O07,out_of_scope,news,end,สรุปข่าวการเมืองวันนี้ให้หน่อย,"นอกขอบเขต; ข่าวปัจจุบัน",SESSION_MANAGEMENT.md,ทดสอบคำถามข่าว
+O08,out_of_scope,coding,end,เขียนโปรแกรมเกมงูด้วย Python ให้หน่อย,"นอกขอบเขต; เขียนโค้ดทั่วไป",SESSION_MANAGEMENT.md,ทดสอบคำถามเขียนโค้ด
+O09,out_of_scope,other_department,end,ภาควิชาวิศวกรรมเครื่องกลอยู่ตึกไหน,"นอกขอบเขต; ไม่ใช่ภาควิชาวิศวกรรมไฟฟ้า",SESSION_MANAGEMENT.md,ทดสอบคำถามต่างหน่วยงาน
+O10,out_of_scope,admission_unknown,end,ช่วยบอกคะแนนขั้นต่ำรอบล่าสุดของคณะให้หน่อย,"นอกขอบเขต; ไม่มีข้อมูลยืนยันในแหล่งปัจจุบัน",SESSION_MANAGEMENT.md,ทดสอบคำถามที่ไม่มีข้อมูลในฐานความรู้

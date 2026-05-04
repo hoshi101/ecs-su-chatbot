@@ -1,0 +1,21 @@
+id,category,subcategory,expected_route,query,expected_keywords,reference_source,notes
+D01,department_info,history,rag,ภาควิชาวิศวกรรมไฟฟ้าก่อตั้งเมื่อปีอะไร,"2550",data/web/clean/faculty_department_overview.md,ทดสอบประวัติภาควิชา
+D02,department_info,history,rag,ภาควิชาเปิดรับนักศึกษารุ่นแรกปีไหน,"2550",data/web/clean/faculty_department_overview.md,ทดสอบปีรับนักศึกษารุ่นแรก
+D03,department_info,history,rag,ภาควิชาเปิดรับนักศึกษาปริญญาโทครั้งแรกเมื่อไร,"2560",data/web/clean/faculty_department_overview.md,ทดสอบปีเปิดปริญญาโท
+D04,department_info,overview,rag,ปัจจุบันภาควิชาเปิดสอนกี่หลักสูตร,"5 หลักสูตร",data/web/clean/faculty_department_overview.md,ทดสอบข้อมูลภาพรวมหลักสูตร
+D05,department_info,overview,rag,ภาควิชามีหลักสูตรปริญญาตรีอะไรบ้าง,"วิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์; วิศวกรรมไฟฟ้าสื่อสาร",data/web/clean/faculty_department_overview.md,ทดสอบหลักสูตรระดับปริญญาตรี
+D06,department_info,overview,rag,ภาควิชามีหลักสูตรปริญญาโทอะไรบ้าง,"วิศวกรรมไฟฟ้าและคอมพิวเตอร์",data/web/clean/faculty_department_overview.md,ทดสอบหลักสูตรระดับปริญญาโท
+D07,department_info,ecs_program,rag,หลักสูตร ECS ชื่อเต็มคืออะไร,"วิศวกรรมศาสตรบัณฑิต; วิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์",data/web/clean/program_ecs.md,ทดสอบชื่อหลักสูตร ECS
+D08,department_info,ecs_program,rag,หลักสูตร ECS ฉบับปรับปรุงล่าสุดปีอะไร,"2565",data/web/clean/program_ecs.md,ทดสอบปีปรับปรุงล่าสุดของ ECS
+D09,department_info,ecs_program,rag,หลักสูตร ECS รวมกี่หน่วยกิต,"147 หน่วยกิต",data/web/clean/program_ecs.md,ทดสอบจำนวนหน่วยกิตรวม ECS
+D10,department_info,ecs_program,rag,หลักสูตร ECS ใช้เวลาเรียนกี่ปี,"4 ปีการศึกษา; ไม่เกิน 8 ปีการศึกษา",data/web/clean/program_ecs.md,ทดสอบระยะเวลาศึกษา ECS
+D11,department_info,ecs_program,rag,หมวดวิชาศึกษาทั่วไปของ ECS ต้องเรียนอย่างน้อยกี่หน่วยกิต,"30 หน่วยกิต",data/web/clean/program_ecs.md,ทดสอบโครงสร้างหมวดศึกษาทั่วไป
+D12,department_info,ecom_program,rag,หลักสูตรวิศวกรรมไฟฟ้าสื่อสารชื่อเต็มคืออะไร,"วิศวกรรมศาสตรบัณฑิต; วิศวกรรมไฟฟ้าสื่อสาร",data/web/clean/program_electrical_communications.md,ทดสอบชื่อหลักสูตรไฟฟ้าสื่อสาร
+D13,department_info,ecom_program,rag,หลักสูตรไฟฟ้าสื่อสารเป็นหลักสูตรปีอะไร,"2565",data/web/clean/program_electrical_communications.md,ทดสอบปีของหลักสูตรไฟฟ้าสื่อสาร
+D14,department_info,ecom_program,rag,หลักสูตรไฟฟ้าสื่อสารรวมกี่หน่วยกิต,"146 หน่วยกิต",data/web/clean/program_electrical_communications.md,ทดสอบจำนวนหน่วยกิตรวม
+D15,department_info,ecom_program,rag,หลักสูตรไฟฟ้าสื่อสารแบบปกติมีกลุ่มวิชาพื้นฐานวิชาชีพกี่หน่วยกิต,"42 หน่วยกิต",data/web/clean/program_electrical_communications.md,ทดสอบกลุ่มพื้นฐานวิชาชีพ
+D16,department_info,master_program,rag,หลักสูตรปริญญาโทของภาควิชาคือสาขาอะไร,"วิศวกรรมศาสตรมหาบัณฑิต; วิศวกรรมไฟฟ้าและคอมพิวเตอร์",data/web/clean/program_master_ece.md,ทดสอบชื่อหลักสูตรปริญญาโท
+D17,department_info,master_program,rag,หลักสูตรปริญญาโทใช้เวลากี่ปี,"2 ปีการศึกษา",data/web/clean/program_master_ece.md,ทดสอบระยะเวลาศึกษาปริญญาโท
+D18,department_info,master_program,rag,หลักสูตรปริญญาโทแบ่งเป็นกี่แผน,"2 แผน; แผน ก แบบ ก 1; แผน ก แบบ ก 2",data/web/clean/program_master_ece.md,ทดสอบโครงสร้างแผนการเรียน
+D19,department_info,staff,rag,นักการเงินปฏิบัติการของภาควิชาคือใคร,"ฐนิชา คล้ำชานา",data/web/clean/department_support_staff.md,ทดสอบบทบาทนักการเงิน
+D20,department_info,staff,rag,ใครเป็นวิศวกรปฏิบัติการของภาควิชา,"พยุงศักดิ์ เรืองจินดา",data/web/clean/department_support_staff.md,ทดสอบบทบาทวิศวกร

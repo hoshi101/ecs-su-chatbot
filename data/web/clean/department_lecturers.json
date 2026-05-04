@@ -3,136 +3,280 @@
   "title": "Department Academic Staff",
   "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
   "category": "faculty",
-  "scraped_at": "2026-03-27T04:37:52.666833+00:00",
+  "scraped_at": "2026-03-27T05:01:12.593383+00:00",
   "entries": [
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. โสภณ ผู้มีจรรยา",
       "role": "หัวหน้าภาควิชาวิศวกรรมไฟฟ้า",
       "email": "phumeechanya_s@su.ac.th",
-      "detail_url": "",
+      "person_id": "2",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=2&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_2.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_2.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_2.json",
+      "detail_summary": {
+        "research_interests": "Deformable models, Pattern recognition, 3D image reconstruction",
+        "education_count": 3,
+        "research_publication_count": 7
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. กัณธิดา พันธุ์เจริญ",
       "role": "รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการศึกษาวิเทศสัมพันธ์และสหกิจ",
       "email": "pancharoen_k@su.ac.th",
-      "detail_url": "",
+      "person_id": "15",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=15&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_15.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_15.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_15.json",
+      "detail_summary": {
+        "research_interests": "Energy harvesting and power management",
+        "education_count": 3,
+        "research_publication_count": 11
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ กิตติธัช พาพลเพ็ญ",
       "role": "รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการกิจการงานทั่วไป",
       "email": "paponpen_k@su.ac.th",
-      "detail_url": "",
+      "person_id": "8",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=8&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_8.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_8.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_8.json",
+      "detail_summary": {
+        "research_interests": "Power electronics, Electric machine drive",
+        "education_count": 2,
+        "research_publication_count": 18
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. ภมร ศิลาพันธ์",
       "role": "รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายการจัดการและนักศึกษา/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์",
       "email": "silapan_p@su.ac.th",
-      "detail_url": "",
+      "person_id": "4",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=4&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_4.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_4.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_4.json",
+      "detail_summary": {
+        "research_interests": "Analog signal processing, Electronic devices",
+        "education_count": 3,
+        "research_publication_count": 36
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. ระพีพันธ์ แก้วอ่อน",
       "role": "รองอธิการบดีพระราชวังสนามจันทร์/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าสื่อสาร",
       "email": "kaewon_r@su.ac.th",
-      "detail_url": "",
+      "person_id": "1",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=1&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_1.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_1.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_1.json",
+      "detail_summary": {
+        "research_interests": "Optical Interferometry, Optical Testing, Optical Measurements, Optical Instrumentation, Applied Optics, Optical Engineering, and Antenna Engineering",
+        "education_count": 3,
+        "research_publication_count": 20
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. ยุทธนา เจวจินดา",
       "role": "ประธานหลักสูตรวิศวกรรมศาสตรมหาบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์",
       "email": "jewajinda_y@su.ac.th",
-      "detail_url": "",
+      "person_id": "5",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=5&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_5.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_5.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_5.json",
+      "detail_summary": {
+        "research_interests": "VLSI circuits and systems, FPGA/ASIC design, Intelligence embedded software/systems",
+        "education_count": 3,
+        "research_publication_count": 10
+      }
     },
     {
       "name": "รองศาสตราจารย์ ดร. ชูเกียรติ สอดศรี",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "sodsri_c@su.ac.th",
-      "detail_url": "",
+      "person_id": "6",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=6&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_6.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_6.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_6.json",
+      "detail_summary": {
+        "research_interests": "Signal processing Engineering acoustics, Maintenance-based condition monitoring system, Sound and noise control, Acoustic emission, Acoustic transducers and applications",
+        "education_count": 3,
+        "research_publication_count": 21
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. ณัฐพงศ์ วงศ์พร้อมมูล",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "wongprommoon_n@su.ac.th",
-      "detail_url": "",
+      "person_id": "7",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=7&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_7.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_7.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_7.json",
+      "detail_summary": {
+        "research_interests": "Analog signal processing, Database, Data analytic, Business intelligence",
+        "education_count": 3,
+        "research_publication_count": 18
+      }
     },
     {
       "name": "ผู้ช่วยศาสตราจารย์ ดร. จิรัฏฐ์ เหมือนชู",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "mearnchu_j@su.ac.th",
-      "detail_url": "",
+      "person_id": "19",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=19&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_19.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_19.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_19.json",
+      "detail_summary": {
+        "research_interests": "Embedded system and digital electronic, Measurement systems for dielectric material",
+        "education_count": 3,
+        "research_publication_count": 9
+      }
     },
     {
       "name": "อาจารย์ ดร. อรทัย วัชรกฤชกรณ์",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "watcharakitchak_o@su.ac.th",
-      "detail_url": "",
+      "person_id": "16",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=16&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_16.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_16.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_16.json",
+      "detail_summary": {
+        "research_interests": "Hard disk drive technology, Photonics Crystal application, Microwave Heating, Optical waveguide and application, Magnetic Sensor",
+        "education_count": 3,
+        "research_publication_count": 2
+      }
     },
     {
       "name": "อาจารย์ ดร. ศักดิ์ระพี ไพศาลนันทน์",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "paisalnan_s@su.ac.th",
-      "detail_url": "",
+      "person_id": "20",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=20&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_20.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_20.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_20.json",
+      "detail_summary": {
+        "research_interests": "",
+        "education_count": 3,
+        "research_publication_count": 1
+      }
     },
     {
       "name": "อาจารย์ ดร. พลอยบุศรา โกมาสังข์",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "gomasang_p@su.ac.th",
-      "detail_url": "",
+      "person_id": "21",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=21&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_21.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_21.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_21.json",
+      "detail_summary": {
+        "research_interests": "Electrical measurement and Instrument, Nanoelectronic technology, Nanocarbon materials, Semiconductor, Magnetic recording head technology, Micromagnetics analysis",
+        "education_count": 3,
+        "research_publication_count": 1
+      }
     },
     {
       "name": "อาจารย์ พรชัย เปลี่ยมทรัพย์",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "pliamsup_p@su.ac.th",
-      "detail_url": "",
+      "person_id": "3",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=3&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_3.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_3.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_3.json",
+      "detail_summary": {
+        "research_interests": "",
+        "education_count": 2,
+        "research_publication_count": 5
+      }
     },
     {
       "name": "อาจารย์ ดร. ชัยวุฒ ชูรักษ์",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "choorak_c@su.ac.th",
-      "detail_url": "",
+      "person_id": "22",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=22&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_22.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_22.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_22.json",
+      "detail_summary": {
+        "research_interests": "Power electronics, Energy conversion, Electric drives",
+        "education_count": 2,
+        "research_publication_count": 10
+      }
     },
     {
       "name": "อาจารย์ ดร. ปาริฉัตร เสริมวุฒิสาร",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "sermwuthisarn_p@su.ac.th",
-      "detail_url": "",
+      "person_id": "23",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=23&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_23.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_23.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_23.json",
+      "detail_summary": {
+        "research_interests": "Image processing, Pattern recognition, Compressed sensing",
+        "education_count": 3,
+        "research_publication_count": 4
+      }
     },
     {
       "name": "อาจารย์ ดร. คุณานนต์  คะระวานิช",
       "role": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
       "email": "karawanich_k@su.ac.th",
-      "detail_url": "",
+      "person_id": "24",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=24&Type=Lecturer",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer",
-      "category": "faculty"
+      "category": "faculty",
+      "detail_raw_html_path": "data/web/raw/staff_details/lecturer_24.html",
+      "detail_markdown_path": "data/web/clean/staff_details/lecturer_24.md",
+      "detail_json_path": "data/web/clean/staff_details/lecturer_24.json",
+      "detail_summary": {
+        "research_interests": "Analog circuits, Communication systems, Chaotic systems, Nonlinear dynamic systems",
+        "education_count": 3,
+        "research_publication_count": 11
+      }
     }
   ],
-  "markdown": "# Department Academic Staff\n\nSource URL: https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer\n\n## Directory\n\n### ผู้ช่วยศาสตราจารย์ ดร. โสภณ ผู้มีจรรยา\n- Role: หัวหน้าภาควิชาวิศวกรรมไฟฟ้า\n- Email: phumeechanya_s@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. กัณธิดา พันธุ์เจริญ\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการศึกษาวิเทศสัมพันธ์และสหกิจ\n- Email: pancharoen_k@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ กิตติธัช พาพลเพ็ญ\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการกิจการงานทั่วไป\n- Email: paponpen_k@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ภมร ศิลาพันธ์\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายการจัดการและนักศึกษา/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์\n- Email: silapan_p@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ระพีพันธ์ แก้วอ่อน\n- Role: รองอธิการบดีพระราชวังสนามจันทร์/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าสื่อสาร\n- Email: kaewon_r@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ยุทธนา เจวจินดา\n- Role: ประธานหลักสูตรวิศวกรรมศาสตรมหาบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์\n- Email: jewajinda_y@su.ac.th\n\n### รองศาสตราจารย์ ดร. ชูเกียรติ สอดศรี\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sodsri_c@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. ณัฐพงศ์ วงศ์พร้อมมูล\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: wongprommoon_n@su.ac.th\n\n### ผู้ช่วยศาสตราจารย์ ดร. จิรัฏฐ์ เหมือนชู\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: mearnchu_j@su.ac.th\n\n### อาจารย์ ดร. อรทัย วัชรกฤชกรณ์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: watcharakitchak_o@su.ac.th\n\n### อาจารย์ ดร. ศักดิ์ระพี ไพศาลนันทน์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: paisalnan_s@su.ac.th\n\n### อาจารย์ ดร. พลอยบุศรา โกมาสังข์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: gomasang_p@su.ac.th\n\n### อาจารย์ พรชัย เปลี่ยมทรัพย์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: pliamsup_p@su.ac.th\n\n### อาจารย์ ดร. ชัยวุฒ ชูรักษ์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: choorak_c@su.ac.th\n\n### อาจารย์ ดร. ปาริฉัตร เสริมวุฒิสาร\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sermwuthisarn_p@su.ac.th\n\n### อาจารย์ ดร. คุณานนต์  คะระวานิช\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: karawanich_k@su.ac.th\n"
+  "markdown": "# Department Academic Staff\n\nSource URL: https://ee-eng.su.ac.th/Staff.aspx?Type=Lecturer\n\n## Directory\n\n### ผู้ช่วยศาสตราจารย์ ดร. โสภณ ผู้มีจรรยา\n- Role: หัวหน้าภาควิชาวิศวกรรมไฟฟ้า\n- Email: phumeechanya_s@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=2&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ ดร. กัณธิดา พันธุ์เจริญ\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการศึกษาวิเทศสัมพันธ์และสหกิจ\n- Email: pancharoen_k@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=15&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ กิตติธัช พาพลเพ็ญ\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการกิจการงานทั่วไป\n- Email: paponpen_k@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=8&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ ดร. ภมร ศิลาพันธ์\n- Role: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายการจัดการและนักศึกษา/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์\n- Email: silapan_p@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=4&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ ดร. ระพีพันธ์ แก้วอ่อน\n- Role: รองอธิการบดีพระราชวังสนามจันทร์/ ประธานหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าสื่อสาร\n- Email: kaewon_r@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=1&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ ดร. ยุทธนา เจวจินดา\n- Role: ประธานหลักสูตรวิศวกรรมศาสตรมหาบัณฑิต สาขาวิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์\n- Email: jewajinda_y@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=5&Type=Lecturer\n\n### รองศาสตราจารย์ ดร. ชูเกียรติ สอดศรี\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sodsri_c@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=6&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ ดร. ณัฐพงศ์ วงศ์พร้อมมูล\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: wongprommoon_n@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=7&Type=Lecturer\n\n### ผู้ช่วยศาสตราจารย์ ดร. จิรัฏฐ์ เหมือนชู\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: mearnchu_j@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=19&Type=Lecturer\n\n### อาจารย์ ดร. อรทัย วัชรกฤชกรณ์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: watcharakitchak_o@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=16&Type=Lecturer\n\n### อาจารย์ ดร. ศักดิ์ระพี ไพศาลนันทน์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: paisalnan_s@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=20&Type=Lecturer\n\n### อาจารย์ ดร. พลอยบุศรา โกมาสังข์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: gomasang_p@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=21&Type=Lecturer\n\n### อาจารย์ พรชัย เปลี่ยมทรัพย์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: pliamsup_p@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=3&Type=Lecturer\n\n### อาจารย์ ดร. ชัยวุฒ ชูรักษ์\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: choorak_c@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=22&Type=Lecturer\n\n### อาจารย์ ดร. ปาริฉัตร เสริมวุฒิสาร\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sermwuthisarn_p@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=23&Type=Lecturer\n\n### อาจารย์ ดร. คุณานนต์  คะระวานิช\n- Role: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: karawanich_k@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=24&Type=Lecturer\n"
 }

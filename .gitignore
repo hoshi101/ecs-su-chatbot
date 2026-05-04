@@ -34,8 +34,10 @@ Thumbs.db
 # Other
 project_example/
 .claude/
+.codex
 CLAUDE.md
 .kiro*
+data/web/downloads/
 
 # Test coverage
 .coverage

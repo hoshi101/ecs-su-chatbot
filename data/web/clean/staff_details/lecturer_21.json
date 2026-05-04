@@ -1,0 +1,21 @@
+{
+  "kind": "staff_detail",
+  "title": "อาจารย์ ดร.พลอยบุศรา โกมาสังข์",
+  "source_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=21&Type=Lecturer",
+  "category": "faculty",
+  "scraped_at": "2026-03-27T05:01:13.478198+00:00",
+  "name": "อาจารย์ ดร.พลอยบุศรา โกมาสังข์",
+  "position": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+  "email": "gomasang_p@su.ac.th",
+  "phone": "",
+  "research_interests": "Electrical measurement and Instrument, Nanoelectronic technology, Nanocarbon materials, Semiconductor, Magnetic recording head technology, Micromagnetics analysis",
+  "education": [
+    "ปริญญาตรี วศ.บ. วิศวกรรมไฟฟ้าสื่อสารและอิเล็กทรอนิกส์ (เกียรตินิยมอันดับ 1) มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2557",
+    "ปริญญาโท M.Eng. Electrical Engineering and Computer Science Shibaura Institute of Technology, Japan ปีที่จบการศึกษา 2017 วศ.ม. วิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2560",
+    "ปริญญาเอก Ph.D. Functional Control Systems in the field of Electrical and Computer Engineering Shibaura Institute of Technology, Japan ปีที่จบการศึกษา 2020"
+  ],
+  "research_publications": [
+    "ระดับนานาชาติ [1.] P. Gomasang, S. Nakajima, and K. Ueno (2021). “Nitrogen-doped amorphous carbon coating on copper pads for direct wire bonding with a long-term humidity reliability,” Japanese Journal of Applied Physics. Vol. 60, No.SCCD03, (2021): 1-4. (ฐานข้อมูล SCOPUS) [2.] T. Murota, T. Mimura, P. Gomasang, S. Yokogawa, and K. Ueno, (2020). “Humidity reliability of commercial flash memories for long-term storage,”Japanese Journal of Applied Physics. Vol.59 No.SLLC01 (2020): 1-4. (ฐานข้อมูล SCOPUS) [3.] P. Gomasang and K. Ueno (2020) “Application of nitrogen-doped amorphous carbon coating for copper pads in preventing moisture and direct wire bonding,” In proceeding of 33rd International Microprocesses and Nanotechnology Conference (MNC), November 2020: 2020-21-1."
+  ],
+  "markdown": "# อาจารย์ ดร.พลอยบุศรา โกมาสังข์\n\nSource URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=21&Type=Lecturer\n\n- Position: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: gomasang_p@su.ac.th\n- Research Interests: Electrical measurement and Instrument, Nanoelectronic technology, Nanocarbon materials, Semiconductor, Magnetic recording head technology, Micromagnetics analysis\n\n## Education\n\n- ปริญญาตรี วศ.บ. วิศวกรรมไฟฟ้าสื่อสารและอิเล็กทรอนิกส์ (เกียรตินิยมอันดับ 1) มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2557\n- ปริญญาโท M.Eng. Electrical Engineering and Computer Science Shibaura Institute of Technology, Japan ปีที่จบการศึกษา 2017 วศ.ม. วิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2560\n- ปริญญาเอก Ph.D. Functional Control Systems in the field of Electrical and Computer Engineering Shibaura Institute of Technology, Japan ปีที่จบการศึกษา 2020\n\n## Research Publications\n\n- ระดับนานาชาติ [1.] P. Gomasang, S. Nakajima, and K. Ueno (2021). “Nitrogen-doped amorphous carbon coating on copper pads for direct wire bonding with a long-term humidity reliability,” Japanese Journal of Applied Physics. Vol. 60, No.SCCD03, (2021): 1-4. (ฐานข้อมูล SCOPUS) [2.] T. Murota, T. Mimura, P. Gomasang, S. Yokogawa, and K. Ueno, (2020). “Humidity reliability of commercial flash memories for long-term storage,”Japanese Journal of Applied Physics. Vol.59 No.SLLC01 (2020): 1-4. (ฐานข้อมูล SCOPUS) [3.] P. Gomasang and K. Ueno (2020) “Application of nitrogen-doped amorphous carbon coating for copper pads in preventing moisture and direct wire bonding,” In proceeding of 33rd International Microprocesses and Nanotechnology Conference (MNC), November 2020: 2020-21-1.\n"
+}

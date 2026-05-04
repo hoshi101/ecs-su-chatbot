@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Document Processing Script for FSS Hero Chatbot
-Processes all documents from data/ folder and stores in Qdrant vector database.
+Document Processing Script for the department support chatbot.
+Processes curated documents from the data/ folder and stores them in the Qdrant vector database.
 Run this once before starting the chat application.
 
 Usage:
@@ -59,6 +59,25 @@ def init_qdrant():
 processor = DocumentProcessor()
 
 
+def should_process_file(file_path: str) -> bool:
+    """
+    Keep ingestion focused on curated content and avoid raw scrape artifacts.
+    """
+    path = Path(file_path)
+    path_str = path.as_posix()
+
+    if "/raw/" in path_str:
+        return False
+
+    if path.name == "index.json":
+        return False
+
+    if "/data/web/clean/" in path_str and path.suffix.lower() == ".json":
+        return False
+
+    return True
+
+
 def process_all_documents(data_path: str = None) -> List:
     """Process all documents in the data folder using DocumentProcessor."""
     data_path = data_path or DOC_SOURCE_DIR
@@ -74,6 +93,9 @@ def process_all_documents(data_path: str = None) -> List:
     for root, _, files in os.walk(data_path):
         for file in files:
             if file.lower().endswith(supported_extensions):
+                file_path = os.path.join(root, file)
+                if not should_process_file(file_path):
+                    continue
                 total_files += 1
 
     if total_files == 0:
@@ -90,6 +112,8 @@ def process_all_documents(data_path: str = None) -> List:
                 continue
 
             file_path = os.path.join(root, file)
+            if not should_process_file(file_path):
+                continue
             print(f"📄 Processing: {file}")
 
             try:
@@ -138,7 +162,7 @@ def create_collection_if_needed(client, collection_name: str):
 
 def main():
     """Main processing function."""
-    print("🚀 Starting FSS Hero Chatbot document processing...")
+    print("🚀 Starting department support chatbot document processing...")
     print("=" * 60)
 
     try:

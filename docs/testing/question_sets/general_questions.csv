@@ -1,0 +1,11 @@
+id,category,subcategory,expected_route,query,expected_keywords,reference_source,notes
+G01,general,greeting,answer,สวัสดีครับ,"สวัสดี; ผู้ช่วยข้อมูล; ภาควิชาวิศวกรรมไฟฟ้า",SESSION_MANAGEMENT.md,ทดสอบ greeting ภาษาไทย
+G02,general,greeting,answer,สวัสดี ช่วยตอบคำถามให้หน่อยได้ไหม,"สวัสดี; ข้อมูลภาควิชา; ช่วยเหลือ",SESSION_MANAGEMENT.md,ทดสอบ greeting แบบไม่เป็นทางการ
+G03,general,capability,answer,ช่วยอะไรได้บ้าง,"หลักสูตร; อาจารย์; บุคลากร; ข้อมูลติดต่อ",SESSION_MANAGEMENT.md,ทดสอบการอธิบายขอบเขตระบบ
+G04,general,capability,answer,แชตบอทนี้ตอบเรื่องอะไรได้บ้าง,"หลักสูตร; ภาควิชา; อาจารย์; ติดต่อ",README.md,ทดสอบข้อความ capability
+G05,general,language,answer,ตอบเป็นภาษาไทยได้ไหม,"ภาษาไทย; ค่าเริ่มต้น; รองรับ",SESSION_MANAGEMENT.md,ทดสอบ default language
+G06,general,language,answer,Can you answer in English if needed?,"English; Thai; bilingual",SESSION_MANAGEMENT.md,ทดสอบ bilingual support
+G07,general,scope,answer,ข้อมูลของแชตบอทนี้อ้างอิงจากอะไร,"ข้อมูลทางการ; local data; เว็บไซต์ภาควิชา",README.md,ทดสอบการอธิบายแหล่งข้อมูล
+G08,general,scope,answer,ถ้าข้อมูลไม่มีในระบบจะทำยังไง,"ไม่เดา; ปฏิเสธ; fallback",SESSION_MANAGEMENT.md,ทดสอบ behavior เมื่อข้อมูลไม่พอ
+G09,general,usage,answer,อยากถามเรื่องอาจารย์ต้องถามแบบไหน,"ชื่ออาจารย์; ตำแหน่ง; อีเมล",docs/testing/question_sets/lecturer_questions.csv,ทดสอบ guidance การใช้งาน
+G10,general,usage,answer,ฉันจะถามข้อมูลติดต่อภาควิชาได้ใช่ไหม,"ที่อยู่; โทรศัพท์; Facebook; เว็บไซต์",docs/testing/question_sets/contact_questions.csv,ทดสอบการชี้นำไปยังหมวดติดต่อ

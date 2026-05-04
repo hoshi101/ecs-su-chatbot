@@ -21,25 +21,38 @@ EMBED_DIMENSIONS = 1024  # BGE-M3 embedding dimensions
 
 # === EXISTING: Paths ===
 DOC_SOURCE_DIR = os.getenv("DOC_SOURCE_DIR", "data")
+WEB_CONTENT_DIR = os.getenv("WEB_CONTENT_DIR", "data/web/clean")
 
-# === NEW: HERO Bot Domain-Specific Configuration ===
-DOMAIN_NAME = os.getenv("DOMAIN_NAME", "Finansia Hero Trading Platform")
-BOT_NAME = os.getenv("BOT_NAME", "HERO Bot")
-SEARCH_DOMAINS = os.getenv("SEARCH_DOMAINS", "www.finansiahero.com,smartaccess.fnsyrus.com/open-board/").split(',')
+# === Department Domain Configuration ===
+DOMAIN_NAME = os.getenv("DOMAIN_NAME", "Department of Electrical Engineering, Silpakorn University")
+BOT_NAME = os.getenv("BOT_NAME", "EE Support Assistant")
+DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "th")
+SEARCH_DOMAINS = [
+    domain.strip()
+    for domain in os.getenv("SEARCH_DOMAINS", "ee-eng.su.ac.th,eng2.su.ac.th").split(",")
+    if domain.strip()
+]
+FACULTY_CONTACT_TEXT = os.getenv(
+    "FACULTY_CONTACT_TEXT",
+    "โทรศัพท์ 034-219364-66 ต่อ 25520, 089-979-7911, โทรศัพท์/โทรสาร 034-241971, Facebook: Department of Electrical Engineering - Silpakorn University"
+)
+SENSITIVE_TOPIC_POLICY = os.getenv(
+    "SENSITIVE_TOPIC_POLICY",
+    "Do not provide personal or sensitive information that is not clearly available in official public sources."
+)
 
-# HERO Bot Specialization Areas (identical to original HERO Bot)
 SPECIALTY_AREAS = [
-    "Platform features and navigation",
-    "Trading tools and order management",
-    "Technical analysis and charting",
-    "Account management and settings",
-    "Risk management and trading strategies",
-    "Troubleshooting platform issues"
+    "Curriculum and degree program information",
+    "Course information and prerequisite guidance",
+    "Lecturer and staff directory information from official sources",
+    "Academic regulations, forms, and department procedures",
+    "Internship, cooperative education, and student services",
+    "Department contact information and general guidance"
 ]
 
-# HERO Bot Response Settings
+# Response Settings
 DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("DEFAULT_SIMILARITY_THRESHOLD", "0.7"))
-FINANCIAL_TEMPERATURE = float(os.getenv("FINANCIAL_TEMPERATURE", "0.3"))
+FINANCIAL_TEMPERATURE = float(os.getenv("FINANCIAL_TEMPERATURE", "0.2"))
 ENABLE_QUERY_ENHANCEMENT = os.getenv("ENABLE_QUERY_ENHANCEMENT", "true").lower() == "true"
 
 # === NEW: Document Processing Configuration ===

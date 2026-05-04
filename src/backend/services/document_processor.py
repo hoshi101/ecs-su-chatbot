@@ -83,6 +83,7 @@ class DocumentProcessor:
 
         file_ext = Path(file_path).suffix.lower().lstrip('.')
         file_name = os.path.basename(file_path)
+        derived_metadata = self._derive_metadata_from_path(file_path)
 
         # Base metadata
         base_metadata = {
@@ -90,8 +91,9 @@ class DocumentProcessor:
             "source_type": file_ext,
             "upload_source": source,
             "timestamp": datetime.now().isoformat(),
-            "file_path": file_path
+            "file_path": file_path,
         }
+        base_metadata.update(derived_metadata)
 
         try:
             # Process based on file type
@@ -368,6 +370,29 @@ class DocumentProcessor:
         """
         file_ext = Path(file_path).suffix.lower().lstrip('.')
         return file_ext in self.supported_formats
+
+    def _derive_metadata_from_path(self, file_path: str) -> Dict[str, Any]:
+        path = Path(file_path)
+        normalized = path.as_posix().lower()
+        stem = path.stem
+
+        category = "general"
+        if "staff_details" in normalized or "lecturer" in normalized:
+            category = "faculty"
+        elif "support_staff" in normalized or "officials" in normalized:
+            category = "staff"
+        elif "program" in normalized or "หลักสูตร" in normalized:
+            category = "academic"
+        elif "contact" in normalized:
+            category = "contact"
+        elif "regulation" in normalized or "ระเบียบ" in normalized:
+            category = "policy"
+
+        title = stem.replace("_", " ").strip()
+        return {
+            "document_category": category,
+            "title": title,
+        }
 
 
 # Global instance for use across the application

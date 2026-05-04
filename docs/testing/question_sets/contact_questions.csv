@@ -1,0 +1,11 @@
+id,category,subcategory,expected_route,query,expected_keywords,reference_source,notes
+C01,contact,address,rag,ภาควิชาวิศวกรรมไฟฟ้าตั้งอยู่ที่ไหน,"มหาวิทยาลัยศิลปากร; พระราชวังสนามจันทร์; นครปฐม",data/web/clean/department_contact.md,ทดสอบที่ตั้งภาควิชา
+C02,contact,address,rag,ที่อยู่ของภาควิชาคืออะไร,"เลขที่ 6 ถ.ราชมรรคาใน; ต.พระปฐมเจดีย์; อ.เมือง; จ.นครปฐม 73000",data/web/clean/department_contact.md,ทดสอบที่อยู่แบบละเอียด
+C03,contact,phone,rag,เบอร์ติดต่อภาควิชามีเบอร์อะไรบ้าง,"034-219364-66 ต่อ 25520; 089-979-7911; 034-241971",data/web/clean/department_contact.md,ทดสอบหลายหมายเลขในคำตอบเดียว
+C04,contact,social,rag,ภาควิชามี Facebook ไหม,"Department of Electrical Engineering - Silpakorn University; Facebook",data/web/clean/department_contact.md,ทดสอบช่องทางออนไลน์
+C05,contact,location,rag,สำนักงานภาควิชาอยู่ชั้นไหน,"ชั้น 5; อาคารคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม",data/web/clean/faculty_department_overview.md,ทดสอบตำแหน่งสำนักงาน
+C06,contact,email,rag,คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรมใช้อีเมลอะไร,"fac-en@silpakorn.edu",data/web/clean/faculty_department_overview.md,ทดสอบอีเมลระดับคณะ
+C07,contact,website,rag,เว็บไซต์ภาควิชาคืออะไร,"https://ee-eng.su.ac.th/",data/web/clean/faculty_department_overview.md,ทดสอบ URL เว็บไซต์ภาควิชา
+C08,contact,facebook,rag,Facebook ของภาควิชาจากหน้า faculty คืออะไร,"http://www.facebook.com/ElectricalEngineeringSilpakornUniversity",data/web/clean/faculty_department_overview.md,ทดสอบลิงก์ Facebook จากหน้า faculty
+C09,contact,phone,rag,เบอร์โทรสำนักงานภาควิชาจากหน้า faculty คืออะไร,"034 109686 ต่อ 209550; 034-241971",data/web/clean/faculty_department_overview.md,ทดสอบข้อมูลติดต่อจากหน้า faculty
+C10,contact,fax,rag,เบอร์โทรสารของภาควิชาหรือคณะคืออะไร,"034-241971; 034-109686 ต่อ 209009",data/web/clean/faculty_department_overview.md,ทดสอบข้อมูลโทรสาร

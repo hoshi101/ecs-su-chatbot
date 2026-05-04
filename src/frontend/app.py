@@ -29,7 +29,7 @@ def main():
     # Render main UI sections
     display_header()
 
-    st.header("Chat with HERO Bot")
+    st.header("Chat with the Department Assistant")
     display_chat_history()
 
     # Display query enhancement and source documents from previous interaction
@@ -42,7 +42,7 @@ def main():
         force_web_search = render_force_web_search_toggle()
 
     # User input field
-    if prompt := st.chat_input("Your message"):
+    if prompt := st.chat_input("Ask about curriculum, lecturers, regulations, or department contact information"):
         # Add user's message to chat history and display immediately
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -50,7 +50,7 @@ def main():
 
         # Display assistant's response and trace
         with st.chat_message("assistant"):
-            with st.spinner("HERO Bot is thinking..."):
+            with st.spinner("Assistant is preparing an answer..."):
                 try:
                     # Call the backend API for chat with enhanced parameters
                     agent_response, trace_events, enhancement_info, source_docs = chat_with_backend_agent(

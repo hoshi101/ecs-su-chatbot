@@ -1,4 +1,3 @@
-import os
 from typing import List, Dict, Any
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
@@ -9,6 +8,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Import configuration - Updated for new structure
 from src.backend.core.config import QDRANT_API_KEY, QDRANT_URL, QDRANT_COLLECTION_NAME, EMBED_MODEL, EMBED_DIMENSIONS
+from src.backend.utils.logging_utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class BGEEmbedder(Embeddings):
@@ -17,13 +19,13 @@ class BGEEmbedder(Embeddings):
     def __init__(self, model_name: str = None):
         """Initialize BGE-M3 embeddings model."""
         model_name = model_name or EMBED_MODEL
-        print(f"🤖 Loading BGE-M3 model: {model_name}")
+        logger.info("Loading BGE-M3 model | model_name=%s", model_name)
         self.embeddings = HuggingFaceEmbeddings(
             model_name=model_name,
             model_kwargs={'device': 'cpu'},  # Use CPU for compatibility
             encode_kwargs={'normalize_embeddings': True}  # Normalize for better retrieval
         )
-        print("✅ BGE-M3 model loaded successfully")
+        logger.info("BGE-M3 model loaded successfully")
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embed a list of documents."""
@@ -61,7 +63,7 @@ def get_retriever():
         collection_names = [c.name for c in collections.collections]
 
         if QDRANT_COLLECTION_NAME not in collection_names:
-            print(f"Creating new Qdrant collection: {QDRANT_COLLECTION_NAME}...")
+            logger.info("Creating Qdrant collection | collection=%s", QDRANT_COLLECTION_NAME)
             client.create_collection(
                 collection_name=QDRANT_COLLECTION_NAME,
                 vectors_config=VectorParams(
@@ -69,11 +71,11 @@ def get_retriever():
                     distance=Distance.COSINE
                 )
             )
-            print(f"Created new Qdrant collection: {QDRANT_COLLECTION_NAME}")
+            logger.info("Created Qdrant collection | collection=%s", QDRANT_COLLECTION_NAME)
         else:
-            print(f"Using existing Qdrant collection: {QDRANT_COLLECTION_NAME}")
+            logger.info("Using existing Qdrant collection | collection=%s", QDRANT_COLLECTION_NAME)
     except Exception as e:
-        print(f"Warning: Could not verify/create collection: {str(e)}")
+        logger.warning("Could not verify/create collection | collection=%s | error=%s", QDRANT_COLLECTION_NAME, e)
 
     # Initialize vector store
     vectorstore = QdrantVectorStore(
@@ -83,6 +85,41 @@ def get_retriever():
     )
 
     return vectorstore.as_retriever()
+
+
+def retrieve_documents(
+    query: str,
+    *,
+    top_k: int = 5,
+    similarity_threshold: float | None = None
+) -> List[Dict[str, Any]]:
+    """
+    Retrieve documents with metadata and similarity scores for UI/debug usage.
+    """
+    client = _get_qdrant_client()
+    vectorstore = QdrantVectorStore(
+        client=client,
+        collection_name=QDRANT_COLLECTION_NAME,
+        embedding=embeddings
+    )
+
+    search_results = vectorstore.similarity_search_with_score(query, k=top_k)
+    documents: List[Dict[str, Any]] = []
+    for doc, score in search_results:
+        score_value = float(score) if score is not None else None
+        if similarity_threshold is not None and score_value is not None and score_value > similarity_threshold:
+            # Qdrant returns distance-like scores in this setup; keep looser filtering here and let caller judge sufficiency.
+            pass
+
+        documents.append(
+            {
+                "content": doc.page_content,
+                "score": score_value,
+                "metadata": doc.metadata,
+            }
+        )
+
+    return documents
 
 
 # --- Function to add documents to the vector store (Compatible with existing interface) ---
@@ -103,7 +140,7 @@ def add_document_to_vectorstore(text_content: str):
     # Create Langchain Document objects from the raw text
     documents = text_splitter.create_documents([text_content])
 
-    print(f"Splitting document into {len(documents)} chunks for indexing...")
+    logger.info("Splitting document into chunks | total_chunks=%s", len(documents))
 
     # Get the vectorstore instance
     client = _get_qdrant_client()
@@ -115,7 +152,7 @@ def add_document_to_vectorstore(text_content: str):
 
     # Add documents to the vector store
     vectorstore.add_documents(documents)
-    print(f"Successfully added {len(documents)} chunks to Qdrant collection '{QDRANT_COLLECTION_NAME}'.")
+    logger.info("Added document chunks to Qdrant | total_chunks=%s | collection=%s", len(documents), QDRANT_COLLECTION_NAME)
 
 
 # --- Additional utility function for batch processing ---
@@ -131,17 +168,17 @@ def add_documents_batch(documents: List, batch_size: int = 100):
     )
 
     total_docs = len(documents)
-    print(f"📤 Uploading {total_docs} documents to Qdrant in batches of {batch_size}...")
+    logger.info("Uploading documents to Qdrant | total_docs=%s | batch_size=%s", total_docs, batch_size)
 
     for i in range(0, total_docs, batch_size):
         batch = documents[i:i + batch_size]
         batch_num = (i // batch_size) + 1
         total_batches = (total_docs + batch_size - 1) // batch_size
 
-        print(f"📤 Uploading batch {batch_num}/{total_batches} ({len(batch)} documents)...")
+        logger.info("Uploading batch | batch_num=%s | total_batches=%s | batch_docs=%s", batch_num, total_batches, len(batch))
         vectorstore.add_documents(batch)
 
-    print("✅ All documents uploaded successfully!")
+    logger.info("All document batches uploaded successfully")
 
 
 # --- Document Management Functions ---
@@ -196,11 +233,11 @@ def get_documents_by_metadata(filters: Dict[str, Any]) -> List[Dict]:
             }
             documents.append(doc_info)
 
-        print(f"✅ Retrieved {len(documents)} documents matching filters: {filters}")
+        logger.info("Retrieved documents by metadata | total=%s | filters=%s", len(documents), filters)
         return documents
 
     except Exception as e:
-        print(f"❌ Error querying documents: {str(e)}")
+        logger.exception("Error querying documents | filters=%s", filters)
         raise Exception(f"Failed to query documents: {str(e)}")
 
 

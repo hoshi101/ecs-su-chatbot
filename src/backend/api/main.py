@@ -2,6 +2,7 @@ import os
 import time
 from typing import List, Dict, Any, Optional
 import uuid
+import traceback
 
 from fastapi import FastAPI, HTTPException, status, UploadFile, File, Query, Request
 from pydantic import BaseModel, Field
@@ -28,14 +29,21 @@ from src.backend.core.config import (
     GOOGLE_API_KEY,
     TAVILY_API_KEY,
     RATE_LIMIT_ENABLED,
-    RATE_LIMIT_PER_MINUTE
+    RATE_LIMIT_PER_MINUTE,
+    BOT_NAME,
+    DOMAIN_NAME,
+    SEARCH_DOMAINS,
 )
 from langchain_qdrant import QdrantVectorStore
+from src.backend.utils.logging_utils import get_logger, setup_logging
+
+setup_logging()
+logger = get_logger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="HERO Bot RAG Agent API",
-    description="API for HERO Bot - Finansia Hero Trading Platform assistant powered by Qdrant, Gemini, and BGE-M3.",
+    title="EE Support Assistant API",
+    description="API for the Electrical Engineering Department support chatbot powered by Qdrant, Gemini, and BGE-M3.",
     version="2.0.0",
 )
 
@@ -428,10 +436,13 @@ async def chat_with_agent(request: Request, body: QueryRequest):
 
         final_message = ""
 
-        print(f"--- Starting Agent Stream for session {body.session_id} ---")
-        print(f"Web Search Enabled: {body.enable_web_search}") # For server-side debugging
-        print(f"Force Web Search: {body.force_web_search}") # For server-side debugging
-        print(f"Similarity Threshold: {body.similarity_threshold}") # For server-side debugging
+        logger.info(
+            "Starting agent stream | session_id=%s | web_search=%s | force_web_search=%s | similarity_threshold=%s",
+            body.session_id,
+            body.enable_web_search,
+            body.force_web_search,
+            body.similarity_threshold,
+        )
 
         for i, s in enumerate(rag_agent.stream(inputs, config=config)):
             current_node_name = None
@@ -450,23 +461,20 @@ async def chat_with_agent(request: Request, body: QueryRequest):
 
             if current_node_name == "router":
                 route_decision = node_output_state.get('route')
-                # Check for overridden route if web search was disabled
                 initial_decision = node_output_state.get('initial_router_decision', route_decision)
                 override_reason = node_output_state.get('router_override_reason', None)
-
-                # NEW: HERO Bot Query Enhancement Information
                 original_query = node_output_state.get('original_query', body.query)
                 enhanced_query = node_output_state.get('enhanced_query', body.query)
                 query_enhanced = enhanced_query != original_query and node_output_state.get('query_enhancement_enabled', False)
 
                 if query_enhanced:
-                    event_description = f"HERO Bot enhanced query and decided: '{route_decision}'"
+                    event_description = f"Query was refined for retrieval and routed to '{route_decision}'."
                     event_details = {
                         "decision": route_decision,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": True,
-                        "reason": "Query enhanced for better trading platform search"
+                        "reason": "Query was clarified for department knowledge base search"
                     }
                 elif override_reason:
                     event_description = f"Router initially decided: '{initial_decision}'. Overridden to: '{route_decision}' because {override_reason}."
@@ -479,68 +487,86 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "query_enhanced": query_enhanced
                     }
                 else:
-                    event_description = f"HERO Bot router decided: '{route_decision}'"
+                    event_description = f"Router decided to use '{route_decision}'."
                     event_details = {
                         "decision": route_decision,
-                        "reason": "Based on Finansia Hero trading platform analysis",
+                        "reason": "Based on department information routing policy",
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": query_enhanced
                     }
-                event_type = "hero_bot_routing"
+                event_type = "routing"
             elif current_node_name == "rag_lookup":
                 rag_content_summary = node_output_state.get("rag", "")[:200] + "..."
                 rag_sufficient = node_output_state.get("route") == "answer"
                 enhanced_query = node_output_state.get("enhanced_query", "")
+                retrieved_docs = []
+                for doc in node_output_state.get("rag_documents", []):
+                    metadata = doc.get("metadata", {})
+                    title = metadata.get("title") or metadata.get("file_name") or "Knowledge Base Document"
+                    if str(title).lower().startswith("lecturer "):
+                        first_line = doc.get("content", "").splitlines()[0].strip("# ").strip()
+                        if first_line:
+                            title = first_line
+                    retrieved_docs.append({
+                        "title": title,
+                        "content": doc.get("content", ""),
+                        "score": doc.get("score"),
+                        "source": metadata.get("file_path") or metadata.get("document_category") or metadata.get("source_type") or "Internal KB"
+                    })
 
                 if rag_sufficient:
-                    event_description = f"📚 Found relevant Finansia Hero platform documentation. Proceeding to answer."
+                    event_description = "Found sufficient department knowledge base content."
                     event_details = {
                         "retrieved_content_summary": rag_content_summary,
-                        "sufficiency_verdict": "Sufficient for trading platform question",
+                        "sufficiency_verdict": "Sufficient for department question",
                         "enhanced_query": enhanced_query,
-                        "search_type": "Platform Documentation Search"
+                        "search_type": "Department Knowledge Base Search",
+                        "retrieved_documents": retrieved_docs
                     }
                 else:
-                    event_description = f"📚 Platform docs found but not sufficient. Searching external trading resources."
+                    event_description = "Knowledge base content was incomplete. Proceeding to official website search."
                     event_details = {
                         "retrieved_content_summary": rag_content_summary,
-                        "sufficiency_verdict": "Not sufficient - needs external resources",
+                        "sufficiency_verdict": "Not sufficient - trying official website search",
                         "enhanced_query": enhanced_query,
-                        "search_type": "Platform Documentation Search"
+                        "search_type": "Department Knowledge Base Search",
+                        "retrieved_documents": retrieved_docs
                     }
 
-                event_type = "hero_bot_rag_search"
+                event_type = "rag_search"
             elif current_node_name == "web_search":
                 web_content_summary = node_output_state.get("web", "")[:200] + "..."
                 enhanced_query = node_output_state.get("enhanced_query", "")
+                web_results = node_output_state.get("web_results", [])
 
-                if web_content_summary.startswith("Web search was disabled"):
-                    event_description = f"🌐 Web search disabled by user. Using available information."
+                if not web_results and not web_content_summary.strip():
+                    event_description = "Official website search was unavailable or returned no usable result."
                     event_details = {
-                        "search_status": "disabled",
+                        "search_status": "empty",
                         "enhanced_query": enhanced_query,
-                        "message": "External trading resource search was disabled by user preference"
+                        "message": "No additional official website result was available"
                     }
                 else:
-                    event_description = f"🌐 Searched external trading resources. Results found from trusted financial sources."
+                    event_description = "Searched official department/faculty websites for supporting information."
                     event_details = {
                         "retrieved_content_summary": web_content_summary,
                         "enhanced_query": enhanced_query,
-                        "search_domains": "www.finansiahero.com, smartaccess.fnsyrus.com",
-                        "search_type": "External Trading Resources"
+                        "search_domains": ", ".join(SEARCH_DOMAINS),
+                        "search_type": "Official Website Search",
+                        "search_results": web_results
                     }
-                event_type = "hero_bot_web_search"
+                event_type = "web_search"
             elif current_node_name == "answer":
                 enhanced_query = node_output_state.get("enhanced_query", "")
-                event_description = "🤖 HERO Bot generating specialized trading platform response."
+                event_description = "Generating the final department support response."
                 event_details = {
-                    "bot_name": "HERO Bot",
-                    "specialization": "Finansia Hero Trading Platform Assistant",
+                    "bot_name": BOT_NAME,
+                    "specialization": DOMAIN_NAME,
                     "enhanced_query": enhanced_query,
-                    "response_type": "Trading Platform Specialized Response"
+                    "response_type": "Department Information Response"
                 }
-                event_type = "hero_bot_response_generation"
+                event_type = "response_generation"
             elif current_node_name == "__end__":
                 event_description = "Agent process completed."
                 event_type = "process_end"
@@ -554,7 +580,13 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_type=event_type
                 )
             )
-            print(f"Streamed Event: Step {i+1} - Node: {current_node_name} - Desc: {event_description}")
+            logger.info(
+                "Streamed event | session_id=%s | step=%s | node=%s | description=%s",
+                body.session_id,
+                i + 1,
+                current_node_name,
+                event_description,
+            )
 
         # Get the final state from the last yielded item in the stream
         final_actual_state_dict = None
@@ -572,18 +604,17 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     break
 
         if not final_message:
-             print("Agent finished, but no final AIMessage found in the final state after stream completion.")
+             logger.error("Agent finished without final AIMessage | session_id=%s", body.session_id)
              raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Agent did not return a valid response (final AI message not found).")
 
-        print(f"--- Agent Stream Ended. Final Response: {final_message[:200]}... ---")
+        logger.info("Agent stream completed | session_id=%s | response_preview=%s", body.session_id, final_message[:200])
 
         return AgentResponse(response=final_message, trace_events=trace_events_for_frontend)
 
     except Exception as e:
-        import traceback
         traceback.print_exc()
         error_details = f"Error during agent invocation: {e}"
-        print(error_details)
+        logger.exception("%s | session_id=%s", error_details, body.session_id)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
 
 
@@ -621,9 +652,12 @@ async def test_retrieval(request: RetrievalTestRequest):
             "return_metadata": true
         }
     """
-    print(f"\n--- Retrieval Test Started ---")
-    print(f"Query: {request.query}")
-    print(f"Parameters: threshold={request.similarity_threshold}, top_k={request.top_k}")
+    logger.info(
+        "Retrieval test started | query=%s | threshold=%s | top_k=%s",
+        request.query,
+        request.similarity_threshold,
+        request.top_k,
+    )
 
     try:
         start_time = time.time()
@@ -635,13 +669,13 @@ async def test_retrieval(request: RetrievalTestRequest):
         if ENABLE_QUERY_ENHANCEMENT:
             try:
                 enhanced_query = enhance_query_hero_bot_style(original_query)
-                print(f"Query enhanced: '{original_query}' -> '{enhanced_query}'")
+                logger.info("Query enhanced | original=%s | enhanced=%s", original_query, enhanced_query)
             except Exception as e:
-                print(f"Query enhancement failed: {e}")
+                logger.warning("Query enhancement failed | error=%s", e)
                 enhanced_query = original_query
         else:
             enhanced_query = original_query
-            print("Query enhancement disabled")
+            logger.info("Query enhancement disabled")
 
         # Use enhanced query for retrieval
         query_to_use = enhanced_query if enhanced_query else original_query
@@ -685,10 +719,10 @@ async def test_retrieval(request: RetrievalTestRequest):
 
             retrieval_latency = (time.time() - retrieval_start) * 1000
 
-            print(f"Retrieved {len(documents)} documents in {retrieval_latency:.2f}ms")
+            logger.info("Retrieval test completed | results=%s | latency_ms=%.2f", len(documents), retrieval_latency)
 
         except Exception as e:
-            print(f"Retrieval error: {e}")
+            logger.exception("Retrieval error | query=%s", query_to_use)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Retrieval failed: {str(e)}"
@@ -714,12 +748,12 @@ async def test_retrieval(request: RetrievalTestRequest):
         try:
             collection_stats = get_collection_stats()
         except Exception as e:
-            print(f"Warning: Could not get collection stats: {e}")
+            logger.warning("Could not get collection stats | error=%s", e)
             collection_stats = {"error": str(e)}
 
         total_time = (time.time() - start_time) * 1000
 
-        print(f"--- Retrieval Test Completed in {total_time:.2f}ms ---")
+        logger.info("Retrieval test request finished | total_time_ms=%.2f", total_time)
 
         return RetrievalTestResponse(
             original_query=original_query,
@@ -740,9 +774,8 @@ async def test_retrieval(request: RetrievalTestRequest):
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
         traceback.print_exc()
-        print(f"Retrieval test error: {e}")
+        logger.exception("Retrieval test failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Retrieval test failed: {str(e)}"
@@ -777,7 +810,7 @@ async def detailed_health_check():
     Example:
         GET /health/detailed
     """
-    print("\n--- Detailed Health Check Started ---")
+    logger.info("Detailed health check started")
 
     from datetime import datetime
     timestamp = datetime.now().isoformat()
@@ -788,7 +821,7 @@ async def detailed_health_check():
     non_critical_failures = 0
 
     # 1. Check Qdrant connection and collection
-    print("Checking Qdrant...")
+    logger.info("Checking Qdrant")
     try:
         start = time.time()
         client = _get_qdrant_client()
@@ -807,7 +840,7 @@ async def detailed_health_check():
                 latency_ms=round(latency, 2),
                 details=f"Collection '{QDRANT_COLLECTION_NAME}' found with {collection_info.points_count} documents"
             ))
-            print(f"✓ Qdrant healthy ({latency:.2f}ms)")
+            logger.info("Qdrant healthy | latency_ms=%.2f", latency)
         else:
             latency = (time.time() - start) * 1000
             components.append(ComponentHealth(
@@ -818,7 +851,7 @@ async def detailed_health_check():
                 error="Collection needs to be created"
             ))
             non_critical_failures += 1
-            print(f"⚠ Qdrant degraded: collection not found")
+            logger.warning("Qdrant degraded | collection=%s not found", QDRANT_COLLECTION_NAME)
 
     except Exception as e:
         components.append(ComponentHealth(
@@ -828,10 +861,10 @@ async def detailed_health_check():
             error=str(e)
         ))
         critical_failures += 1
-        print(f"✗ Qdrant unhealthy: {e}")
+        logger.exception("Qdrant unhealthy")
 
     # 2. Test BGE-M3 embedding generation
-    print("Checking BGE-M3 embeddings...")
+    logger.info("Checking BGE-M3 embeddings")
     try:
         start = time.time()
         test_text = "Testing embedding generation for health check"
@@ -845,7 +878,7 @@ async def detailed_health_check():
                 latency_ms=round(latency, 2),
                 details=f"Generated {len(embedding)}-dimensional embedding"
             ))
-            print(f"✓ BGE-M3 healthy ({latency:.2f}ms)")
+            logger.info("BGE-M3 healthy | latency_ms=%.2f", latency)
         else:
             components.append(ComponentHealth(
                 name="BGE-M3 Embeddings",
@@ -854,7 +887,7 @@ async def detailed_health_check():
                 error="Empty embedding vector"
             ))
             critical_failures += 1
-            print(f"✗ BGE-M3 unhealthy: empty embedding")
+            logger.error("BGE-M3 unhealthy | empty embedding")
 
     except Exception as e:
         components.append(ComponentHealth(
@@ -864,10 +897,10 @@ async def detailed_health_check():
             error=str(e)
         ))
         critical_failures += 1
-        print(f"✗ BGE-M3 unhealthy: {e}")
+        logger.exception("BGE-M3 unhealthy")
 
     # 3. Verify Google Gemini API connectivity
-    print("Checking Google Gemini API...")
+    logger.info("Checking Google Gemini API")
     try:
         start = time.time()
         from langchain_google_genai import ChatGoogleGenerativeAI
@@ -889,7 +922,7 @@ async def detailed_health_check():
                 latency_ms=round(latency, 2),
                 details="Successfully connected to gemini-2.5-flash"
             ))
-            print(f"✓ Gemini healthy ({latency:.2f}ms)")
+            logger.info("Gemini healthy | latency_ms=%.2f", latency)
         else:
             components.append(ComponentHealth(
                 name="Google Gemini API",
@@ -899,7 +932,7 @@ async def detailed_health_check():
                 error="Empty response content"
             ))
             non_critical_failures += 1
-            print(f"⚠ Gemini degraded: empty response")
+            logger.warning("Gemini degraded | empty response")
 
     except Exception as e:
         components.append(ComponentHealth(
@@ -909,10 +942,10 @@ async def detailed_health_check():
             error=str(e)
         ))
         critical_failures += 1
-        print(f"✗ Gemini unhealthy: {e}")
+        logger.exception("Gemini unhealthy")
 
     # 4. Test Tavily web search (if configured)
-    print("Checking Tavily web search...")
+    logger.info("Checking Tavily web search")
     if TAVILY_API_KEY:
         try:
             start = time.time()
@@ -934,7 +967,7 @@ async def detailed_health_check():
                     latency_ms=round(latency, 2),
                     details="Successfully executed test search"
                 ))
-                print(f"✓ Tavily healthy ({latency:.2f}ms)")
+                logger.info("Tavily healthy | latency_ms=%.2f", latency)
             else:
                 components.append(ComponentHealth(
                     name="Tavily Web Search",
@@ -944,7 +977,7 @@ async def detailed_health_check():
                     error="Empty search results"
                 ))
                 non_critical_failures += 1
-                print(f"⚠ Tavily degraded: empty results")
+                logger.warning("Tavily degraded | empty results")
 
         except Exception as e:
             components.append(ComponentHealth(
@@ -954,7 +987,7 @@ async def detailed_health_check():
                 error=str(e)
             ))
             non_critical_failures += 1
-            print(f"⚠ Tavily degraded: {e}")
+            logger.warning("Tavily degraded | error=%s", e)
     else:
         components.append(ComponentHealth(
             name="Tavily Web Search",
@@ -963,10 +996,10 @@ async def detailed_health_check():
             error="TAVILY_API_KEY not set"
         ))
         non_critical_failures += 1
-        print(f"⚠ Tavily degraded: not configured")
+        logger.warning("Tavily degraded | not configured")
 
     # 5. Check DocumentProcessor initialization
-    print("Checking DocumentProcessor...")
+    logger.info("Checking DocumentProcessor")
     try:
         start = time.time()
 
@@ -982,7 +1015,7 @@ async def detailed_health_check():
                 latency_ms=round(latency, 2),
                 details=f"Initialized with {len(supported_formats)} supported formats, chunk_size={chunk_size}"
             ))
-            print(f"✓ DocumentProcessor healthy ({latency:.2f}ms)")
+            logger.info("DocumentProcessor healthy | latency_ms=%.2f", latency)
         else:
             components.append(ComponentHealth(
                 name="DocumentProcessor",
@@ -991,7 +1024,7 @@ async def detailed_health_check():
                 error="Processor instance is None"
             ))
             critical_failures += 1
-            print(f"✗ DocumentProcessor unhealthy: not initialized")
+            logger.error("DocumentProcessor unhealthy | not initialized")
 
     except Exception as e:
         components.append(ComponentHealth(
@@ -1001,7 +1034,7 @@ async def detailed_health_check():
             error=str(e)
         ))
         critical_failures += 1
-        print(f"✗ DocumentProcessor unhealthy: {e}")
+        logger.exception("DocumentProcessor unhealthy")
 
     # Determine overall status
     if critical_failures > 0:
@@ -1011,8 +1044,12 @@ async def detailed_health_check():
     else:
         overall_status = "healthy"
 
-    print(f"\n--- Health Check Complete: {overall_status.upper()} ---")
-    print(f"Critical failures: {critical_failures}, Non-critical failures: {non_critical_failures}")
+    logger.info(
+        "Health check complete | overall_status=%s | critical_failures=%s | non_critical_failures=%s",
+        overall_status,
+        critical_failures,
+        non_critical_failures,
+    )
 
     return SystemHealthResponse(
         overall_status=overall_status,
@@ -1056,19 +1093,18 @@ async def test_embeddings(request: EmbeddingTestRequest):
     Example 2 - Compare against reference:
         POST /debug/embedding-test
         {
-            "texts": ["Trading platform features", "Account management"],
-            "reference_text": "How to use the trading platform?",
+            "texts": ["Curriculum structure", "Course prerequisite information"],
+            "reference_text": "How can I find curriculum details for the department?",
             "compute_similarities": false
         }
     """
-    print(f"\n--- Embedding Test Started ---")
-    print(f"Testing {len(request.texts)} texts")
+    logger.info("Embedding test started | total_texts=%s", len(request.texts))
 
     try:
         start_time = time.time()
 
         # Step 1: Generate embeddings for all texts
-        print("Generating embeddings...")
+        logger.info("Generating embeddings")
         try:
             embedding_start = time.time()
             text_embeddings = []
@@ -1076,19 +1112,19 @@ async def test_embeddings(request: EmbeddingTestRequest):
             for idx, text in enumerate(request.texts):
                 embedding = embeddings.embed_query(text)
                 text_embeddings.append(embedding)
-                print(f"Generated embedding {idx+1}/{len(request.texts)}: {len(embedding)} dimensions")
+                logger.info("Generated embedding | index=%s | dimensions=%s", idx + 1, len(embedding))
 
             # Generate reference embedding if provided
             reference_embedding = None
             if request.reference_text:
                 reference_embedding = embeddings.embed_query(request.reference_text)
-                print(f"Generated reference embedding: {len(reference_embedding)} dimensions")
+                logger.info("Generated reference embedding | dimensions=%s", len(reference_embedding))
 
             embedding_time = (time.time() - embedding_start) * 1000
-            print(f"All embeddings generated in {embedding_time:.2f}ms")
+            logger.info("All embeddings generated | latency_ms=%.2f", embedding_time)
 
         except Exception as e:
-            print(f"Embedding generation error: {e}")
+            logger.exception("Embedding generation error")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to generate embeddings: {str(e)}"
@@ -1098,7 +1134,7 @@ async def test_embeddings(request: EmbeddingTestRequest):
         similarity_matrix = None
 
         if request.compute_similarities:
-            print("Computing similarity matrix...")
+            logger.info("Computing similarity matrix")
             try:
                 import numpy as np
 
@@ -1111,17 +1147,17 @@ async def test_embeddings(request: EmbeddingTestRequest):
                 normalized = embeddings_array / norms
                 similarity_matrix = np.dot(normalized, normalized.T).tolist()
 
-                print(f"Computed {len(similarity_matrix)}x{len(similarity_matrix)} similarity matrix")
+                logger.info("Computed similarity matrix | size=%sx%s", len(similarity_matrix), len(similarity_matrix))
 
             except Exception as e:
-                print(f"Similarity computation error: {e}")
+                logger.exception("Similarity computation error")
                 # Don't fail the entire request, just skip similarity matrix
                 similarity_matrix = None
 
         # Step 3: Compute similarity to reference if provided
         reference_similarities = []
         if reference_embedding:
-            print("Computing similarities to reference text...")
+            logger.info("Computing similarities to reference text")
             try:
                 import numpy as np
 
@@ -1136,10 +1172,10 @@ async def test_embeddings(request: EmbeddingTestRequest):
                     similarity = np.dot(ref_array, text_array) / (ref_norm * text_norm)
                     reference_similarities.append(float(similarity))
 
-                print(f"Computed {len(reference_similarities)} reference similarities")
+                logger.info("Computed reference similarities | total=%s", len(reference_similarities))
 
             except Exception as e:
-                print(f"Reference similarity computation error: {e}")
+                logger.exception("Reference similarity computation error")
                 reference_similarities = [None] * len(request.texts)
         else:
             reference_similarities = [None] * len(request.texts)
@@ -1157,7 +1193,7 @@ async def test_embeddings(request: EmbeddingTestRequest):
 
         total_time = (time.time() - start_time) * 1000
 
-        print(f"--- Embedding Test Completed in {total_time:.2f}ms ---")
+        logger.info("Embedding test completed | total_time_ms=%.2f", total_time)
 
         # Get embedding model name
         from src.backend.core.config import EMBED_MODEL
@@ -1173,9 +1209,8 @@ async def test_embeddings(request: EmbeddingTestRequest):
     except HTTPException:
         raise
     except Exception as e:
-        import traceback
         traceback.print_exc()
-        print(f"Embedding test error: {e}")
+        logger.exception("Embedding test failed")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Embedding test failed: {str(e)}"

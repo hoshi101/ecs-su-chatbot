@@ -1,0 +1,19 @@
+# อาจารย์ ดร.อรทัย วัชรกฤชกรณ์
+
+Source URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=16&Type=Lecturer
+
+- Position: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า
+- Email: watcharakitchak_o@su.ac.th
+- Phone: 081-7026206
+- Research Interests: Hard disk drive technology, Photonics Crystal application, Microwave Heating, Optical waveguide and application, Magnetic Sensor
+
+## Education
+
+- ปริญญาตรี วn.บ. ฟิสิกส์ มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2542
+- ปริญญาโท M.Eng. Electrical and Information Engineering King Mongkut’s University of Technology Thonburi, Thailand ปีที่จบการศึกษา 2008
+- ปริญญาเอก Ph.D. Electrical and Computer Engineering King Mongkut’s University of Technology Thonburi, Thailand ปีที่จบการศึกษา 2017
+
+## Research Publications
+
+- ระดับนานาชาติ [1.] Phongchit Phonkitiphan, Rapeepan Kaewon, Kantida Pancharoen, Phamorn Silapan, and Orrathai Watcharakitchakorn. (2020). “Design of graphene-based annular ring microstrip antenna using short-pin technique for dual band applications,” International Journal of Electrical and Electronic Engineering & Telecommunications Volume 9 Issue/No. 4 (July 2020). pages 231-236. (ฐานข้อมูล Scopus)
+- ระดับชาติ [2.] คมกฤษ หอมกลิ่นแก้ว, วรินทร ทิพย์ทำมา, ธีร์ธวัช แจ่มโสภณ, อรทัย วัชรกฤชกรณ์, ระพีพันธ์ แก้วอ่อน, กัณธิดา พันธุ์เจริญ, กิตติธัช พาพลเพ็ญ และ พรชัย เปลี่ยมทรัพย์, (2564). “ตู้รับ-ฝากพัสดุอัจฉริยะ.” ใน Proceeding การประชุมวิชาการ งานวิจัย และพัฒนาเชิงประยุกต์ ครั้งที่ 13 (ECTI-CARD 2021), 28-30 เมษายน 2564 นครพนม (ออนไลน์), ประเทศไทย. [3.] ชิษณพงศ์ อินทะเส, ระพีพันธ์ แก้วอ่อน, อรทัย วัชรกฤชกรณ์ และ กัณธิดา พันธุ์เจริญ (2563). “ระบบขายหน้าร้านสำหรับธุรกิจในการจัดการค้าปลีกโดยใช้ระบบปฏิบัติการไอโฟน,” ใน Proceeding การประชุมวิชาการ งานวิจัย และพัฒนาเชิงประยุกต์ ครั้งที่ 12 (ECTI-CARD 2020) มหาวิทยาลัยราชภัฏนครสวรรค์ จ.นครสวรรค์ ไทย, 26 พฤษภาคม 2563 - 27 พฤษภาคม 2563. หน้าที่ 86-90.

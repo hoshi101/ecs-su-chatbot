@@ -72,7 +72,7 @@ def extract_source_documents(trace_events):
                             "title": doc.get("title", "Document"),
                             "snippet": doc.get("content", "")[:300],  # First 300 chars
                             "relevance_score": doc.get("score", 0.0),
-                            "source_type": doc.get("source", "Internal Documentation")
+                            "source_type": doc.get("source", "Internal Knowledge Base")
                         })
 
             # Check for search results
@@ -84,7 +84,8 @@ def extract_source_documents(trace_events):
                             "title": result.get("title", "Search Result"),
                             "snippet": result.get("snippet", ""),
                             "relevance_score": result.get("relevance", 0.0),
-                            "source_type": "Web Search"
+                            "source_type": "Official Website Search",
+                            "url": result.get("url", "")
                         })
 
             # Check for retrieved content summary
@@ -93,7 +94,7 @@ def extract_source_documents(trace_events):
                     "title": "Retrieved Content",
                     "snippet": details["retrieved_content_summary"],
                     "relevance_score": 0.8,  # Default score
-                    "source_type": "Platform Documentation"
+                    "source_type": "Department Knowledge Base"
                 })
 
     return source_docs

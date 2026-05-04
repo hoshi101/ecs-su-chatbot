@@ -7,154 +7,85 @@
   - `สาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์`
   - `วิศวกรรมไฟฟ้า`
   - `Electronic and Computer System Engineering`
-- Deadline target:
-  - First usable delivery by `2026-03-26`
-  - Latest acceptable delivery by `2026-03-27`
+- Primary demo stack:
+  - `Streamlit` frontend
+  - `FastAPI` backend
+  - `LangGraph` agent workflow
+  - `Qdrant` vector store
 
 ## Agreed Scope
 
-- Keep current architecture as base instead of rebuilding from scratch.
-- Keep `Streamlit` for demo UI.
-- Support Thai and English, with Thai as the default language.
-- Tone should be friendly and staff-like.
-- Keep `Web Search`, but use it as a constrained fallback instead of the primary source.
-- Answers must prioritize department documents and must not guess.
-- Sensitive or unsupported questions should be declined clearly.
-- Knowledge base updates can be handled through backend/developer workflow.
+- Keep the current architecture as the working base.
+- Thai is the default language, with bilingual support where needed.
+- Answers must prioritize official local data before any fallback path.
+- The chatbot should answer department, curriculum, lecturer, staff, and contact questions.
+- Unsupported or non-department questions should be declined clearly.
 
-## Demo Priorities
+## Current Status
 
-1. Answer questions about curriculum and courses.
-2. Answer questions about lecturers and staff.
-3. Answer questions about rules, regulations, and department information.
-4. Provide core chatbot functionality reliably for a live demo.
+- Department-domain rebrand has already been applied to the codebase.
+- Department/faculty web scraping outputs already exist under `data/web/`.
+- The project already has session handling on the frontend side via `src/frontend/state/session_manager.py`.
+- The main remaining operational blocker is still ingestion/runtime validation against the configured `Qdrant` endpoint.
+- Test question assets have now been reorganized into a maintainable structure for repeated validation.
 
-## Current Local Data Inventory
+## Completed Work
 
-Current files found in `data/`:
+- Replaced the old single-purpose planning list with a tracked completion-oriented planning file.
+- Created canonical categorized question sets under `docs/testing/question_sets/`.
+- Added one master CSV for full regression-style testing across all categories.
+- Normalized question coverage around five categories:
+  - general
+  - department info
+  - lecturer
+  - contact
+  - out of scope
+- Verified that the new question sets reference real sources already present in the repo.
 
-- `data/มคอ.2.pdf`
-- `data/รายละเอียดของหลักสูตร_2565.pdf`
+## Canonical Data And Test Assets
 
-Status:
+- Canonical planning file: `PLANNING_MANAGEMENT.md`
+- Canonical session log: `SESSION_MANAGEMENT.md`
+- Canonical test question location: `docs/testing/question_sets/`
+- Legacy question file retained for history only: `docs/reports/department_chatbot_test_questions.csv`
 
-- The current local knowledge base is still very small.
-- More source documents should be added before final ingestion and testing.
+## Source Coverage Used For Testing
 
-## Confirmed External Sources
+- Department contact:
+  - `data/web/clean/department_contact.md`
+  - `data/web/clean/faculty_department_overview.md`
+- Department overview and program information:
+  - `data/web/clean/faculty_department_overview.md`
+  - `data/web/clean/program_ecs.md`
+  - `data/web/clean/program_electrical_communications.md`
+  - `data/web/clean/program_master_ece.md`
+- Lecturer information:
+  - `data/web/clean/department_lecturers.md`
+  - `data/web/clean/staff_details/`
+- Support staff information:
+  - `data/web/clean/department_support_staff.md`
 
-- Department website: `https://ee-eng.su.ac.th/`
-- Faculty website: `https://eng2.su.ac.th/index.php`
+## Current Focus
 
-Useful pages identified:
+1. Use the new categorized question sets to run actual chatbot validation.
+2. Confirm routing behavior for `answer`, `rag`, and `end` cases.
+3. Re-run ingestion/runtime validation once the `Qdrant` configuration issue is resolved.
+4. Summarize response quality, coverage, and failure cases for the next report/testing pass.
 
-- Department about/contact page
-- Department lecturer page
-- Department support staff page
-- Department curriculum pages
-- Faculty department page for electrical engineering
+## Next Validation Step
 
-## Confirmed Contact Information
-
-From the user and official pages:
-
-- Phone: `034-219364-66 ext. 25520`
-- Phone: `089-979-7911`
-- Phone/Fax: `034-241971`
-- Facebook: `Department of Electrical Engineering - Silpakorn University`
-
-Additional contact details found on official pages:
-
-- Address: `เลขที่ 6 ถ.ราชมรรคาใน ต.พระปฐมเจดีย์ อ.เมือง จ.นครปฐม 73000`
-
-## Website Findings
-
-The following information appears to be available from the official sites and should be considered for ingestion:
-
-- Department history/about information
-- Curriculum and degree program descriptions
-- Lecturer names, roles, and emails
-- Support staff names, roles, and emails
-- Contact information
-- Internship / cooperative education pages
-- Project and research pages
-
-Examples already verified during discovery:
-
-- Lecturer page contains names, roles, and emails.
-- Support staff page contains names, roles, and emails.
-- Contact page contains address and phone numbers.
-- Department/faculty pages contain summary information about programs and history.
-
-## Recommended Additional Sources To Collect
-
-- Curriculum and study-plan PDFs for all active programs
-- Course catalog / syllabus / prerequisite documents
-- Internship and cooperative education guides
-- Department regulations or student handbook documents
-- Faculty/department staff directory pages exported to PDF or text
-- Admission pages if the chatbot should answer applicant questions
-- Research/project pages if the chatbot should answer broader department questions
-
-## Technical Adaptation Plan
-
-### 1. Rebrand and re-scope the assistant
-
-- Remove Finansia Hero identity from prompts, config, API description, and UI wording.
-- Replace domain language with department-specific assistant behavior.
-
-### 2. Adjust agent behavior
-
-- Make RAG the default path.
-- Keep web search as a guarded fallback limited to trusted domains.
-- Add stronger refusal behavior for unsupported or sensitive requests.
-- Improve source-aware answer generation.
-
-### 3. Rebuild the knowledge base
-
-- Organize incoming documents by category:
-  - `academic`
-  - `faculty`
-  - `policy`
-  - `facilities`
-  - `student_services`
-- Improve metadata quality so answers can cite source names more clearly.
-
-### 4. Update the demo UI
-
-- Keep Streamlit.
-- Change project name and copywriting.
-- Default to Thai-friendly UX.
-- Preserve source display for testing, but improve clarity where possible.
-
-### 5. Improve observability
-
-- Add practical logging around:
-  - environment/config loading
-  - retrieval
-  - web search fallback
-  - model/API failures
-
-## Immediate Next Steps
-
-1. Run `python scripts/scrape_department_sources.py` to collect official web sources.
-2. Review outputs in `data/web/clean/` and add any missing official documents.
-3. Inspect and update config, prompts, and UI branding.
-4. Review vectorstore and retrieval code for metadata/citation improvements.
-5. Run ingestion and validate retrieval quality with representative questions.
-6. Refine answer style and fallback behavior.
-
-## Open Items
-
-- Confirm final project display name for UI.
-- Confirm whether applicant/admission questions are in scope.
-- Confirm whether web search should be enabled in the final demo by default.
-- Add more official source files into `data/`.
+- Run the chatbot against `docs/testing/question_sets/master_department_chatbot_test_questions.csv`
+- Check:
+  - retrieval coverage from local sources
+  - accuracy of lecturer/contact answers
+  - refusal quality for out-of-scope questions
+  - response consistency across repeated sessions
 
 ## Working Notes
 
 - This file should be updated after each substantial work session.
-- It is intended to track scope, source coverage, implementation status, and open risks.
+- Before creating new test assets, check `docs/testing/question_sets/` first.
+- Before starting new planning work, check `PLANNING_MANAGEMENT.md` first.
 
 ### 2026-03-27
 
@@ -172,4 +103,56 @@ Examples already verified during discovery:
 - Current scrape result:
   - 7 sources succeeded
   - 0 sources failed
-  - raw HTML, cleaned Markdown/JSON, and downloaded PDFs were saved under `data/web/`
+- Added lecturer detail scraping for all academic staff pages via `StaffDetail.aspx`
+- Generated per-lecturer files under:
+  - `data/web/raw/staff_details/`
+  - `data/web/clean/staff_details/`
+- Updated chat agent/domain behavior:
+  - rebranded assistant identity to department domain
+  - changed routing and answer prompts away from trading platform behavior
+  - added source-aware RAG trace payloads for frontend display
+- Updated ingestion workflow to skip raw scrape artifacts and prefer curated content
+- Updated Streamlit UI copy for department demo usage
+- Runtime validation:
+  - BGE-M3 model download/load succeeded when run with network access
+  - Qdrant connection reached the configured host
+  - Collection create/access currently fails with `404 page not found`, so ingestion is blocked on Qdrant configuration
+
+### 2026-04-22
+
+- Rebuilt `PLANNING_MANAGEMENT.md` into a completion-tracking format with explicit done markers
+- Created `docs/testing/question_sets/` as the canonical location for chatbot validation questions
+- Added categorized CSV files:
+  - `general_questions.csv`
+  - `department_info_questions.csv`
+  - `lecturer_questions.csv`
+  - `contact_questions.csv`
+  - `out_of_scope_questions.csv`
+  - `master_department_chatbot_test_questions.csv`
+- New master test set now covers 70 questions total across greeting/scope, department data, lecturers, contact details, and out-of-scope refusal cases
+- Legacy file `docs/reports/department_chatbot_test_questions.csv` is now treated as historical only and should not be extended further
+
+### 2026-04-23
+
+- Repaired `.venv` after finding that `.venv/bin/python` and `.venv/bin/python3` were empty files and recreated the virtual environment
+- Installed project dependencies into `.venv` and confirmed backend imports can run in the intended environment
+- Added centralized backend logging with console + rotating file output
+- New backend log file path: `logs/backend.log`
+- Verified `GET /health/detailed` with network access:
+  - `BGE-M3 Embeddings`: healthy
+  - `Google Gemini API`: healthy
+  - `Tavily Web Search`: healthy
+  - `DocumentProcessor`: healthy
+  - `Qdrant`: initially degraded because collection `ECS-Chatbot-ProjectTesting` did not exist
+- Verified the new Qdrant API key can connect successfully to the configured Qdrant cloud instance
+- Ran smoke retrieval and chat tests:
+  - retrieval failed before ingestion because the Qdrant collection was missing
+  - chat endpoint still returned a fallback answer, but not from real retrieval
+- Started ingestion with `scripts/process_documents.py`
+  - created collection `ECS-Chatbot-ProjectTesting`
+  - ingestion began uploading document chunks to Qdrant successfully
+  - confirmed collection status turned `green`
+  - confirmed points started entering the collection during upload
+- Residual issue during ingestion:
+  - some `.json` files were skipped because Python package `jq` is not installed in `.venv`
+  - markdown and PDF sources were still processed, so ingestion is not fully blocked

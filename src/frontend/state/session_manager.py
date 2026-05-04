@@ -13,8 +13,14 @@ def init_session_state():
     # Initialize a unique session ID for LangGraph checkpointing and conversation tracking
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
-        # Add an initial greeting from the assistant for a fresh conversation
-        st.session_state.messages.append({"role": "assistant", "content": "Hello! I'm HERO Bot, your Finansia Hero Trading Platform assistant. How can I help you today?"})
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": (
+                "สวัสดีครับ ผมคือ EE Support Assistant "
+                "ยินดีช่วยตอบคำถามเกี่ยวกับหลักสูตร รายวิชา อาจารย์ ระเบียบการศึกษา "
+                "และข้อมูลติดต่อของภาควิชาครับ"
+            ),
+        })
 
     # Initialize the web search enabled flag, defaulting to True
     if "web_search_enabled" not in st.session_state:
@@ -61,5 +67,9 @@ def clear_conversation():
     # Add initial greeting for new conversation
     st.session_state.messages.append({
         "role": "assistant",
-        "content": "Hello! I'm HERO Bot, your Finansia Hero Trading Platform assistant. How can I help you today?"
+        "content": (
+            "สวัสดีครับ ผมคือ EE Support Assistant "
+            "ยินดีช่วยตอบคำถามเกี่ยวกับหลักสูตร รายวิชา อาจารย์ ระเบียบการศึกษา "
+            "และข้อมูลติดต่อของภาควิชาครับ"
+        )
     })

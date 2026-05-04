@@ -1,20 +1,16 @@
 import streamlit as st
-import requests
-
-
 def display_header():
     """Display the application header with title and description."""
-    st.title("HERO Bot - Finansia Hero AI Assistant")
+    st.title("EE Support Assistant")
     st.markdown("""
-    **Welcome to HERO Bot!** Your intelligent assistant for the Finansia Hero Trading Platform.
+    **ผู้ช่วยข้อมูลของสาขาวิชาวิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์ / วิศวกรรมไฟฟ้า**
 
-    I can help you with:
-    - Platform features and navigation
-    - Trading tools and order management
-    - Technical analysis and charting
-    - Account management and settings
-    - Risk management and trading strategies
-    - Troubleshooting platform issues
+    ระบบนี้ช่วยตอบคำถามจากข้อมูลทางการของภาควิชา เช่น
+    - หลักสูตรและรายวิชา
+    - อาจารย์และบุคลากร
+    - ระเบียบการศึกษาและขั้นตอนทั่วไป
+    - ฝึกงาน สหกิจศึกษา และบริการนักศึกษา
+    - ข้อมูลติดต่อภาควิชา
     """)
     st.divider()
 
@@ -25,7 +21,6 @@ def render_sidebar_settings():
     with st.sidebar:
         st.header("⚙️ Settings")
 
-        # Clear conversation button
         if st.button("🗑️ Clear Conversation", use_container_width=True):
             from state.session_manager import clear_conversation
             clear_conversation()
@@ -40,22 +35,23 @@ def render_sidebar_settings():
             max_value=1.0,
             value=st.session_state.get("similarity_threshold", 0.7),
             step=0.05,
-            help="Higher values require more relevant matches. Lower values return more results but may be less accurate."
+            help="Higher values require more relevant matches. Lower values may retrieve broader results."
         )
         st.session_state.similarity_threshold = similarity_threshold
 
-        # Web search toggle
         web_search_enabled = st.checkbox(
-            "Enable Web Search",
+            "Enable Official Website Search",
             value=st.session_state.get("web_search_enabled", True),
-            help="Allow HERO Bot to search external trading resources when platform documentation is insufficient."
+            help="Allow fallback search on official department/faculty websites when the local knowledge base is insufficient."
         )
         st.session_state.web_search_enabled = web_search_enabled
 
         if web_search_enabled:
-            st.success("🌐 Web search enabled")
+            st.success("🌐 Official website fallback enabled")
         else:
-            st.warning("🔒 Web search disabled")
+            st.warning("🔒 Website fallback disabled")
+
+        st.caption("Trusted domains: ee-eng.su.ac.th, eng2.su.ac.th")
 
 
 def render_agent_settings_section():
@@ -69,7 +65,7 @@ def render_force_web_search_toggle():
     force_web_search = st.toggle(
         '🌐',
         value=st.session_state.get("force_web_search", False),
-        help="Search external trading resources"
+        help="Force official website fallback search"
     )
     st.session_state.force_web_search = force_web_search
     return force_web_search
@@ -107,7 +103,8 @@ def display_source_documents():
                     with col1:
                         st.markdown(f"**{i}. {doc.get('title', 'Untitled Document')}**")
                         if doc.get('snippet'):
-                            st.markdown(f"*{doc['snippet'][:200]}...*")
+                            snippet = doc["snippet"][:220]
+                            st.markdown(f"*{snippet}...*" if len(doc["snippet"]) > 220 else f"*{snippet}*")
 
                     with col2:
                         if doc.get('relevance_score'):
@@ -116,6 +113,9 @@ def display_source_documents():
 
                     if doc.get('source_type'):
                         st.caption(f"Source: {doc['source_type']}")
+
+                    if doc.get('url'):
+                        st.caption(f"URL: {doc['url']}")
 
                     if i < len(source_docs):
                         st.divider()
@@ -136,20 +136,20 @@ def display_trace_events(trace_events):
     if not trace_events:
         return
 
-    with st.expander("🔍 HERO Bot Workflow Trace", expanded=False):
-        st.markdown("See how HERO Bot processed your question:")
+    with st.expander("🔍 Assistant Workflow Trace", expanded=False):
+        st.markdown("See how the assistant processed your question:")
 
         for i, event in enumerate(trace_events, 1):
             # Create a container for each event
             with st.container():
                 # Color-code based on event type
-                if event.event_type == "hero_bot_routing":
+                if event.event_type == "routing":
                     st.markdown(f"**🎯 Step {event.step}: Router Decision**")
-                elif event.event_type == "hero_bot_rag_search":
-                    st.markdown(f"**📚 Step {event.step}: Platform Documentation Search**")
-                elif event.event_type == "hero_bot_web_search":
-                    st.markdown(f"**🌐 Step {event.step}: External Resources Search**")
-                elif event.event_type == "hero_bot_response_generation":
+                elif event.event_type == "rag_search":
+                    st.markdown(f"**📚 Step {event.step}: Knowledge Base Search**")
+                elif event.event_type == "web_search":
+                    st.markdown(f"**🌐 Step {event.step}: Official Website Search**")
+                elif event.event_type == "response_generation":
                     st.markdown(f"**🤖 Step {event.step}: Response Generation**")
                 else:
                     st.markdown(f"**⚙️ Step {event.step}: {event.node_name}**")
@@ -180,4 +180,4 @@ def display_trace_events(trace_events):
                     st.markdown("↓")
 
         st.markdown("---")
-        st.caption("This trace shows HERO Bot's decision-making process for transparency and debugging.")
+        st.caption("This trace shows the assistant's retrieval and routing process for transparency and debugging.")

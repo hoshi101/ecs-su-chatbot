@@ -1,0 +1,71 @@
+id,category,subcategory,expected_route,query,expected_keywords,reference_source,notes
+G01,general,greeting,answer,สวัสดีครับ,"สวัสดี; ผู้ช่วยข้อมูล; ภาควิชาวิศวกรรมไฟฟ้า",SESSION_MANAGEMENT.md,ทดสอบ greeting ภาษาไทย
+G02,general,greeting,answer,สวัสดี ช่วยตอบคำถามให้หน่อยได้ไหม,"สวัสดี; ข้อมูลภาควิชา; ช่วยเหลือ",SESSION_MANAGEMENT.md,ทดสอบ greeting แบบไม่เป็นทางการ
+G03,general,capability,answer,ช่วยอะไรได้บ้าง,"หลักสูตร; อาจารย์; บุคลากร; ข้อมูลติดต่อ",SESSION_MANAGEMENT.md,ทดสอบการอธิบายขอบเขตระบบ
+G04,general,capability,answer,แชตบอทนี้ตอบเรื่องอะไรได้บ้าง,"หลักสูตร; ภาควิชา; อาจารย์; ติดต่อ",README.md,ทดสอบข้อความ capability
+G05,general,language,answer,ตอบเป็นภาษาไทยได้ไหม,"ภาษาไทย; ค่าเริ่มต้น; รองรับ",SESSION_MANAGEMENT.md,ทดสอบ default language
+G06,general,language,answer,Can you answer in English if needed?,"English; Thai; bilingual",SESSION_MANAGEMENT.md,ทดสอบ bilingual support
+G07,general,scope,answer,ข้อมูลของแชตบอทนี้อ้างอิงจากอะไร,"ข้อมูลทางการ; local data; เว็บไซต์ภาควิชา",README.md,ทดสอบการอธิบายแหล่งข้อมูล
+G08,general,scope,answer,ถ้าข้อมูลไม่มีในระบบจะทำยังไง,"ไม่เดา; ปฏิเสธ; fallback",SESSION_MANAGEMENT.md,ทดสอบ behavior เมื่อข้อมูลไม่พอ
+G09,general,usage,answer,อยากถามเรื่องอาจารย์ต้องถามแบบไหน,"ชื่ออาจารย์; ตำแหน่ง; อีเมล",docs/testing/question_sets/lecturer_questions.csv,ทดสอบ guidance การใช้งาน
+G10,general,usage,answer,ฉันจะถามข้อมูลติดต่อภาควิชาได้ใช่ไหม,"ที่อยู่; โทรศัพท์; Facebook; เว็บไซต์",docs/testing/question_sets/contact_questions.csv,ทดสอบการชี้นำไปยังหมวดติดต่อ
+D01,department_info,history,rag,ภาควิชาวิศวกรรมไฟฟ้าก่อตั้งเมื่อปีอะไร,"2550",data/web/clean/faculty_department_overview.md,ทดสอบประวัติภาควิชา
+D02,department_info,history,rag,ภาควิชาเปิดรับนักศึกษารุ่นแรกปีไหน,"2550",data/web/clean/faculty_department_overview.md,ทดสอบปีรับนักศึกษารุ่นแรก
+D03,department_info,history,rag,ภาควิชาเปิดรับนักศึกษาปริญญาโทครั้งแรกเมื่อไร,"2560",data/web/clean/faculty_department_overview.md,ทดสอบปีเปิดปริญญาโท
+D04,department_info,overview,rag,ปัจจุบันภาควิชาเปิดสอนกี่หลักสูตร,"5 หลักสูตร",data/web/clean/faculty_department_overview.md,ทดสอบข้อมูลภาพรวมหลักสูตร
+D05,department_info,overview,rag,ภาควิชามีหลักสูตรปริญญาตรีอะไรบ้าง,"วิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์; วิศวกรรมไฟฟ้าสื่อสาร",data/web/clean/faculty_department_overview.md,ทดสอบหลักสูตรระดับปริญญาตรี
+D06,department_info,overview,rag,ภาควิชามีหลักสูตรปริญญาโทอะไรบ้าง,"วิศวกรรมไฟฟ้าและคอมพิวเตอร์",data/web/clean/faculty_department_overview.md,ทดสอบหลักสูตรระดับปริญญาโท
+D07,department_info,ecs_program,rag,หลักสูตร ECS ชื่อเต็มคืออะไร,"วิศวกรรมศาสตรบัณฑิต; วิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์",data/web/clean/program_ecs.md,ทดสอบชื่อหลักสูตร ECS
+D08,department_info,ecs_program,rag,หลักสูตร ECS ฉบับปรับปรุงล่าสุดปีอะไร,"2565",data/web/clean/program_ecs.md,ทดสอบปีปรับปรุงล่าสุดของ ECS
+D09,department_info,ecs_program,rag,หลักสูตร ECS รวมกี่หน่วยกิต,"147 หน่วยกิต",data/web/clean/program_ecs.md,ทดสอบจำนวนหน่วยกิตรวม ECS
+D10,department_info,ecs_program,rag,หลักสูตร ECS ใช้เวลาเรียนกี่ปี,"4 ปีการศึกษา; ไม่เกิน 8 ปีการศึกษา",data/web/clean/program_ecs.md,ทดสอบระยะเวลาศึกษา ECS
+D11,department_info,ecs_program,rag,หมวดวิชาศึกษาทั่วไปของ ECS ต้องเรียนอย่างน้อยกี่หน่วยกิต,"30 หน่วยกิต",data/web/clean/program_ecs.md,ทดสอบโครงสร้างหมวดศึกษาทั่วไป
+D12,department_info,ecom_program,rag,หลักสูตรวิศวกรรมไฟฟ้าสื่อสารชื่อเต็มคืออะไร,"วิศวกรรมศาสตรบัณฑิต; วิศวกรรมไฟฟ้าสื่อสาร",data/web/clean/program_electrical_communications.md,ทดสอบชื่อหลักสูตรไฟฟ้าสื่อสาร
+D13,department_info,ecom_program,rag,หลักสูตรไฟฟ้าสื่อสารเป็นหลักสูตรปีอะไร,"2565",data/web/clean/program_electrical_communications.md,ทดสอบปีของหลักสูตรไฟฟ้าสื่อสาร
+D14,department_info,ecom_program,rag,หลักสูตรไฟฟ้าสื่อสารรวมกี่หน่วยกิต,"146 หน่วยกิต",data/web/clean/program_electrical_communications.md,ทดสอบจำนวนหน่วยกิตรวม
+D15,department_info,ecom_program,rag,หลักสูตรไฟฟ้าสื่อสารแบบปกติมีกลุ่มวิชาพื้นฐานวิชาชีพกี่หน่วยกิต,"42 หน่วยกิต",data/web/clean/program_electrical_communications.md,ทดสอบกลุ่มพื้นฐานวิชาชีพ
+D16,department_info,master_program,rag,หลักสูตรปริญญาโทของภาควิชาคือสาขาอะไร,"วิศวกรรมศาสตรมหาบัณฑิต; วิศวกรรมไฟฟ้าและคอมพิวเตอร์",data/web/clean/program_master_ece.md,ทดสอบชื่อหลักสูตรปริญญาโท
+D17,department_info,master_program,rag,หลักสูตรปริญญาโทใช้เวลากี่ปี,"2 ปีการศึกษา",data/web/clean/program_master_ece.md,ทดสอบระยะเวลาศึกษาปริญญาโท
+D18,department_info,master_program,rag,หลักสูตรปริญญาโทแบ่งเป็นกี่แผน,"2 แผน; แผน ก แบบ ก 1; แผน ก แบบ ก 2",data/web/clean/program_master_ece.md,ทดสอบโครงสร้างแผนการเรียน
+D19,department_info,staff,rag,นักการเงินปฏิบัติการของภาควิชาคือใคร,"ฐนิชา คล้ำชานา",data/web/clean/department_support_staff.md,ทดสอบบทบาทนักการเงิน
+D20,department_info,staff,rag,ใครเป็นวิศวกรปฏิบัติการของภาควิชา,"พยุงศักดิ์ เรืองจินดา",data/web/clean/department_support_staff.md,ทดสอบบทบาทวิศวกร
+L01,lecturer,role,rag,หัวหน้าภาควิชาวิศวกรรมไฟฟ้าคือใคร,"โสภณ ผู้มีจรรยา; หัวหน้าภาควิชาวิศวกรรมไฟฟ้า",data/web/clean/department_lecturers.md,ทดสอบบทบาทหัวหน้าภาควิชา
+L02,lecturer,email,rag,อีเมลอาจารย์โสภณคืออะไร,"phumeechanya_s@su.ac.th",data/web/clean/department_lecturers.md,ทดสอบอีเมลหัวหน้าภาควิชา
+L03,lecturer,role,rag,รองหัวหน้าภาคฝ่ายจัดการศึกษาวิเทศสัมพันธ์และสหกิจคือใคร,"กัณธิดา พันธุ์เจริญ",data/web/clean/department_lecturers.md,ทดสอบบทบาทรองหัวหน้าภาค
+L04,lecturer,email,rag,อีเมลอาจารย์กัณธิดาคืออะไร,"pancharoen_k@su.ac.th",data/web/clean/department_lecturers.md,ทดสอบอีเมลอาจารย์กัณธิดา
+L05,lecturer,role,rag,รองหัวหน้าภาคฝ่ายจัดการกิจการงานทั่วไปคือใคร,"กิตติธัช พาพลเพ็ญ",data/web/clean/department_lecturers.md,ทดสอบบทบาทรองหัวหน้าภาคอีกตำแหน่ง
+L06,lecturer,interest,rag,อาจารย์กิตติธัชสนใจวิจัยด้านอะไร,"Power electronics; Electric machine drive",data/web/clean/staff_details/lecturer_8.json,ทดสอบ research interests ของกิตติธัช
+L07,lecturer,role,rag,ประธานหลักสูตร ECS คือใคร,"ภมร ศิลาพันธ์",data/web/clean/department_lecturers.md,ทดสอบบทบาทประธานหลักสูตร ECS
+L08,lecturer,email,rag,อีเมลอาจารย์ภมรคืออะไร,"silapan_p@su.ac.th",data/web/clean/department_lecturers.md,ทดสอบอีเมลอาจารย์ภมร
+L09,lecturer,role,rag,ประธานหลักสูตรวิศวกรรมไฟฟ้าสื่อสารคือใคร,"ระพีพันธ์ แก้วอ่อน",data/web/clean/department_lecturers.md,ทดสอบบทบาทประธานหลักสูตรไฟฟ้าสื่อสาร
+L10,lecturer,contact,rag,อาจารย์ระพีพันธ์มีเบอร์โทรไหม,"034-241971",data/web/clean/staff_details/lecturer_1__..json,ทดสอบเบอร์โทรในหน้า profile
+L11,lecturer,role,rag,ประธานหลักสูตรปริญญาโทวิศวกรรมไฟฟ้าและคอมพิวเตอร์คือใคร,"ยุทธนา เจวจินดา",data/web/clean/department_lecturers.md,ทดสอบบทบาทประธานหลักสูตรปริญญาโท
+L12,lecturer,interest,rag,อาจารย์ยุทธนาสนใจวิจัยด้านอะไร,"VLSI circuits and systems; FPGA/ASIC design; Intelligence embedded software/systems",data/web/clean/staff_details/lecturer_5__..json,ทดสอบ research interests ของยุทธนา
+L13,lecturer,email,rag,อาจารย์ชูเกียรติ สอดศรีมีอีเมลอะไร,"sodsri_c@su.ac.th",data/web/clean/department_lecturers.md,ทดสอบอีเมลอาจารย์ชูเกียรติ
+L14,lecturer,interest,rag,อาจารย์ณัฐพงศ์สนใจเรื่องอะไร,"Analog signal processing; Database; Data analytic; Business intelligence",data/web/clean/staff_details/lecturer_7__..json,ทดสอบ research interests ของณัฐพงศ์
+L15,lecturer,email,rag,อาจารย์จิรัฏฐ์ เหมือนชูใช้อีเมลอะไร,"mearnchu_j@su.ac.th",data/web/clean/department_lecturers.md,ทดสอบอีเมลอาจารย์จิรัฏฐ์
+L16,lecturer,interest,rag,อาจารย์จิรัฏฐ์สนใจงานวิจัยด้านไหน,"Embedded system and digital electronic; Measurement systems for dielectric material",data/web/clean/staff_details/lecturer_19.md,ทดสอบ research interests ของจิรัฏฐ์
+L17,lecturer,contact,rag,อาจารย์ชัยวุฒมีเบอร์โทรอะไร,"0894516123",data/web/clean/staff_details/lecturer_22__..md,ทดสอบเบอร์โทรอาจารย์ชัยวุฒ
+L18,lecturer,email,rag,อาจารย์ปาริฉัตร เสริมวุฒิสารใช้อีเมลอะไร,"sermwuthisarn_p@su.ac.th",data/web/clean/department_lecturers.md,ทดสอบอีเมลอาจารย์ปาริฉัตร
+L19,lecturer,interest,rag,อาจารย์ปาริฉัตรสนใจวิจัยด้านอะไร,"Image processing; Pattern recognition; Compressed sensing",data/web/clean/staff_details/lecturer_23.md,ทดสอบ research interests ของปาริฉัตร
+L20,lecturer,interest,rag,อาจารย์คุณานนต์สนใจงานวิจัยอะไร,"Analog circuits; Communication systems; Chaotic systems; Nonlinear dynamic systems",data/web/clean/staff_details/lecturer_24__..json,ทดสอบ research interests ของคุณานนต์
+C01,contact,address,rag,ภาควิชาวิศวกรรมไฟฟ้าตั้งอยู่ที่ไหน,"มหาวิทยาลัยศิลปากร; พระราชวังสนามจันทร์; นครปฐม",data/web/clean/department_contact.md,ทดสอบที่ตั้งภาควิชา
+C02,contact,address,rag,ที่อยู่ของภาควิชาคืออะไร,"เลขที่ 6 ถ.ราชมรรคาใน; ต.พระปฐมเจดีย์; อ.เมือง; จ.นครปฐม 73000",data/web/clean/department_contact.md,ทดสอบที่อยู่แบบละเอียด
+C03,contact,phone,rag,เบอร์ติดต่อภาควิชามีเบอร์อะไรบ้าง,"034-219364-66 ต่อ 25520; 089-979-7911; 034-241971",data/web/clean/department_contact.md,ทดสอบหลายหมายเลขในคำตอบเดียว
+C04,contact,social,rag,ภาควิชามี Facebook ไหม,"Department of Electrical Engineering - Silpakorn University; Facebook",data/web/clean/department_contact.md,ทดสอบช่องทางออนไลน์
+C05,contact,location,rag,สำนักงานภาควิชาอยู่ชั้นไหน,"ชั้น 5; อาคารคณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรม",data/web/clean/faculty_department_overview.md,ทดสอบตำแหน่งสำนักงาน
+C06,contact,email,rag,คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรมใช้อีเมลอะไร,"fac-en@silpakorn.edu",data/web/clean/faculty_department_overview.md,ทดสอบอีเมลระดับคณะ
+C07,contact,website,rag,เว็บไซต์ภาควิชาคืออะไร,"https://ee-eng.su.ac.th/",data/web/clean/faculty_department_overview.md,ทดสอบ URL เว็บไซต์ภาควิชา
+C08,contact,facebook,rag,Facebook ของภาควิชาจากหน้า faculty คืออะไร,"http://www.facebook.com/ElectricalEngineeringSilpakornUniversity",data/web/clean/faculty_department_overview.md,ทดสอบลิงก์ Facebook จากหน้า faculty
+C09,contact,phone,rag,เบอร์โทรสำนักงานภาควิชาจากหน้า faculty คืออะไร,"034 109686 ต่อ 209550; 034-241971",data/web/clean/faculty_department_overview.md,ทดสอบข้อมูลติดต่อจากหน้า faculty
+C10,contact,fax,rag,เบอร์โทรสารของภาควิชาหรือคณะคืออะไร,"034-241971; 034-109686 ต่อ 209009",data/web/clean/faculty_department_overview.md,ทดสอบข้อมูลโทรสาร
+O01,out_of_scope,weather,end,วันนี้ฝนจะตกไหม,"นอกขอบเขต; สภาพอากาศ",SESSION_MANAGEMENT.md,ทดสอบคำถามพยากรณ์อากาศ
+O02,out_of_scope,creative,end,ช่วยแต่งกลอนวันสงกรานต์ให้หน่อย,"นอกขอบเขต; งานสร้างสรรค์ทั่วไป",SESSION_MANAGEMENT.md,ทดสอบคำขอเชิงสร้างสรรค์
+O03,out_of_scope,finance,end,ช่วยวิเคราะห์หุ้นให้หน่อย,"นอกขอบเขต; ไม่ใช่ข้อมูลภาควิชา",SESSION_MANAGEMENT.md,ทดสอบคำถามการเงิน
+O04,out_of_scope,medical,end,ปวดหัวควรกินยาอะไร,"นอกขอบเขต; คำแนะนำทางการแพทย์",SESSION_MANAGEMENT.md,ทดสอบคำถามการแพทย์
+O05,out_of_scope,travel,end,ช่วยหาที่เที่ยวในกรุงเทพให้หน่อย,"นอกขอบเขต; การท่องเที่ยว",SESSION_MANAGEMENT.md,ทดสอบคำถามท่องเที่ยว
+O06,out_of_scope,personal,end,คุณคิดว่าฉันควรคบกับแฟนต่อไหม,"นอกขอบเขต; เรื่องส่วนตัว",SESSION_MANAGEMENT.md,ทดสอบคำถามเรื่องส่วนตัว
+O07,out_of_scope,news,end,สรุปข่าวการเมืองวันนี้ให้หน่อย,"นอกขอบเขต; ข่าวปัจจุบัน",SESSION_MANAGEMENT.md,ทดสอบคำถามข่าว
+O08,out_of_scope,coding,end,เขียนโปรแกรมเกมงูด้วย Python ให้หน่อย,"นอกขอบเขต; เขียนโค้ดทั่วไป",SESSION_MANAGEMENT.md,ทดสอบคำถามเขียนโค้ด
+O09,out_of_scope,other_department,end,ภาควิชาวิศวกรรมเครื่องกลอยู่ตึกไหน,"นอกขอบเขต; ไม่ใช่ภาควิชาวิศวกรรมไฟฟ้า",SESSION_MANAGEMENT.md,ทดสอบคำถามต่างหน่วยงาน
+O10,out_of_scope,admission_unknown,end,ช่วยบอกคะแนนขั้นต่ำรอบล่าสุดของคณะให้หน่อย,"นอกขอบเขต; ไม่มีข้อมูลยืนยันในแหล่งปัจจุบัน",SESSION_MANAGEMENT.md,ทดสอบคำถามที่ไม่มีข้อมูลในฐานความรู้

@@ -3,13 +3,14 @@
   "title": "Department Support Staff",
   "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
   "category": "staff",
-  "scraped_at": "2026-03-27T04:37:52.755671+00:00",
+  "scraped_at": "2026-03-27T05:01:13.810692+00:00",
   "entries": [
     {
       "name": "นายธชทัต จวงสอน",
       "role": "นักวิชาการอุดมศึกษาปฏิบัติการ",
       "email": "juangsorn_t@su.ac.th",
-      "detail_url": "",
+      "person_id": "10",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=10&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     },
@@ -17,7 +18,8 @@
       "name": "นายพยุงศักดิ์ เรืองจินดา",
       "role": "วิศวกรปฏิบัติการ",
       "email": "rungjinda_p@su.ac.th",
-      "detail_url": "",
+      "person_id": "11",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=11&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     },
@@ -25,7 +27,8 @@
       "name": "นางสาวฐนิชา คล้ำชานา",
       "role": "นักการเงินปฏิบัติการ",
       "email": "klamchana_t@su.ac.th",
-      "detail_url": "",
+      "person_id": "12",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=12&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     },
@@ -33,7 +36,8 @@
       "name": "นางผกามาศ สมจิตต์",
       "role": "นักวิชาการอุดมศึกษาปฏิบัติการ",
       "email": "somjit_p@su.ac.th",
-      "detail_url": "",
+      "person_id": "13",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=13&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     },
@@ -41,7 +45,8 @@
       "name": "นางสาวณัฏฐ์นรี กระกรกุล",
       "role": "นักวิชาการอุดมศึกษาปฏิบัติการ",
       "email": "krakornkul_n@su.ac.th",
-      "detail_url": "",
+      "person_id": "14",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=14&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     },
@@ -49,7 +54,8 @@
       "name": "นางสาวกุลธิดา เอี่ยมมงคล",
       "role": "ผู้ปฏิบัติงานทั่วไป",
       "email": "aiammongkol_K@su.ac.th",
-      "detail_url": "",
+      "person_id": "17",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=17&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     },
@@ -57,10 +63,11 @@
       "name": "นายจิรศักดิ์ วงษ์บงกชไพศาล",
       "role": "ผู้ช่วยสอน",
       "email": "wongbongkot_j@su.ac.th",
-      "detail_url": "",
+      "person_id": "18",
+      "detail_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=18&Type=Officials",
       "source_url": "https://ee-eng.su.ac.th/Staff.aspx?Type=Officials",
       "category": "staff"
     }
   ],
-  "markdown": "# Department Support Staff\n\nSource URL: https://ee-eng.su.ac.th/Staff.aspx?Type=Officials\n\n## Directory\n\n### นายธชทัต จวงสอน\n- Role: นักวิชาการอุดมศึกษาปฏิบัติการ\n- Email: juangsorn_t@su.ac.th\n\n### นายพยุงศักดิ์ เรืองจินดา\n- Role: วิศวกรปฏิบัติการ\n- Email: rungjinda_p@su.ac.th\n\n### นางสาวฐนิชา คล้ำชานา\n- Role: นักการเงินปฏิบัติการ\n- Email: klamchana_t@su.ac.th\n\n### นางผกามาศ สมจิตต์\n- Role: นักวิชาการอุดมศึกษาปฏิบัติการ\n- Email: somjit_p@su.ac.th\n\n### นางสาวณัฏฐ์นรี กระกรกุล\n- Role: นักวิชาการอุดมศึกษาปฏิบัติการ\n- Email: krakornkul_n@su.ac.th\n\n### นางสาวกุลธิดา เอี่ยมมงคล\n- Role: ผู้ปฏิบัติงานทั่วไป\n- Email: aiammongkol_K@su.ac.th\n\n### นายจิรศักดิ์ วงษ์บงกชไพศาล\n- Role: ผู้ช่วยสอน\n- Email: wongbongkot_j@su.ac.th\n"
+  "markdown": "# Department Support Staff\n\nSource URL: https://ee-eng.su.ac.th/Staff.aspx?Type=Officials\n\n## Directory\n\n### นายธชทัต จวงสอน\n- Role: นักวิชาการอุดมศึกษาปฏิบัติการ\n- Email: juangsorn_t@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=10&Type=Officials\n\n### นายพยุงศักดิ์ เรืองจินดา\n- Role: วิศวกรปฏิบัติการ\n- Email: rungjinda_p@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=11&Type=Officials\n\n### นางสาวฐนิชา คล้ำชานา\n- Role: นักการเงินปฏิบัติการ\n- Email: klamchana_t@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=12&Type=Officials\n\n### นางผกามาศ สมจิตต์\n- Role: นักวิชาการอุดมศึกษาปฏิบัติการ\n- Email: somjit_p@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=13&Type=Officials\n\n### นางสาวณัฏฐ์นรี กระกรกุล\n- Role: นักวิชาการอุดมศึกษาปฏิบัติการ\n- Email: krakornkul_n@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=14&Type=Officials\n\n### นางสาวกุลธิดา เอี่ยมมงคล\n- Role: ผู้ปฏิบัติงานทั่วไป\n- Email: aiammongkol_K@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=17&Type=Officials\n\n### นายจิรศักดิ์ วงษ์บงกชไพศาล\n- Role: ผู้ช่วยสอน\n- Email: wongbongkot_j@su.ac.th\n- Detail URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=18&Type=Officials\n"
 }

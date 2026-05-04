@@ -1,6 +1,6 @@
-# FSS Hero Chatbot - Restructured
+# EE Support Chatbot
 
-A sophisticated AI-powered chatbot specialized for the Finansia Hero Trading Platform, built with LangGraph, Qdrant, and Gemini AI.
+An AI-powered department support chatbot for Electrical Engineering / Electronic and Computer Systems Engineering, built with LangGraph, Qdrant, and Gemini AI.
 
 ## Project Structure (Restructured)
 
@@ -20,7 +20,7 @@ fsshero-chatbot/
 │   │   │   └── main.py         # FastAPI application
 │   │   ├── core/                # Core business logic
 │   │   │   ├── config.py       # Configuration management
-│   │   │   └── agent.py        # HERO Bot agent implementation
+│   │   │   └── agent.py        # Department assistant agent implementation
 │   │   ├── services/            # Service layer
 │   │   │   ├── vectorstore.py  # Vector database operations
 │   │   │   └── document_processor.py
@@ -132,13 +132,13 @@ cd src/frontend && streamlit run app.py
 
 ## Key Features
 
-### HERO Bot Capabilities
+### Assistant Capabilities
 
-- **Specialized Trading Assistant**: Expert knowledge of Finansia Hero Trading Platform
-- **Multi-Modal RAG**: Combines internal documentation with external trading resources
-- **Query Enhancement**: Automatically improves user questions for better search results
-- **Domain-Restricted Search**: Only searches trusted financial sources
-- **Real-time Workflow Tracing**: Transparent decision-making process
+- **Department Support Assistant**: Answers questions about curriculum, lecturers, regulations, and department services
+- **RAG-First Workflow**: Prioritizes local official documents and scraped department/faculty content
+- **Query Enhancement**: Rewrites vague user questions into stronger knowledge base searches
+- **Official Website Fallback**: Searches trusted department/faculty domains when local context is insufficient
+- **Workflow Tracing**: Exposes routing and retrieval steps for debugging and demo transparency
 
 ### Technical Features
 
@@ -260,11 +260,11 @@ FASTAPI_BASE_URL=http://localhost:8000
 # Optional: Document Processing
 DOC_SOURCE_DIR=data
 
-# Optional: HERO Bot Configuration
-DOMAIN_NAME=Finansia Hero Trading Platform
-BOT_NAME=HERO Bot
-SEARCH_DOMAINS=www.finansiahero.com,smartaccess.fnsyrus.com
-FINANCIAL_TEMPERATURE=0.3
+# Optional: Assistant Configuration
+DOMAIN_NAME=Department of Electrical Engineering, Silpakorn University
+BOT_NAME=EE Support Assistant
+SEARCH_DOMAINS=ee-eng.su.ac.th,eng2.su.ac.th
+FINANCIAL_TEMPERATURE=0.2
 ENABLE_QUERY_ENHANCEMENT=true
 ```
 

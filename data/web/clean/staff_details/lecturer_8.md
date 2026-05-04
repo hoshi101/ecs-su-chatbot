@@ -1,0 +1,33 @@
+# ผู้ช่วยศาสตราจารย์กิตติธัช พาพลเพ็ญ
+
+Source URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=8&Type=Lecturer
+
+- Position: รองหัวหน้าภาควิชาวิศวกรรมไฟฟ้า ฝ่ายจัดการกิจการงานทั่วไป
+- Email: paponpen_k@su.ac.th
+- Research Interests: Power electronics, Electric machine drive
+
+## Education
+
+- ปริญญาตรี วศ.บ. วิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีสุรนารี ปีที่จบการศึกษา 2544
+- ปริญญาโท วศ.ม. วิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี ปีที่จบการศึกษา 2550
+
+## Research Publications
+
+- ระดับนานาชาติ
+- [1] Kittithuch Paponpen, Kantapong Sucharitpongpan, Nichakarn Termsaithong, Parin Chaipunya, "The Implementation of Steering Angle Estimation on Miniature Raspberry Pi-based Autonomous Car", 2022 IEEE 17th Conference on Industrial Electronics and Applications (ICIEA), 16-19 December 2022, Chengdu, China.
+- [2] Parin Chaipunya, Wachirapong Jirakitpuwapat, Kittithuch Paponpen, "Adaptive Kernel Approach to Inverse Problems and Image Restoration using Block Coordinate Descent", 2021 18th International Conference on Electrical Engineering/Electronics, Computer, Telecommunications and Information Technology (ECTI-CON), 19-22 May 2021, Chiang Mai, Thailand.
+- [3] N. Thanyaratsakul, A. Tanthong, T. Tritummanurak, R. Keaw-on, K. Paponpen, P. Silapan, and W. Jaikla. (2021). “Single LT1228 Based Electronically Controllable Sawtooth Generator.” In proceedings of 2021 International Electrical Engineering Congress (iEECON2021) March 10-12, 2021, Pattaya, THAILAND, pp.1-4, 2021.
+- [4] Kittithuch Paponpen, Mongkol Konghirun, "The hybrid observer for sensorless IPMSM drives based on LQR state-feedback control", 2016 19th International Conference on Electrical Machines and Systems (ICEMS), 13-16 November 2016, Chiba, Japan.
+- [5] Kittithuch Paponpen, Mongkol Konghirun, "LQR state feedback controller based on particle swarm optimization for IPMSM drive system", 2015 IEEE 10th Conference on Industrial Electronics and Applications (ICIEA), 15-17 June 2015, Auckland, New Zealand.
+- [6] K. Paponpen, M. Konghirun, "An Improved Sliding Mode Observer for Speed Sensorless Vector Control Drive of PMSM", 2006 CES/IEEE 5th International Power Electronics and Motion Control Conference, 14-16 August 2006, Shanghai, China.
+- ระดับชาติ
+- [1] กิตติธัช พาพลเพ็ญ และ อัครวินท์ งาเนียม,"การปรับค่าเกนของตัวควบคุมความเร็วแบบพีไอสำหรับขับเคลื่อนมอเตอร์ซิงโครนัสแม่เหล็กถาวรโดยใช้เทคนิคการหาค่าที่เหมาะสมด้วยกลุ่มอนุภาค," การประชุมวิชาการ งานวิจัยและพัฒนาเชิงประยุกต์ ครั้งที่ 15 , 15th ECTI-CARD 2023, หัวหิน ประจวบคีรีขันธ์ ประเทศไทย. หน้า 442-445.
+- [2] ซั้ลมา มหากลั่น, รณกร มโนธรรมภัทร วรินทร์, วงษ์มณีเทศ และกิตติธัช พาพลเพ็ญ, “หุ่นยนต์เก็บลูกเทเบิลเทนนิสที่ถูกควบคุมโดยราสเบอร์รี่พาย.” การประชุมวิชาการเครือข่ายวิศวกรรมไฟฟ้าครั้งที่ 14, 25-27 พฤษภาคม พ.ศ. 2565, โรงแรมฮิลตัน อาร์เคเดีย รีสอร์ท แอนด์ สปา จังหวัดภูเก็ต,ประเทศไทย, หน้า 620 – 623.
+- [3] ฐิตินันท์ สมานทรัพย์, ทัศณีวรรณ กิจประชุม, มงคลกิตติ์ จิรโรจน์บวรภัค, ณัฐพล พูลเผือก และ กิตติธัช พาพลเพ็ญ, “การพัฒนาหุ่นยนต์หลบหลีกสิ่งกีดขวางที่ถูกควบคุมด้วยอาดูโน่ ยูโน่ อาร์ 3” ”, การประชุมวิชาการเครือข่ายวิศวกรรมไฟฟ้าครั้งที่ 14, 25-27 พฤษภาคม พ.ศ. 2565, โรงแรมฮิลตัน อาร์เคเดีย รีสอร์ท แอนด์ สปา จังหวัดภูเก็ต, ประเทศไทย, หน้า 624 – 627.
+- [4] กิตติกานต์ อนุชาติ, มนัสญา ลิ้มบริบูรณ์, วริยา รัตนพันธ์ และ กิตติธัช พาพลเพ็ญ, “กล้องดักถ่ายภาพอัตโนมัติด้วยเซนเซอร์ตรวจจับความเคลื่อนไหวพีไออาร์”, การประชุมวิชาการเครือข่ายวิศวกรรมไฟฟ้าครั้งที่ 14, 25-27 พฤษภาคม พ.ศ. 2565, โรงแรมฮิลตัน อาร์เคเดีย รีสอร์ท แอนด์ สปา จังหวัดภูเก็ต, ประเทศไทย, หน้า 640 – 643.
+- [5] กันตพงศ์ สุจริตพงษ์พันธ์, ณิชกานต์ เติมสายทอง และ กิตติธัช พาพลเพ็ญ “การจำแนกป้ายจราจรโดยใช้โครงข่ายประสาทเทียมแบบ 2 มิติสำหรับรถยนต์ขับเคลื่อนอัตโนมัติ”, การประชุมวิชาการเครือข่ายวิศวกรรมไฟฟ้าครั้งที่ 14, 25-27 พฤษภาคม พ.ศ. 2565, โรงแรมฮิลตัน อาร์เคเดีย รีสอร์ท แอนด์ สปา จังหวัดภูเก็ต, ประเทศไทย, หน้า 672 – 675.
+- [6] มารุต อารยธรรม, คมกฤษฏิ์ ขาวเหลือง, วรชิต ชุมพลรักษ์, ระพีพันธ์ แก้วอ่อน, และ กิตติธัช พาพลเพ็ญ, "การออกแบบเครื่องยิงลูกแบดมินตันที่ถูกควบคุมโดยไมโครคอนโทรลเลอร์ ESP8266"การประชุมวิชาการเครือข่ายวิศวกรรมไฟฟ้า ครั้งที่ 13 ( 13th Conference of Electrical Engineering Network 2021 (EENET 2021)), 12-14 พฤษภาคม พ.ศ. 2564, โรงแรมเวียงอินทร์ อำเภอเมือง จังหวัดเชียงราย, หน้า 388 - 391.
+- [7] จิรภัทร เทวบุญ, นพรุจ นิลเพชร์พลอย, พานิช อึ้งพานิช, กิตติธัช พาพลเพ็ญ, "การควบคุมแขนกลหุ่นยนต์ด้วยเทคนิคการเล่นย้อนกลับตามหน่วยความจำที่บันทึกไว้"การประชุมวิชาการเครือข่ายวิศวกรรมไฟฟ้า ครั้งที่ 13 ( 13th Conference of Electrical Engineering Network 2021 (EENET 2021)), 12-14 พฤษภาคม พ.ศ. 2564, โรงแรมเวียงอินทร์ อำเภอเมือง จังหวัดเชียงราย, หน้า 46 - 419.
+- [8] คมกฤษ หอมกลิ่นแก้ว, วรินทร ทิพย์ทำมา, ธีร์ธวัช แจ่มโสภณ, อรทัย วัชรกฤชกรณ์, ระพีพันธ์ แก้วอ่อน, กัณธิดา พันธุ์เจริญ, กิตติธัช พาพลเพ็ญ และ พรชัย เปลี่ยมทรัพย์, (2564). “ตู้รับ-ฝากพัสดุอัจฉริยะ.” ในการประชุมวิชาการ งานวิจัย และพัฒนาเชิงประยุกต์ ครั้งที่ 13 (ECTI-CARD 2021), 28-30 เมษายน 2564 นครพนม (ออนไลน์), ประเทศไทย.
+- [9] จิรศักดิ์ วงษ์บงกชไพศาล, รัตนาพร อังคณารุ่งรัตน์, อรณิชา แซ่ตั้ง, ระพีพันธ์ แก้วอ่อน, ชัยวุฒ ชูรักษ์, พรชัย เปลี่ยมทรัพย์, และ กิตติธัช พาพลเพ็ญ. (2562) “โปรแกรมทดสอบอุณหภูมิและความชื้นในดินสำหรับโรงเรือนอัจฉริยะเพื่อใช้ปลูกผักออร์แกนิค.” ใน Proceeding การประชุมวิชาการ
+- ระดับชาติงานวิจัยและพัฒนาเชิงประยุกต์ ครั้งที่ 11 หน้า 43 อุบลราชธานี 4-7 มิถุนายน 2562.

@@ -1,0 +1,24 @@
+{
+  "kind": "staff_detail",
+  "title": "อาจารย์ ดร.ปาริฉัตร เสริมวุฒิสาร",
+  "source_url": "https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=23&Type=Lecturer",
+  "category": "faculty",
+  "scraped_at": "2026-03-27T05:00:21.199548+00:00",
+  "name": "อาจารย์ ดร.ปาริฉัตร เสริมวุฒิสาร",
+  "position": "อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า",
+  "email": "sermwuthisarn_p@su.ac.th",
+  "phone": "",
+  "research_interests": "Image processing, Pattern recognition, Compressed sensing",
+  "education": [
+    "ปริญญาตรี วศ.บ. วิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ ปีที่จบการศึกษา 2548",
+    "ปริญญาโท วศ.ม. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2551",
+    "ปริญญาเอก วศ.ด. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2555"
+  ],
+  "research_publications": [
+    "ระดับนานาชาติ \"",
+    "[1] Achitpon Yimpin, Parichat Sermwuthisarn, Wanwisa Phimcharoen, Tanapon Chaisan, Damrongvudhi Onwimol (2022). “SVRice: An Automated Rice Seed Vigor Classification System via Radicle Emergence Testing Using Image-Processing, Curve-Fitting, and Clustering Methods” Applied Engineering in Agriculture. 38. 831-843.\"",
+    "ระดับชาติ \"",
+    "[1] โสภณ ผู้มีจรรยา, ปาริฉัตร เสริมวุฒิสาร, (2563) “วิธีการชักตัวอย่างภาพแบบทำซ้ำสองทิศทางสำหรับการตรวจหาบริเวณที่เบลอ”, วารสารเทคโนโลยีสารสนเทศ, หน้า 81 – 90, ปีที่ 16, ฉบับที่ 1, มกราคม – มิถุนายน 2563.\""
+  ],
+  "markdown": "# อาจารย์ ดร.ปาริฉัตร เสริมวุฒิสาร\n\nSource URL: https://ee-eng.su.ac.th/StaffDetail.aspx?PersonID=23&Type=Lecturer\n\n- Position: อาจารย์ประจำภาควิชาวิศวกรรมไฟฟ้า\n- Email: sermwuthisarn_p@su.ac.th\n- Research Interests: Image processing, Pattern recognition, Compressed sensing\n\n## Education\n\n- ปริญญาตรี วศ.บ. วิศวกรรมไฟฟ้า มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ ปีที่จบการศึกษา 2548\n- ปริญญาโท วศ.ม. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2551\n- ปริญญาเอก วศ.ด. วิศวกรรมไฟฟ้า จุฬาลงกรณ์มหาวิทยาลัย ปีที่จบการศึกษา 2555\n\n## Research Publications\n\n- ระดับนานาชาติ \"\n- [1] Achitpon Yimpin, Parichat Sermwuthisarn, Wanwisa Phimcharoen, Tanapon Chaisan, Damrongvudhi Onwimol (2022). “SVRice: An Automated Rice Seed Vigor Classification System via Radicle Emergence Testing Using Image-Processing, Curve-Fitting, and Clustering Methods” Applied Engineering in Agriculture. 38. 831-843.\"\n- ระดับชาติ \"\n- [1] โสภณ ผู้มีจรรยา, ปาริฉัตร เสริมวุฒิสาร, (2563) “วิธีการชักตัวอย่างภาพแบบทำซ้ำสองทิศทางสำหรับการตรวจหาบริเวณที่เบลอ”, วารสารเทคโนโลยีสารสนเทศ, หน้า 81 – 90, ปีที่ 16, ฉบับที่ 1, มกราคม – มิถุนายน 2563.\"\n"
+}
