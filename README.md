@@ -1,6 +1,6 @@
 # EE Support Chatbot
 
-An AI-powered department support chatbot for Electrical Engineering / Electronic and Computer Systems Engineering, built with LangGraph, Qdrant, and Gemini AI.
+An AI-powered department support chatbot for Electrical Engineering / Electronic and Computer Systems Engineering, built with LangGraph, Qdrant, and switchable Gemini/OpenAI chat models.
 
 ## Project Structure (Restructured)
 
@@ -89,7 +89,13 @@ cp .env.example .env
 # - QDRANT_API_KEY
 # - QDRANT_URL
 # - GOOGLE_API_KEY
+# - OPENAI_API_KEY
 # - TAVILY_API_KEY
+#
+# Optional defaults:
+# - LLM_PROVIDER=gemini|openai
+# - GEMINI_MODEL=gemini-2.5-flash
+# - OPENAI_MODEL=chat-latest
 ```
 
 ### 2. Process Documents (First Run)
@@ -142,12 +148,13 @@ cd src/frontend && streamlit run app.py
 
 ### Technical Features
 
-- **Advanced Architecture**: LangGraph state machine with Gemini AI
+- **Advanced Architecture**: LangGraph state machine with selectable Gemini or OpenAI chat models
 - **Vector Database**: Qdrant with BGE-M3 multilingual embeddings
 - **Document Processing**: Supports PDF, CSV, JSON, TXT, and MD files
 - **Session Management**: Persistent conversation history
 - **Error Handling**: Comprehensive error handling and recovery
 - **Configurable Search**: Enable/disable web search as needed
+- **Provider Switching**: Choose provider and model from the Streamlit sidebar at runtime
 
 ## Development
 
@@ -189,8 +196,15 @@ POST /chat/
 {
   "session_id": "string",
   "query": "string",
-  "enable_web_search": true
+  "enable_web_search": true,
+  "llm_provider": "gemini",
+  "llm_model": "gemini-2.5-flash"
 }
+```
+
+### LLM Options Endpoint
+```
+GET /llm/options
 ```
 
 ### Document Upload

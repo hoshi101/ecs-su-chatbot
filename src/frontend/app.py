@@ -12,7 +12,7 @@ from components.ui_components import (
     display_source_documents,
     display_trace_events
 )
-from api.backend_client import chat_with_backend_agent
+from api.backend_client import chat_with_backend_agent, get_llm_options
 
 def main():
     """Main function to run the Streamlit application."""
@@ -23,18 +23,37 @@ def main():
     # Get FastAPI base URL from config
     fastapi_base_url = FRONTEND_CONFIG["FASTAPI_BASE_URL"]
 
+    if not st.session_state.get("llm_options"):
+        try:
+            llm_options_payload = get_llm_options(fastapi_base_url)
+            st.session_state.llm_options = llm_options_payload.get("providers", {})
+            st.session_state.llm_provider = llm_options_payload.get(
+                "default_provider",
+                st.session_state.get("llm_provider", FRONTEND_CONFIG["DEFAULT_LLM_PROVIDER"]),
+            )
+            st.session_state.llm_model = llm_options_payload.get(
+                "default_model",
+                st.session_state.get("llm_model", FRONTEND_CONFIG["DEFAULT_LLM_MODEL"]),
+            )
+        except requests.exceptions.RequestException:
+            st.session_state.llm_options = {
+                "gemini": ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"],
+                "openai": ["chat-latest", "gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-4.1"],
+            }
+
     # Render sidebar with settings
     render_sidebar_settings()
 
     # Render main UI sections
     display_header()
 
-    st.header("Chat with the Department Assistant")
+    st.header(f"Chat with {FRONTEND_CONFIG['BOT_NAME']}")
     display_chat_history()
 
-    # Display query enhancement and source documents from previous interaction
+    # Display diagnostics from the previous interaction
     display_query_enhancement()
     display_source_documents()
+    display_trace_events(st.session_state.get("trace_events", []))
 
     # Force web search toggle above chat input
     col1, col2 = st.columns([3, 1])
@@ -58,6 +77,8 @@ def main():
                         st.session_state.session_id,
                         prompt,
                         st.session_state.web_search_enabled,
+                        st.session_state.llm_provider,
+                        st.session_state.llm_model,
                         force_web_search,
                         st.session_state.similarity_threshold
                     )
@@ -65,6 +86,7 @@ def main():
                     # Store enhancement and source information in session state
                     st.session_state.enhanced_query = enhancement_info
                     st.session_state.source_documents = source_docs
+                    st.session_state.trace_events = trace_events
 
                     # Display the agent's final response
                     st.markdown(agent_response)

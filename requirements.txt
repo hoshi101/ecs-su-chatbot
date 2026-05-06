@@ -12,6 +12,8 @@ langchain-qdrant==0.2.0
 # LLM Providers
 langchain-google-genai>=0.3.0
 google-generativeai>=0.3.0
+langchain-openai>=0.2.0
+openai>=1.0.0
 langchain-tavily  # Keeping as requested for parity
 
 # Embeddings - BGE-M3 support

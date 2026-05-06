@@ -2,8 +2,10 @@ import os
 from typing import Any, Dict, List, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_tavily import TavilySearch
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
@@ -17,10 +19,14 @@ from src.backend.core.config import (
     FACULTY_CONTACT_TEXT,
     FINANCIAL_TEMPERATURE,
     GOOGLE_API_KEY,
+    OPENAI_API_KEY,
+    PROVIDER_MODEL_SUGGESTIONS,
     SEARCH_DOMAINS,
     SENSITIVE_TOPIC_POLICY,
     SPECIALTY_AREAS,
     TAVILY_API_KEY,
+    normalize_provider,
+    resolve_model_name,
 )
 from src.backend.services.vectorstore import retrieve_documents
 from src.backend.utils.logging_utils import get_logger
@@ -29,6 +35,7 @@ logger = get_logger(__name__)
 
 
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY or ""
 os.environ["TAVILY_API_KEY"] = TAVILY_API_KEY or ""
 
 tavily = TavilySearch(
@@ -47,31 +54,6 @@ class RagJudge(BaseModel):
     sufficient: bool = Field(..., description="Whether the retrieved content is sufficient to answer the question.")
 
 
-router_llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0,
-    google_api_key=GOOGLE_API_KEY,
-).with_structured_output(RouteDecision)
-
-judge_llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0,
-    google_api_key=GOOGLE_API_KEY,
-).with_structured_output(RagJudge)
-
-answer_llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=FINANCIAL_TEMPERATURE,
-    google_api_key=GOOGLE_API_KEY,
-)
-
-query_rewriter_llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.1,
-    google_api_key=GOOGLE_API_KEY,
-)
-
-
 class AgentState(TypedDict, total=False):
     messages: List[BaseMessage]
     route: Literal["rag", "web", "answer", "end"]
@@ -87,6 +69,67 @@ class AgentState(TypedDict, total=False):
     similarity_threshold: float
     initial_router_decision: str
     router_override_reason: str
+    llm_provider: str
+    llm_model: str
+
+
+def get_available_model_suggestions() -> Dict[str, List[str]]:
+    return PROVIDER_MODEL_SUGGESTIONS
+
+
+def get_default_llm_settings() -> Dict[str, str]:
+    provider = normalize_provider(None)
+    return {
+        "provider": provider,
+        "model": resolve_model_name(provider),
+    }
+
+
+def resolve_runtime_llm_settings(
+    provider: str | None = None,
+    model_name: str | None = None,
+) -> Dict[str, str]:
+    provider_name = normalize_provider(provider)
+    resolved_model = resolve_model_name(provider_name, model_name)
+    return {
+        "provider": provider_name,
+        "model": resolved_model,
+    }
+
+
+def build_chat_model(
+    provider: str | None = None,
+    model_name: str | None = None,
+    *,
+    temperature: float = 0,
+) -> BaseChatModel:
+    settings = resolve_runtime_llm_settings(provider, model_name)
+    provider_name = settings["provider"]
+    resolved_model = settings["model"]
+
+    if provider_name == "openai":
+        if not OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY is not configured.")
+        return ChatOpenAI(
+            model=resolved_model,
+            temperature=temperature,
+            api_key=OPENAI_API_KEY,
+        )
+
+    if not GOOGLE_API_KEY:
+        raise ValueError("GOOGLE_API_KEY is not configured.")
+    return ChatGoogleGenerativeAI(
+        model=resolved_model,
+        temperature=temperature,
+        google_api_key=GOOGLE_API_KEY,
+    )
+
+
+def get_runtime_settings_from_state(state: AgentState) -> Dict[str, str]:
+    return resolve_runtime_llm_settings(
+        state.get("llm_provider"),
+        state.get("llm_model"),
+    )
 
 
 def build_default_greeting() -> str:
@@ -126,10 +169,23 @@ Rewritten query:"""
 
 
 def enhance_query_hero_bot_style(original_query: str) -> str:
+    return enhance_query_with_provider(original_query, None, None)
+
+
+def enhance_query_with_provider(
+    original_query: str,
+    provider: str | None,
+    model_name: str | None,
+) -> str:
     if not ENABLE_QUERY_ENHANCEMENT or not original_query.strip():
         return original_query
 
     try:
+        query_rewriter_llm = build_chat_model(
+            provider,
+            model_name,
+            temperature=0.1,
+        )
         response = query_rewriter_llm.invoke(
             [HumanMessage(content=build_query_enhancement_prompt(original_query))]
         )
@@ -171,7 +227,12 @@ def get_query_context(state: AgentState) -> tuple[str, str]:
 
 def router_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
-    enhanced_query = enhance_query_hero_bot_style(original_query)
+    runtime_settings = get_runtime_settings_from_state(state)
+    enhanced_query = enhance_query_with_provider(
+        original_query,
+        runtime_settings["provider"],
+        runtime_settings["model"],
+    )
     query = enhanced_query or original_query
 
     web_search_enabled = state.get("web_search_enabled", True)
@@ -202,6 +263,11 @@ Safety policy:
         system_prompt += "\nWeb search is disabled. Do not route to 'web'."
 
     messages = [("system", system_prompt), ("user", query)]
+    router_llm = build_chat_model(
+        runtime_settings["provider"],
+        runtime_settings["model"],
+        temperature=0,
+    ).with_structured_output(RouteDecision)
     result: RouteDecision = router_llm.invoke(messages)
 
     initial_route = result.route
@@ -223,6 +289,8 @@ Safety policy:
         "original_query": original_query,
         "enhanced_query": enhanced_query,
         "query_enhancement_enabled": ENABLE_QUERY_ENHANCEMENT,
+        "llm_provider": runtime_settings["provider"],
+        "llm_model": runtime_settings["model"],
     }
 
     if result.route == "end":
@@ -249,6 +317,7 @@ def format_rag_context(documents: List[Dict[str, Any]]) -> str:
 def rag_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
     similarity_threshold = state.get("similarity_threshold", 0.7)
+    runtime_settings = get_runtime_settings_from_state(state)
     query = enhanced_query or original_query
 
     try:
@@ -279,7 +348,12 @@ Return sufficient=true only if the retrieved content is enough to answer accurat
 If the content is incomplete, unrelated, or too weak, return sufficient=false.
 """
 
-    verdict: RagJudge = judge_llm.invoke([("system", judge_prompt)])
+    judge_llm = build_chat_model(
+        runtime_settings["provider"],
+        runtime_settings["model"],
+        temperature=0,
+    ).with_structured_output(RagJudge)
+    verdict: RagJudge = judge_llm.invoke([HumanMessage(content=judge_prompt)])
     next_route = "answer" if verdict.sufficient else ("web" if state.get("web_search_enabled", True) else "answer")
 
     return {
@@ -289,11 +363,14 @@ If the content is incomplete, unrelated, or too weak, return sufficient=false.
         "route": next_route,
         "original_query": original_query,
         "enhanced_query": enhanced_query,
+        "llm_provider": runtime_settings["provider"],
+        "llm_model": runtime_settings["model"],
     }
 
 
 def web_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
+    runtime_settings = get_runtime_settings_from_state(state)
     query = enhanced_query or original_query
 
     if not state.get("web_search_enabled", True):
@@ -325,6 +402,8 @@ def web_node(state: AgentState) -> AgentState:
         "route": "answer",
         "original_query": original_query,
         "enhanced_query": enhanced_query,
+        "llm_provider": runtime_settings["provider"],
+        "llm_model": runtime_settings["model"],
     }
 
 
@@ -371,9 +450,20 @@ If context is not available:
 
 
 def answer_node(state: AgentState) -> AgentState:
+    runtime_settings = get_runtime_settings_from_state(state)
     prompt = build_answer_prompt(state)
+    answer_llm = build_chat_model(
+        runtime_settings["provider"],
+        runtime_settings["model"],
+        temperature=FINANCIAL_TEMPERATURE,
+    )
     answer = answer_llm.invoke([HumanMessage(content=prompt)]).content
-    return {**state, "messages": state["messages"] + [AIMessage(content=answer)]}
+    return {
+        **state,
+        "messages": state["messages"] + [AIMessage(content=answer)],
+        "llm_provider": runtime_settings["provider"],
+        "llm_model": runtime_settings["model"],
+    }
 
 
 def from_router(st: AgentState) -> Literal["rag", "web", "answer", "end"]:

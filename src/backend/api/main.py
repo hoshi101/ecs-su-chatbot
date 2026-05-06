@@ -12,8 +12,13 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
-# Updated imports for new structure
-from src.backend.core.agent import rag_agent, enhance_query_hero_bot_style
+from src.backend.core.agent import (
+    build_chat_model,
+    enhance_query_hero_bot_style,
+    get_available_model_suggestions,
+    get_default_llm_settings,
+    rag_agent,
+)
 from src.backend.services.vectorstore import (
     add_documents_batch,
     get_documents_by_metadata,
@@ -24,15 +29,18 @@ from src.backend.services.vectorstore import (
 )
 from src.backend.services.document_processor import document_processor, DocumentProcessingError
 from src.backend.core.config import (
+    GEMINI_MODEL,
     QDRANT_COLLECTION_NAME,
     ENABLE_QUERY_ENHANCEMENT,
-    GOOGLE_API_KEY,
+    OPENAI_API_KEY,
     TAVILY_API_KEY,
     RATE_LIMIT_ENABLED,
     RATE_LIMIT_PER_MINUTE,
     BOT_NAME,
     DOMAIN_NAME,
     SEARCH_DOMAINS,
+    normalize_provider,
+    resolve_model_name,
 )
 from langchain_qdrant import QdrantVectorStore
 from src.backend.utils.logging_utils import get_logger, setup_logging
@@ -43,7 +51,7 @@ logger = get_logger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="EE Support Assistant API",
-    description="API for the Electrical Engineering Department support chatbot powered by Qdrant, Gemini, and BGE-M3.",
+    description="API for the Electrical Engineering Department support chatbot powered by Qdrant, configurable LLM providers, and BGE-M3.",
     version="2.0.0",
 )
 
@@ -69,10 +77,90 @@ class QueryRequest(BaseModel):
     enable_web_search: bool = True # NEW: Add web search toggle state
     force_web_search: bool = False # NEW: Force web search override
     similarity_threshold: float = 0.7 # NEW: Search relevance threshold (0.0-1.0)
+    llm_provider: str | None = Field(None, description="LLM provider to use: gemini or openai")
+    llm_model: str | None = Field(None, description="Exact model name for the selected provider")
 
 class AgentResponse(BaseModel):
     response: str
     trace_events: List[TraceEvent] = Field(default_factory=list)
+    sources: List[Dict[str, Any]] = Field(default_factory=list)
+    llm_provider: str | None = None
+    llm_model: str | None = None
+
+
+class LLMOptionsResponse(BaseModel):
+    default_provider: str
+    default_model: str
+    providers: Dict[str, List[str]]
+
+
+def _safe_snippet(content: str, limit: int = 320) -> str:
+    text = (content or "").strip()
+    if len(text) <= limit:
+        return text
+    return text[:limit].rstrip() + "..."
+
+
+def _load_sidecar_source_metadata(file_path: str | None) -> Dict[str, Any]:
+    if not file_path:
+        return {}
+
+    sidecar_path = os.path.splitext(file_path)[0] + ".json"
+    if not os.path.exists(sidecar_path):
+        return {}
+
+    try:
+        import json
+
+        with open(sidecar_path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+
+    return {
+        "source_url": payload.get("source_url"),
+        "title": payload.get("title"),
+        "document_category": payload.get("category"),
+    }
+
+
+def _build_rag_source_reference(doc: Dict[str, Any]) -> Dict[str, Any]:
+    metadata = doc.get("metadata", {})
+    sidecar_metadata = _load_sidecar_source_metadata(metadata.get("file_path"))
+    merged_metadata = {**sidecar_metadata, **metadata}
+    title = merged_metadata.get("title") or merged_metadata.get("file_name") or "Knowledge Base Document"
+    content = doc.get("content", "")
+
+    if str(title).lower().startswith("lecturer "):
+        first_line = content.splitlines()[0].strip("# ").strip()
+        if first_line:
+            title = first_line
+
+    return {
+        "title": title,
+        "snippet": _safe_snippet(content),
+        "relevance_score": doc.get("score"),
+        "source_type": "Department Knowledge Base",
+        "file_name": merged_metadata.get("file_name"),
+        "file_path": merged_metadata.get("file_path"),
+        "source_url": merged_metadata.get("source_url"),
+        "document_category": merged_metadata.get("document_category"),
+        "page": merged_metadata.get("page"),
+        "page_label": merged_metadata.get("page_label"),
+        "chunk_index": merged_metadata.get("chunk_index"),
+        "total_chunks": merged_metadata.get("total_chunks"),
+        "content_hash": merged_metadata.get("content_hash"),
+    }
+
+
+def _build_web_source_reference(result: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "title": result.get("title") or "Official Website Result",
+        "snippet": _safe_snippet(result.get("snippet", "")),
+        "relevance_score": result.get("relevance"),
+        "source_type": "Official Website Search",
+        "source_url": result.get("url"),
+    }
 
 class DocumentUploadResponse(BaseModel):
     message: str
@@ -421,6 +509,9 @@ async def chat_with_agent(request: Request, body: QueryRequest):
     trace_events_for_frontend: List[TraceEvent] = []
 
     try:
+        llm_provider = normalize_provider(body.llm_provider)
+        llm_model = resolve_model_name(llm_provider, body.llm_model)
+
         # Pass enhanced parameters into the config for the agent to access
         config = {
             "configurable": {
@@ -431,14 +522,18 @@ async def chat_with_agent(request: Request, body: QueryRequest):
             "messages": [HumanMessage(content=body.query)],
             "web_search_enabled": body.enable_web_search,
             "force_web_search": body.force_web_search,
-            "similarity_threshold": body.similarity_threshold
+            "similarity_threshold": body.similarity_threshold,
+            "llm_provider": llm_provider,
+            "llm_model": llm_model,
         }
 
         final_message = ""
 
         logger.info(
-            "Starting agent stream | session_id=%s | web_search=%s | force_web_search=%s | similarity_threshold=%s",
+            "Starting agent stream | session_id=%s | provider=%s | model=%s | web_search=%s | force_web_search=%s | similarity_threshold=%s",
             body.session_id,
+            llm_provider,
+            llm_model,
             body.enable_web_search,
             body.force_web_search,
             body.similarity_threshold,
@@ -474,6 +569,8 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": True,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                         "reason": "Query was clarified for department knowledge base search"
                     }
                 elif override_reason:
@@ -484,7 +581,9 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "override_reason": override_reason,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
-                        "query_enhanced": query_enhanced
+                        "query_enhanced": query_enhanced,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                     }
                 else:
                     event_description = f"Router decided to use '{route_decision}'."
@@ -493,27 +592,19 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "reason": "Based on department information routing policy",
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
-                        "query_enhanced": query_enhanced
+                        "query_enhanced": query_enhanced,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                     }
                 event_type = "routing"
             elif current_node_name == "rag_lookup":
                 rag_content_summary = node_output_state.get("rag", "")[:200] + "..."
                 rag_sufficient = node_output_state.get("route") == "answer"
                 enhanced_query = node_output_state.get("enhanced_query", "")
-                retrieved_docs = []
-                for doc in node_output_state.get("rag_documents", []):
-                    metadata = doc.get("metadata", {})
-                    title = metadata.get("title") or metadata.get("file_name") or "Knowledge Base Document"
-                    if str(title).lower().startswith("lecturer "):
-                        first_line = doc.get("content", "").splitlines()[0].strip("# ").strip()
-                        if first_line:
-                            title = first_line
-                    retrieved_docs.append({
-                        "title": title,
-                        "content": doc.get("content", ""),
-                        "score": doc.get("score"),
-                        "source": metadata.get("file_path") or metadata.get("document_category") or metadata.get("source_type") or "Internal KB"
-                    })
+                retrieved_docs = [
+                    _build_rag_source_reference(doc)
+                    for doc in node_output_state.get("rag_documents", [])
+                ]
 
                 if rag_sufficient:
                     event_description = "Found sufficient department knowledge base content."
@@ -521,6 +612,8 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "retrieved_content_summary": rag_content_summary,
                         "sufficiency_verdict": "Sufficient for department question",
                         "enhanced_query": enhanced_query,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                         "search_type": "Department Knowledge Base Search",
                         "retrieved_documents": retrieved_docs
                     }
@@ -530,6 +623,8 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "retrieved_content_summary": rag_content_summary,
                         "sufficiency_verdict": "Not sufficient - trying official website search",
                         "enhanced_query": enhanced_query,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                         "search_type": "Department Knowledge Base Search",
                         "retrieved_documents": retrieved_docs
                     }
@@ -545,6 +640,8 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_details = {
                         "search_status": "empty",
                         "enhanced_query": enhanced_query,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                         "message": "No additional official website result was available"
                     }
                 else:
@@ -552,9 +649,14 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_details = {
                         "retrieved_content_summary": web_content_summary,
                         "enhanced_query": enhanced_query,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
                         "search_domains": ", ".join(SEARCH_DOMAINS),
                         "search_type": "Official Website Search",
-                        "search_results": web_results
+                        "search_results": [
+                            _build_web_source_reference(result)
+                            for result in web_results
+                        ]
                     }
                 event_type = "web_search"
             elif current_node_name == "answer":
@@ -564,6 +666,8 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     "bot_name": BOT_NAME,
                     "specialization": DOMAIN_NAME,
                     "enhanced_query": enhanced_query,
+                    "llm_provider": node_output_state.get("llm_provider"),
+                    "llm_model": node_output_state.get("llm_model"),
                     "response_type": "Department Information Response"
                 }
                 event_type = "response_generation"
@@ -607,9 +711,31 @@ async def chat_with_agent(request: Request, body: QueryRequest):
              logger.error("Agent finished without final AIMessage | session_id=%s", body.session_id)
              raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Agent did not return a valid response (final AI message not found).")
 
-        logger.info("Agent stream completed | session_id=%s | response_preview=%s", body.session_id, final_message[:200])
+        final_sources: List[Dict[str, Any]] = []
+        if final_actual_state_dict:
+            final_sources.extend(
+                _build_rag_source_reference(doc)
+                for doc in final_actual_state_dict.get("rag_documents", [])
+            )
+            final_sources.extend(
+                _build_web_source_reference(result)
+                for result in final_actual_state_dict.get("web_results", [])
+            )
 
-        return AgentResponse(response=final_message, trace_events=trace_events_for_frontend)
+        logger.info(
+            "Agent stream completed | session_id=%s | response_preview=%s | sources=%s",
+            body.session_id,
+            final_message[:200],
+            len(final_sources),
+        )
+
+        return AgentResponse(
+            response=final_message,
+            trace_events=trace_events_for_frontend,
+            sources=final_sources,
+            llm_provider=final_actual_state_dict.get("llm_provider") if final_actual_state_dict else llm_provider,
+            llm_model=final_actual_state_dict.get("llm_model") if final_actual_state_dict else llm_model,
+        )
 
     except Exception as e:
         traceback.print_exc()
@@ -621,6 +747,16 @@ async def chat_with_agent(request: Request, body: QueryRequest):
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
+
+
+@app.get("/llm/options", response_model=LLMOptionsResponse)
+async def llm_options():
+    defaults = get_default_llm_settings()
+    return LLMOptionsResponse(
+        default_provider=defaults["provider"],
+        default_model=defaults["model"],
+        providers=get_available_model_suggestions(),
+    )
 
 
 # --- Testing and Monitoring Endpoints ---
@@ -790,7 +926,7 @@ async def detailed_health_check():
     This endpoint checks:
     - Qdrant connection and collection status
     - BGE-M3 embedding generation
-    - Google Gemini API connectivity
+    - Configured LLM provider connectivity (Gemini and/or OpenAI)
     - Tavily web search (if configured)
     - DocumentProcessor initialization
 
@@ -899,52 +1035,100 @@ async def detailed_health_check():
         critical_failures += 1
         logger.exception("BGE-M3 unhealthy")
 
-    # 3. Verify Google Gemini API connectivity
-    logger.info("Checking Google Gemini API")
-    try:
-        start = time.time()
-        from langchain_google_genai import ChatGoogleGenerativeAI
-
-        test_llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            temperature=0,
-            google_api_key=GOOGLE_API_KEY
-        )
-
-        # Simple test invocation
-        test_response = test_llm.invoke([HumanMessage(content="Respond with 'OK'")])
-        latency = (time.time() - start) * 1000
-
-        if test_response and test_response.content:
-            components.append(ComponentHealth(
-                name="Google Gemini API",
-                status="healthy",
-                latency_ms=round(latency, 2),
-                details="Successfully connected to gemini-2.5-flash"
-            ))
-            logger.info("Gemini healthy | latency_ms=%.2f", latency)
-        else:
+    # 3. Verify Gemini connectivity if configured
+    if GEMINI_MODEL:
+        logger.info("Checking Google Gemini API")
+        if not os.getenv("GOOGLE_API_KEY"):
             components.append(ComponentHealth(
                 name="Google Gemini API",
                 status="degraded",
-                latency_ms=round(latency, 2),
-                details="API responded but with empty content",
-                error="Empty response content"
+                details="GOOGLE_API_KEY is not configured",
+                error="Missing GOOGLE_API_KEY"
             ))
             non_critical_failures += 1
-            logger.warning("Gemini degraded | empty response")
+        else:
+            try:
+                start = time.time()
+                test_llm = build_chat_model("gemini", GEMINI_MODEL, temperature=0)
+                test_response = test_llm.invoke([HumanMessage(content="Respond with OK")])
+                latency = (time.time() - start) * 1000
 
-    except Exception as e:
+                if test_response and test_response.content:
+                    components.append(ComponentHealth(
+                        name="Google Gemini API",
+                        status="healthy",
+                        latency_ms=round(latency, 2),
+                        details=f"Successfully connected to {GEMINI_MODEL}"
+                    ))
+                    logger.info("Gemini healthy | latency_ms=%.2f", latency)
+                else:
+                    components.append(ComponentHealth(
+                        name="Google Gemini API",
+                        status="degraded",
+                        latency_ms=round(latency, 2),
+                        details="API responded but with empty content",
+                        error="Empty response content"
+                    ))
+                    non_critical_failures += 1
+                    logger.warning("Gemini degraded | empty response")
+
+            except Exception as e:
+                components.append(ComponentHealth(
+                    name="Google Gemini API",
+                    status="unhealthy",
+                    details=f"Failed to connect to Gemini model {GEMINI_MODEL}",
+                    error=str(e)
+                ))
+                critical_failures += 1
+                logger.exception("Gemini unhealthy")
+
+    # 4. Verify OpenAI connectivity if configured
+    logger.info("Checking OpenAI API")
+    if not OPENAI_API_KEY:
         components.append(ComponentHealth(
-            name="Google Gemini API",
-            status="unhealthy",
-            details="Failed to connect to Gemini API",
-            error=str(e)
+            name="OpenAI API",
+            status="degraded",
+            details="OPENAI_API_KEY is not configured",
+            error="Missing OPENAI_API_KEY"
         ))
-        critical_failures += 1
-        logger.exception("Gemini unhealthy")
+        non_critical_failures += 1
+    else:
+        try:
+            start = time.time()
+            test_llm = build_chat_model("openai", resolve_model_name("openai"), temperature=0)
+            test_response = test_llm.invoke([HumanMessage(content="Respond with OK")])
+            latency = (time.time() - start) * 1000
 
-    # 4. Test Tavily web search (if configured)
+            if test_response and test_response.content:
+                components.append(ComponentHealth(
+                    name="OpenAI API",
+                    status="healthy",
+                    latency_ms=round(latency, 2),
+                    details=f"Successfully connected to {resolve_model_name('openai')}"
+                ))
+                logger.info("OpenAI healthy | latency_ms=%.2f", latency)
+            else:
+                components.append(ComponentHealth(
+                    name="OpenAI API",
+                    status="degraded",
+                    latency_ms=round(latency, 2),
+                    details="API responded but with empty content",
+                    error="Empty response content"
+                ))
+                non_critical_failures += 1
+                logger.warning("OpenAI degraded | empty response")
+
+        except Exception as e:
+            components.append(ComponentHealth(
+                name="OpenAI API",
+                status="unhealthy",
+                details=f"Failed to connect to OpenAI model {resolve_model_name('openai')}",
+                error=str(e)
+            ))
+            critical_failures += 1
+            logger.exception("OpenAI unhealthy")
+
+    # 5. Test Tavily web search (if configured)
     logger.info("Checking Tavily web search")
     if TAVILY_API_KEY:
         try:
