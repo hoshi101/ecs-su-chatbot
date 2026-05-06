@@ -1,4 +1,5 @@
 import os
+import re
 from typing import Any, Dict, List, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
@@ -71,6 +72,12 @@ class AgentState(TypedDict, total=False):
     router_override_reason: str
     llm_provider: str
     llm_model: str
+    rag_status: Literal["sufficient", "insufficient", "empty", "error"]
+    rag_error: str
+    query_enhancement_status: Literal["enhanced", "skipped", "unchanged"]
+    query_enhancement_reason: str
+    precheck_intent: Literal["contact", "greeting", "out_of_scope", "domain_question"]
+    precheck_reason: str
 
 
 def get_available_model_suggestions() -> Dict[str, List[str]]:
@@ -168,6 +175,140 @@ User question: {original_query}
 Rewritten query:"""
 
 
+NON_INFORMATIONAL_PATTERNS = (
+    r"^(hi|hello|hey|yo|ok|okay|thanks|thank you|thx|sure|yes|no|lol|555+|ครับ|ค่ะ|คับ|จ้า|โอเค|ได้เลย|ขอบคุณ|หวัดดี|สวัสดี)$",
+    r"^(กินข้าวยัง|ไปไหนมา|เป็นไงบ้าง|สบายดีไหม|ทำอะไรอยู่)$",
+)
+
+DOMAIN_HINTS = (
+    "ภาควิชา",
+    "สาขา",
+    "มหาลัย",
+    "มหาวิทยาลัย",
+    "คณะ",
+    "หลักสูตร",
+    "รายวิชา",
+    "อาจารย์",
+    "บุคลากร",
+    "ติดต่อ",
+    "โทร",
+    "facebook",
+    "website",
+    "contact",
+    "course",
+    "curriculum",
+    "lecturer",
+    "department",
+    "internship",
+    "co-op",
+    "coop",
+    "prerequisite",
+)
+
+CONTACT_HINTS = (
+    "ติดต่อ",
+    "contact",
+    "โทร",
+    "phone",
+    "เบอร์",
+    "facebook",
+    "email",
+    "อีเมล",
+    "ที่อยู่",
+    "address",
+    "website",
+    "เว็บ",
+    "location",
+    "สถานที่ตั้ง",
+)
+
+GREETING_PATTERNS = (
+    r"^(hi|hello|hey|yo|สวัสดี|หวัดดี)$",
+    r"^(hi|hello|hey|yo|สวัสดี|หวัดดี)\s+(ครับ|ค่ะ|คับ|จ้า)?$",
+)
+
+OUT_OF_SCOPE_PATTERNS = (
+    r"^(กินข้าวยัง|กินไรดี|ไปไหนมา|เป็นไงบ้าง|สบายดีไหม|ทำอะไรอยู่)$",
+    r"^(เล่าเรื่องตลก|ดูดวง|แต่งเพลง|เขียนโค้ด|คำนวณหวย|แนะนำหนัง|สรุปข่าว)$",
+)
+
+
+def should_enhance_query(original_query: str) -> tuple[bool, str]:
+    query = " ".join(original_query.strip().split())
+    normalized = query.lower().strip(" \t\n\r?!.,")
+
+    if not ENABLE_QUERY_ENHANCEMENT:
+        return False, "Query enhancement is disabled."
+    if not query:
+        return False, "Empty query."
+
+    for pattern in NON_INFORMATIONAL_PATTERNS:
+        if re.fullmatch(pattern, normalized):
+            return False, "Small talk or acknowledgement does not need search enhancement."
+
+    token_count = len(query.split())
+    has_domain_hint = any(term in normalized for term in DOMAIN_HINTS)
+
+    if not has_domain_hint and token_count <= 5:
+        return False, "Short non-domain query does not need enhancement."
+
+    if has_domain_hint and (len(query) >= 60 or token_count >= 8):
+        return False, "Query is already specific enough for retrieval."
+
+    return True, "Query may benefit from retrieval-oriented rewriting."
+
+
+def build_contact_response() -> str:
+    return f"""ได้เลยครับ นี่คือข้อมูลติดต่อของ{DOMAIN_NAME}
+
+- โทรศัพท์: 034-219364-66 ต่อ 25520
+- มือถือ: 089-979-7911
+- โทรศัพท์/โทรสาร: 034-241971
+- Facebook: Department of Electrical Engineering - Silpakorn University
+
+หากต้องการ ผมช่วยสรุปเป็นรูปแบบสั้นสำหรับส่งต่อได้ครับ"""
+
+
+def build_out_of_scope_response() -> str:
+    return f"""ขออภัยครับ ผมช่วยได้เฉพาะข้อมูลที่เกี่ยวข้องกับ{DOMAIN_NAME} เช่น
+
+- หลักสูตรและรายวิชา
+- อาจารย์และบุคลากร
+- ระเบียบและเอกสาร
+- ข้อมูลติดต่อภาควิชา
+
+ถ้าคุณมีคำถามเกี่ยวกับภาควิชาหรือมหาวิทยาลัยในส่วนนี้ ส่งมาได้เลยครับ"""
+
+
+def normalize_for_rules(text: str) -> str:
+    return " ".join(text.strip().lower().split()).strip(" \t\n\r?!.,")
+
+
+def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str]:
+    normalized = normalize_for_rules(original_query)
+    if not normalized:
+        return "greeting", "Empty input treated as a greeting/help prompt."
+
+    has_domain_hint = any(term in normalized for term in DOMAIN_HINTS)
+    has_contact_hint = any(term in normalized for term in CONTACT_HINTS)
+
+    for pattern in GREETING_PATTERNS:
+        if re.fullmatch(pattern, normalized):
+            return "greeting", "Greeting matched a direct template response."
+
+    if has_domain_hint and has_contact_hint:
+        return "contact", "Contact keywords matched a direct template response."
+
+    for pattern in OUT_OF_SCOPE_PATTERNS:
+        if re.fullmatch(pattern, normalized):
+            return "out_of_scope", "Clearly outside the chatbot scope."
+
+    if not has_domain_hint and len(normalized.split()) <= 6:
+        return "out_of_scope", "Short query without department or university hints."
+
+    return "domain_question", "Query appears related to the department knowledge domain."
+
+
 def enhance_query_hero_bot_style(original_query: str) -> str:
     return enhance_query_with_provider(original_query, None, None)
 
@@ -228,11 +369,58 @@ def get_query_context(state: AgentState) -> tuple[str, str]:
 def router_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
     runtime_settings = get_runtime_settings_from_state(state)
-    enhanced_query = enhance_query_with_provider(
-        original_query,
-        runtime_settings["provider"],
-        runtime_settings["model"],
-    )
+    precheck_intent, precheck_reason = classify_query_precheck(original_query)
+
+    base_state: AgentState = {
+        "messages": state["messages"],
+        "web_search_enabled": state.get("web_search_enabled", True),
+        "force_web_search": state.get("force_web_search", False),
+        "similarity_threshold": state.get("similarity_threshold", 0.7),
+        "original_query": original_query,
+        "enhanced_query": original_query,
+        "query_enhancement_enabled": ENABLE_QUERY_ENHANCEMENT,
+        "llm_provider": runtime_settings["provider"],
+        "llm_model": runtime_settings["model"],
+        "query_enhancement_status": "skipped",
+        "query_enhancement_reason": "Template or shortcut response does not need query rewriting.",
+        "precheck_intent": precheck_intent,
+        "precheck_reason": precheck_reason,
+    }
+
+    if precheck_intent == "contact":
+        return {
+            **base_state,
+            "route": "end",
+            "messages": state["messages"] + [AIMessage(content=build_contact_response())],
+        }
+
+    if precheck_intent == "greeting":
+        return {
+            **base_state,
+            "route": "end",
+            "messages": state["messages"] + [AIMessage(content=build_default_greeting())],
+        }
+
+    if precheck_intent == "out_of_scope":
+        return {
+            **base_state,
+            "route": "end",
+            "messages": state["messages"] + [AIMessage(content=build_out_of_scope_response())],
+        }
+
+    should_enhance, enhancement_reason = should_enhance_query(original_query)
+    enhancement_status: Literal["enhanced", "skipped", "unchanged"] = "skipped"
+    if should_enhance:
+        enhanced_query = enhance_query_with_provider(
+            original_query,
+            runtime_settings["provider"],
+            runtime_settings["model"],
+        )
+        enhancement_status = "enhanced" if enhanced_query != original_query else "unchanged"
+        if enhancement_status == "unchanged":
+            enhancement_reason = "The original wording was already suitable for retrieval."
+    else:
+        enhanced_query = original_query
     query = enhanced_query or original_query
 
     web_search_enabled = state.get("web_search_enabled", True)
@@ -291,6 +479,10 @@ Safety policy:
         "query_enhancement_enabled": ENABLE_QUERY_ENHANCEMENT,
         "llm_provider": runtime_settings["provider"],
         "llm_model": runtime_settings["model"],
+        "query_enhancement_status": enhancement_status,
+        "query_enhancement_reason": enhancement_reason,
+        "precheck_intent": precheck_intent,
+        "precheck_reason": precheck_reason,
     }
 
     if result.route == "end":
@@ -329,12 +521,29 @@ def rag_node(state: AgentState) -> AgentState:
     except Exception as exc:
         logger.exception("RAG retrieval error | query=%s", query)
         next_route = "web" if state.get("web_search_enabled", True) else "answer"
-        return {**state, "rag": "", "rag_documents": [], "route": next_route}
+        return {
+            **state,
+            "rag": "",
+            "rag_documents": [],
+            "route": next_route,
+            "rag_status": "error",
+            "rag_error": str(exc),
+            "llm_provider": runtime_settings["provider"],
+            "llm_model": runtime_settings["model"],
+        }
 
     rag_text = format_rag_context(documents)
     if not rag_text.strip():
         next_route = "web" if state.get("web_search_enabled", True) else "answer"
-        return {**state, "rag": "", "rag_documents": [], "route": next_route}
+        return {
+            **state,
+            "rag": "",
+            "rag_documents": [],
+            "route": next_route,
+            "rag_status": "empty",
+            "llm_provider": runtime_settings["provider"],
+            "llm_model": runtime_settings["model"],
+        }
 
     judge_prompt = f"""You are evaluating whether retrieved department information is sufficient to answer the user's question.
 
@@ -365,6 +574,7 @@ If the content is incomplete, unrelated, or too weak, return sufficient=false.
         "enhanced_query": enhanced_query,
         "llm_provider": runtime_settings["provider"],
         "llm_model": runtime_settings["model"],
+        "rag_status": "sufficient" if verdict.sufficient else "insufficient",
     }
 
 

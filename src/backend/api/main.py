@@ -560,18 +560,36 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                 override_reason = node_output_state.get('router_override_reason', None)
                 original_query = node_output_state.get('original_query', body.query)
                 enhanced_query = node_output_state.get('enhanced_query', body.query)
+                enhancement_status = node_output_state.get("query_enhancement_status", "unchanged")
+                enhancement_reason = node_output_state.get("query_enhancement_reason", "")
+                precheck_intent = node_output_state.get("precheck_intent")
+                precheck_reason = node_output_state.get("precheck_reason", "")
                 query_enhanced = enhanced_query != original_query and node_output_state.get('query_enhancement_enabled', False)
 
-                if query_enhanced:
+                if route_decision == "end" and precheck_intent in {"contact", "greeting", "out_of_scope"}:
+                    event_description = f"Shortcut response selected for '{precheck_intent}'."
+                    event_details = {
+                        "decision": route_decision,
+                        "precheck_intent": precheck_intent,
+                        "precheck_reason": precheck_reason,
+                        "original_query": original_query,
+                        "enhanced_query": enhanced_query,
+                        "query_enhanced": False,
+                        "query_enhancement_status": enhancement_status,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
+                    }
+                elif query_enhanced:
                     event_description = f"Query was refined for retrieval and routed to '{route_decision}'."
                     event_details = {
                         "decision": route_decision,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": True,
+                        "query_enhancement_status": enhancement_status,
                         "llm_provider": node_output_state.get("llm_provider"),
                         "llm_model": node_output_state.get("llm_model"),
-                        "reason": "Query was clarified for department knowledge base search"
+                        "reason": enhancement_reason or "Query was clarified for department knowledge base search"
                     }
                 elif override_reason:
                     event_description = f"Router initially decided: '{initial_decision}'. Overridden to: '{route_decision}' because {override_reason}."
@@ -582,6 +600,21 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": query_enhanced,
+                        "query_enhancement_status": enhancement_status,
+                        "query_enhancement_reason": enhancement_reason,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
+                    }
+                elif enhancement_status == "skipped":
+                    event_description = f"Router skipped query enhancement and decided to use '{route_decision}'."
+                    event_details = {
+                        "decision": route_decision,
+                        "reason": "Based on department information routing policy",
+                        "original_query": original_query,
+                        "enhanced_query": enhanced_query,
+                        "query_enhanced": False,
+                        "query_enhancement_status": enhancement_status,
+                        "query_enhancement_reason": enhancement_reason,
                         "llm_provider": node_output_state.get("llm_provider"),
                         "llm_model": node_output_state.get("llm_model"),
                     }
@@ -593,24 +626,49 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": query_enhanced,
+                        "query_enhancement_status": enhancement_status,
+                        "query_enhancement_reason": enhancement_reason,
                         "llm_provider": node_output_state.get("llm_provider"),
                         "llm_model": node_output_state.get("llm_model"),
                     }
                 event_type = "routing"
             elif current_node_name == "rag_lookup":
                 rag_content_summary = node_output_state.get("rag", "")[:200] + "..."
-                rag_sufficient = node_output_state.get("route") == "answer"
+                rag_status = node_output_state.get("rag_status")
                 enhanced_query = node_output_state.get("enhanced_query", "")
                 retrieved_docs = [
                     _build_rag_source_reference(doc)
                     for doc in node_output_state.get("rag_documents", [])
                 ]
 
-                if rag_sufficient:
+                if rag_status == "sufficient":
                     event_description = "Found sufficient department knowledge base content."
                     event_details = {
                         "retrieved_content_summary": rag_content_summary,
                         "sufficiency_verdict": "Sufficient for department question",
+                        "enhanced_query": enhanced_query,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
+                        "search_type": "Department Knowledge Base Search",
+                        "retrieved_documents": retrieved_docs
+                    }
+                elif rag_status == "error":
+                    event_description = "Knowledge base retrieval failed. Continuing without RAG evidence."
+                    event_details = {
+                        "retrieved_content_summary": rag_content_summary,
+                        "sufficiency_verdict": "Retrieval error",
+                        "enhanced_query": enhanced_query,
+                        "llm_provider": node_output_state.get("llm_provider"),
+                        "llm_model": node_output_state.get("llm_model"),
+                        "search_type": "Department Knowledge Base Search",
+                        "retrieved_documents": retrieved_docs,
+                        "error": node_output_state.get("rag_error"),
+                    }
+                elif rag_status == "empty":
+                    event_description = "Knowledge base search returned no matching content."
+                    event_details = {
+                        "retrieved_content_summary": rag_content_summary,
+                        "sufficiency_verdict": "No matching knowledge base content",
                         "enhanced_query": enhanced_query,
                         "llm_provider": node_output_state.get("llm_provider"),
                         "llm_model": node_output_state.get("llm_model"),
