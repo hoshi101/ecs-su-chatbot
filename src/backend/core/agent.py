@@ -1,4 +1,5 @@
 import os
+import random
 import re
 from typing import Any, Dict, List, Literal, TypedDict
 
@@ -232,6 +233,42 @@ OUT_OF_SCOPE_PATTERNS = (
     r"^(เล่าเรื่องตลก|ดูดวง|แต่งเพลง|เขียนโค้ด|คำนวณหวย|แนะนำหนัง|สรุปข่าว)$",
 )
 
+CONTACT_RESPONSE_TEMPLATES = (
+    """ได้เลยครับ นี่คือข้อมูลติดต่อของ{domain_name}
+
+- โทรศัพท์: 034-219364-66 ต่อ 25520
+- มือถือ: 089-979-7911
+- โทรศัพท์/โทรสาร: 034-241971
+- Facebook: Department of Electrical Engineering - Silpakorn University
+
+หากต้องการ ผมช่วยสรุปเป็นรูปแบบสั้นสำหรับส่งต่อได้ครับ""",
+    """ข้อมูลติดต่อ{domain_name}ที่ใช้ได้ตอนนี้มีดังนี้ครับ
+
+- เบอร์หลัก: 034-219364-66 ต่อ 25520
+- มือถือ: 089-979-7911
+- โทรศัพท์/โทรสาร: 034-241971
+- Facebook: Department of Electrical Engineering - Silpakorn University
+
+ถ้าต้องการ ผมช่วยจัดรูปแบบให้พร้อมส่งต่อได้ครับ""",
+)
+
+GREETING_RESPONSE_TEMPLATES = (
+    "สวัสดีครับ ผมคือ {bot_name} ผู้ช่วยข้อมูลของ{domain_name} ถามเรื่องหลักสูตร รายวิชา อาจารย์ ระเบียบ หรือข้อมูลติดต่อได้เลยครับ",
+    "สวัสดีครับ ผมช่วยตอบคำถามเกี่ยวกับ{domain_name}ได้ เช่น หลักสูตร อาจารย์ เอกสาร และข้อมูลติดต่อครับ",
+)
+
+OUT_OF_SCOPE_RESPONSE_TEMPLATES = (
+    """ขออภัยครับ ผมช่วยได้เฉพาะข้อมูลที่เกี่ยวข้องกับ{domain_name} เช่น
+
+- หลักสูตรและรายวิชา
+- อาจารย์และบุคลากร
+- ระเบียบและเอกสาร
+- ข้อมูลติดต่อภาควิชา
+
+ถ้าคุณมีคำถามเกี่ยวกับภาควิชาหรือมหาวิทยาลัยในส่วนนี้ ส่งมาได้เลยครับ""",
+    """คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ ตอนนี้ผมช่วยได้เฉพาะเรื่องของ{domain_name} เช่น หลักสูตร รายวิชา อาจารย์ เอกสาร และข้อมูลติดต่อภาควิชาเท่านั้นครับ""",
+)
+
 
 def should_enhance_query(original_query: str) -> tuple[bool, str]:
     query = " ".join(original_query.strip().split())
@@ -259,25 +296,18 @@ def should_enhance_query(original_query: str) -> tuple[bool, str]:
 
 
 def build_contact_response() -> str:
-    return f"""ได้เลยครับ นี่คือข้อมูลติดต่อของ{DOMAIN_NAME}
+    return random.choice(CONTACT_RESPONSE_TEMPLATES).format(domain_name=DOMAIN_NAME)
 
-- โทรศัพท์: 034-219364-66 ต่อ 25520
-- มือถือ: 089-979-7911
-- โทรศัพท์/โทรสาร: 034-241971
-- Facebook: Department of Electrical Engineering - Silpakorn University
 
-หากต้องการ ผมช่วยสรุปเป็นรูปแบบสั้นสำหรับส่งต่อได้ครับ"""
+def build_greeting_response() -> str:
+    return random.choice(GREETING_RESPONSE_TEMPLATES).format(
+        bot_name=BOT_NAME,
+        domain_name=DOMAIN_NAME,
+    )
 
 
 def build_out_of_scope_response() -> str:
-    return f"""ขออภัยครับ ผมช่วยได้เฉพาะข้อมูลที่เกี่ยวข้องกับ{DOMAIN_NAME} เช่น
-
-- หลักสูตรและรายวิชา
-- อาจารย์และบุคลากร
-- ระเบียบและเอกสาร
-- ข้อมูลติดต่อภาควิชา
-
-ถ้าคุณมีคำถามเกี่ยวกับภาควิชาหรือมหาวิทยาลัยในส่วนนี้ ส่งมาได้เลยครับ"""
+    return random.choice(OUT_OF_SCOPE_RESPONSE_TEMPLATES).format(domain_name=DOMAIN_NAME)
 
 
 def normalize_for_rules(text: str) -> str:
@@ -302,9 +332,6 @@ def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "gr
     for pattern in OUT_OF_SCOPE_PATTERNS:
         if re.fullmatch(pattern, normalized):
             return "out_of_scope", "Clearly outside the chatbot scope."
-
-    if not has_domain_hint and len(normalized.split()) <= 6:
-        return "out_of_scope", "Short query without department or university hints."
 
     return "domain_question", "Query appears related to the department knowledge domain."
 
@@ -398,7 +425,7 @@ def router_node(state: AgentState) -> AgentState:
         return {
             **base_state,
             "route": "end",
-            "messages": state["messages"] + [AIMessage(content=build_default_greeting())],
+            "messages": state["messages"] + [AIMessage(content=build_greeting_response())],
         }
 
     if precheck_intent == "out_of_scope":
