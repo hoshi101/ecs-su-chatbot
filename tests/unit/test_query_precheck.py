@@ -1,7 +1,7 @@
 from langchain_core.messages import HumanMessage
 
 from src.backend.core import agent
-from src.backend.core.agent import classify_query_precheck, router_node, should_enhance_query
+from src.backend.core.agent import classify_query_precheck, resolve_precheck_decision, router_node, should_enhance_query
 
 
 def test_contact_query_shortcuts_to_template():
@@ -63,7 +63,7 @@ def test_soft_out_of_scope_semantic_query_shortcuts():
 
 def test_hard_out_of_scope_semantic_query_shortcuts():
     intent, _ = classify_query_precheck("ใครคือนายก")
-    assert intent == "out_of_scope"
+    assert intent == "domain_question"
 
 
 def test_out_of_scope_with_polite_suffix_still_shortcuts():
@@ -203,3 +203,47 @@ def test_repeated_out_of_scope_variants_do_not_call_llm(monkeypatch):
         assert result["route"] == "end"
         assert result["precheck_intent"] == "out_of_scope"
         assert result["messages"][-1].content
+
+
+def test_resolve_precheck_decision_uses_llm_classifier_for_soft_oob(monkeypatch):
+    def fake_classifier(*args, **kwargs):
+        return agent.IntentDecision(
+            intent="soft_oob",
+            confidence="high",
+            reason="Casual hunger statement outside scope.",
+        )
+
+    monkeypatch.setattr(agent, "classify_intent_with_provider", fake_classifier)
+
+    intent, reason, variant, source = resolve_precheck_decision(
+        "หิวข้าวจัง",
+        "openai",
+        "gpt-5.4-mini",
+    )
+
+    assert intent == "out_of_scope"
+    assert variant == "soft_oob"
+    assert source == "llm_classifier"
+    assert "outside scope" in reason
+
+
+def test_resolve_precheck_decision_uses_llm_classifier_for_hard_oob(monkeypatch):
+    def fake_classifier(*args, **kwargs):
+        return agent.IntentDecision(
+            intent="hard_oob",
+            confidence="high",
+            reason="General knowledge question outside scope.",
+        )
+
+    monkeypatch.setattr(agent, "classify_intent_with_provider", fake_classifier)
+
+    intent, reason, variant, source = resolve_precheck_decision(
+        "ใครคือนายก",
+        "openai",
+        "gpt-5.4-mini",
+    )
+
+    assert intent == "out_of_scope"
+    assert variant == "hard_oob"
+    assert source == "llm_classifier"
+    assert "outside scope" in reason
