@@ -565,7 +565,6 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                 precheck_intent = node_output_state.get("precheck_intent")
                 precheck_reason = node_output_state.get("precheck_reason", "")
                 precheck_variant = node_output_state.get("precheck_variant", "")
-                precheck_source = node_output_state.get("precheck_source", "")
                 query_enhanced = enhanced_query != original_query and node_output_state.get('query_enhancement_enabled', False)
 
                 if route_decision == "end" and precheck_intent in {"contact", "greeting", "out_of_scope"}:
@@ -574,7 +573,6 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "decision": route_decision,
                         "shortcut_type": precheck_intent,
                         "shortcut_variant": precheck_variant,
-                        "shortcut_source": precheck_source,
                         "precheck_intent": precheck_intent,
                         "precheck_reason": precheck_reason,
                         "original_query": original_query,

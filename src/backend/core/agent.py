@@ -57,12 +57,6 @@ class RagJudge(BaseModel):
     sufficient: bool = Field(..., description="Whether the retrieved content is sufficient to answer the question.")
 
 
-class IntentDecision(BaseModel):
-    intent: Literal["greeting", "contact", "domain_question", "soft_oob", "hard_oob"]
-    confidence: Literal["high", "medium", "low"]
-    reason: str = Field(..., description="Short explanation for the selected intent.")
-
-
 class AgentState(TypedDict, total=False):
     messages: List[BaseMessage]
     route: Literal["rag", "web", "answer", "end"]
@@ -87,7 +81,6 @@ class AgentState(TypedDict, total=False):
     precheck_intent: Literal["contact", "greeting", "out_of_scope", "domain_question"]
     precheck_reason: str
     precheck_variant: str
-    precheck_source: Literal["rule", "llm_classifier", "fallback"]
 
 
 def get_available_model_suggestions() -> Dict[str, List[str]]:
@@ -183,35 +176,6 @@ Examples:
 User question: {original_query}
 
 Rewritten query:"""
-
-
-def build_intent_classification_prompt(original_query: str) -> str:
-    return f"""You are an intent classifier for {BOT_NAME}, the information assistant of {DOMAIN_NAME}.
-
-Your job is to classify the user's message into exactly one intent:
-- greeting: direct greeting only
-- contact: short direct request for department contact or channels
-- domain_question: question related to the department, university, curriculum, lecturers, admissions, documents, services, regulations, or official information
-- soft_oob: casual everyday small-talk or emotional statement outside scope, where the reply should be gentle
-- hard_oob: general knowledge or unrelated request outside scope, where the reply should politely refuse and redirect
-
-Rules:
-- Prefer domain_question whenever the message could reasonably be about the department or university.
-- Use greeting only for pure greetings, not greeting plus a real question.
-- Use contact only for short direct contact requests, not detailed staff-specific requests.
-- Use soft_oob for casual statements like hunger, tiredness, boredom, or light chatter.
-- Use hard_oob for politics, general news, coding, entertainment recommendations, or unrelated factual questions.
-- Return the most appropriate single label only through the structured schema.
-
-Examples:
-- "สวัสดีครับ" -> greeting
-- "ขอเบอร์โทรภาควิชา" -> contact
-- "หิวข้าวจัง" -> soft_oob
-- "ใครคือนายก" -> hard_oob
-- "รับสมัครเมื่อไหร่" -> domain_question
-- "สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย" -> domain_question
-
-User message: {original_query}"""
 
 
 NON_INFORMATIONAL_PATTERNS = (
@@ -406,14 +370,6 @@ OUT_OF_SCOPE_SOFT_EXAMPLES = (
     "เบื่อจัง",
     "เครียดจัง",
     "กินอะไรดี",
-)
-
-INTENT_BENCHMARK_CASES = (
-    {"query": "สวัสดีครับ", "expected_intent": "greeting", "expected_variant": "greeting_template"},
-    {"query": "ขอเบอร์โทรภาควิชา", "expected_intent": "contact", "expected_variant": "contact_template"},
-    {"query": "หิวข้าวจัง", "expected_intent": "out_of_scope", "expected_variant": "soft_oob"},
-    {"query": "ใครคือนายก", "expected_intent": "out_of_scope", "expected_variant": "hard_oob"},
-    {"query": "รับสมัครเมื่อไหร่", "expected_intent": "domain_question", "expected_variant": ""},
 )
 
 CONTACT_RESPONSE_TEMPLATES = (
@@ -777,59 +733,13 @@ def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "gr
     if is_out_of_scope_query(normalized):
         return "out_of_scope", "Clearly outside the chatbot scope."
 
+    semantic_oob_variant = semantic_out_of_scope_variant(original_query)
+    if semantic_oob_variant == "soft_oob":
+        return "out_of_scope", "Semantic classifier identified friendly small-talk outside the chatbot scope."
+    if semantic_oob_variant == "hard_oob":
+        return "out_of_scope", "Semantic classifier identified a non-department question outside the chatbot scope."
+
     return "domain_question", "Query appears related to the department knowledge domain."
-
-
-def classify_intent_with_provider(
-    original_query: str,
-    provider: str,
-    model_name: str,
-) -> IntentDecision:
-    classifier_llm = build_chat_model(
-        provider,
-        model_name,
-        temperature=0,
-    ).with_structured_output(IntentDecision)
-    return classifier_llm.invoke(
-        [HumanMessage(content=build_intent_classification_prompt(original_query))]
-    )
-
-
-def resolve_precheck_decision(
-    original_query: str,
-    provider: str,
-    model_name: str,
-) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str, str, Literal["rule", "llm_classifier", "fallback"]]:
-    rule_intent, rule_reason = classify_query_precheck(original_query)
-    if rule_intent == "greeting":
-        return "greeting", rule_reason, "greeting_template", "rule"
-    if rule_intent == "contact":
-        return "contact", rule_reason, "contact_template", "rule"
-    if rule_intent == "out_of_scope":
-        return "out_of_scope", rule_reason, resolve_out_of_scope_variant(original_query), "rule"
-
-    try:
-        intent_decision = classify_intent_with_provider(original_query, provider, model_name)
-        if intent_decision.intent == "greeting":
-            return "greeting", intent_decision.reason, "greeting_template", "llm_classifier"
-        if intent_decision.intent == "contact":
-            return "contact", intent_decision.reason, "contact_template", "llm_classifier"
-        if intent_decision.intent == "soft_oob":
-            return "out_of_scope", intent_decision.reason, "soft_oob", "llm_classifier"
-        if intent_decision.intent == "hard_oob":
-            return "out_of_scope", intent_decision.reason, "hard_oob", "llm_classifier"
-        return "domain_question", intent_decision.reason, "", "llm_classifier"
-    except Exception as exc:
-        logger.warning("Intent classifier fallback triggered | error=%s", exc)
-
-    fallback_variant = semantic_out_of_scope_variant(original_query)
-    if fallback_variant:
-        return "out_of_scope", "Fallback semantic classifier marked the query as outside the chatbot scope.", fallback_variant, "fallback"
-    return "domain_question", "Fallback kept the query in the department domain flow.", "", "fallback"
-
-
-def get_intent_benchmark_cases() -> List[Dict[str, str]]:
-    return [dict(item) for item in INTENT_BENCHMARK_CASES]
 
 
 def enhance_query_hero_bot_style(original_query: str) -> str:
@@ -892,11 +802,14 @@ def get_query_context(state: AgentState) -> tuple[str, str]:
 def router_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
     runtime_settings = get_runtime_settings_from_state(state)
-    precheck_intent, precheck_reason, precheck_variant, precheck_source = resolve_precheck_decision(
-        original_query,
-        runtime_settings["provider"],
-        runtime_settings["model"],
-    )
+    precheck_intent, precheck_reason = classify_query_precheck(original_query)
+    precheck_variant = ""
+    if precheck_intent == "greeting":
+        precheck_variant = "greeting_template"
+    elif precheck_intent == "contact":
+        precheck_variant = "contact_template"
+    elif precheck_intent == "out_of_scope":
+        precheck_variant = resolve_out_of_scope_variant(original_query)
 
     base_state: AgentState = {
         "messages": state["messages"],
@@ -913,7 +826,6 @@ def router_node(state: AgentState) -> AgentState:
         "precheck_intent": precheck_intent,
         "precheck_reason": precheck_reason,
         "precheck_variant": precheck_variant,
-        "precheck_source": precheck_source,
     }
 
     if precheck_intent == "contact":
@@ -1013,7 +925,6 @@ Safety policy:
         "precheck_intent": precheck_intent,
         "precheck_reason": precheck_reason,
         "precheck_variant": precheck_variant,
-        "precheck_source": precheck_source,
     }
 
     if result.route == "end":
