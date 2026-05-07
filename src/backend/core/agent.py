@@ -1,7 +1,6 @@
 import os
 import random
 import re
-import math
 from typing import Any, Dict, List, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
@@ -31,7 +30,7 @@ from src.backend.core.config import (
     normalize_provider,
     resolve_model_name,
 )
-from src.backend.services.vectorstore import embeddings, retrieve_documents
+from src.backend.services.vectorstore import retrieve_documents
 from src.backend.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
@@ -343,34 +342,6 @@ OUT_OF_SCOPE_SOFT_HINTS = {
     "stress": ("เครียด", "ท้อ", "เบื่อ"),
 }
 
-DOMAIN_SEMANTIC_EXAMPLES = (
-    "หลักสูตรสาขามีอะไรบ้าง",
-    "ข้อมูลรายวิชาของภาควิชา",
-    "อาจารย์ประจำภาควิชามีใครบ้าง",
-    "ตารางเรียนและเอกสารการศึกษา",
-    "ข้อมูลติดต่อภาควิชา",
-    "ฝึกงานและสหกิจศึกษาของสาขา",
-    "รับสมัครนักศึกษาและรายละเอียดหลักสูตร",
-)
-
-OUT_OF_SCOPE_HARD_EXAMPLES = (
-    "ใครคือนายก",
-    "ราคาทองวันนี้เท่าไหร่",
-    "ช่วยเขียนโค้ด python ให้หน่อย",
-    "สรุปข่าววันนี้ให้หน่อย",
-    "วิเคราะห์บอลคืนนี้",
-    "แนะนำหนังสนุกๆ",
-    "แต่งเพลงรักให้หน่อย",
-)
-
-OUT_OF_SCOPE_SOFT_EXAMPLES = (
-    "หิวข้าวจัง",
-    "ง่วงมากเลย",
-    "เหนื่อยจังวันนี้",
-    "เบื่อจัง",
-    "เครียดจัง",
-    "กินอะไรดี",
-)
 
 CONTACT_RESPONSE_TEMPLATES = (
     """นี่คือข้อมูลติดต่อของ{domain_name}
@@ -576,31 +547,6 @@ def build_out_of_scope_response(original_query: str, variant: str) -> str:
     return build_hard_out_of_scope_response()
 
 
-def cosine_similarity(left: List[float], right: List[float]) -> float:
-    numerator = sum(a * b for a, b in zip(left, right))
-    left_norm = math.sqrt(sum(a * a for a in left))
-    right_norm = math.sqrt(sum(b * b for b in right))
-    if not left_norm or not right_norm:
-        return 0.0
-    return numerator / (left_norm * right_norm)
-
-
-def average_embedding(texts: tuple[str, ...]) -> List[float]:
-    vectors = [embeddings.embed_query(text) for text in texts]
-    dimensions = len(vectors[0])
-    return [
-        sum(vector[index] for vector in vectors) / len(vectors)
-        for index in range(dimensions)
-    ]
-
-
-SEMANTIC_OOB_PROTOTYPES = {
-    "domain_question": average_embedding(DOMAIN_SEMANTIC_EXAMPLES),
-    "soft_oob": average_embedding(OUT_OF_SCOPE_SOFT_EXAMPLES),
-    "hard_oob": average_embedding(OUT_OF_SCOPE_HARD_EXAMPLES),
-}
-
-
 def normalize_for_rules(text: str) -> str:
     return " ".join(text.strip().lower().split()).strip(" \t\n\r?!.,")
 
@@ -679,35 +625,6 @@ def is_out_of_scope_query(original_query: str) -> bool:
     return compact in {term.replace(" ", "") for term in OUT_OF_SCOPE_BASE_TERMS}
 
 
-def semantic_out_of_scope_variant(original_query: str) -> str | None:
-    normalized = normalize_for_rules(original_query)
-    if not normalized:
-        return None
-
-    if any(term in normalized for term in DOMAIN_HINTS):
-        return None
-
-    try:
-        query_embedding = embeddings.embed_query(original_query)
-    except Exception as exc:
-        logger.warning("Semantic OOB classification failed | error=%s", exc)
-        return None
-
-    scores = {
-        name: cosine_similarity(query_embedding, prototype)
-        for name, prototype in SEMANTIC_OOB_PROTOTYPES.items()
-    }
-    domain_score = scores["domain_question"]
-    soft_score = scores["soft_oob"]
-    hard_score = scores["hard_oob"]
-    best_oob_variant = "soft_oob" if soft_score >= hard_score else "hard_oob"
-    best_oob_score = max(soft_score, hard_score)
-
-    if best_oob_score >= 0.55 and best_oob_score > domain_score + 0.05:
-        return best_oob_variant
-    return None
-
-
 def resolve_out_of_scope_variant(original_query: str) -> str:
     normalized = normalize_for_rules(original_query)
     if any(term in normalized for term in OUT_OF_SCOPE_SOFT_TERMS):
@@ -716,7 +633,7 @@ def resolve_out_of_scope_variant(original_query: str) -> str:
         if get_soft_oob_theme(normalized) != "generic":
             return "soft_oob"
         return "hard_oob"
-    return semantic_out_of_scope_variant(original_query) or "hard_oob"
+    return "hard_oob"
 
 
 def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str]:
@@ -732,12 +649,6 @@ def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "gr
 
     if is_out_of_scope_query(normalized):
         return "out_of_scope", "Clearly outside the chatbot scope."
-
-    semantic_oob_variant = semantic_out_of_scope_variant(original_query)
-    if semantic_oob_variant == "soft_oob":
-        return "out_of_scope", "Semantic classifier identified friendly small-talk outside the chatbot scope."
-    if semantic_oob_variant == "hard_oob":
-        return "out_of_scope", "Semantic classifier identified a non-department question outside the chatbot scope."
 
     return "domain_question", "Query appears related to the department knowledge domain."
 
