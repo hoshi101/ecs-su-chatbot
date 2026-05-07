@@ -9,6 +9,13 @@ def test_contact_query_shortcuts_to_template():
     assert intent == "contact"
 
 
+def test_long_contact_query_goes_to_domain_flow():
+    intent, _ = classify_query_precheck(
+        "ขอข้อมูลติดต่อภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร พร้อมอีเมลและที่อยู่สำนักงาน"
+    )
+    assert intent == "domain_question"
+
+
 def test_greeting_shortcuts_to_template():
     intent, _ = classify_query_precheck("สวัสดี")
     assert intent == "greeting"

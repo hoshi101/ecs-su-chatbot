@@ -177,8 +177,7 @@ Rewritten query:"""
 
 
 NON_INFORMATIONAL_PATTERNS = (
-    r"^(hi|hello|hey|yo|ok|okay|thanks|thank you|thx|sure|yes|no|lol|555+|ครับ|ค่ะ|คับ|จ้า|โอเค|ได้เลย|ขอบคุณ|หวัดดี|สวัสดี)$",
-    r"^(กินข้าวยัง|ไปไหนมา|เป็นไงบ้าง|สบายดีไหม|ทำอะไรอยู่)$",
+    r"^(hi|hello|hey|yo|สวัสดี|หวัดดี)$",
 )
 
 DOMAIN_HINTS = (
@@ -228,6 +227,14 @@ GREETING_PATTERNS = (
     r"^(hi|hello|hey|yo|สวัสดี|หวัดดี)\s+(ครับ|ค่ะ|คับ|จ้า)?$",
 )
 
+CONTACT_SHORT_PATTERNS = (
+    r"^(ขอ)?(ข้อมูล)?ติดต่อ(ภาควิชา|สาขา|department)?(หน่อย|ครับ|ค่ะ|คับ)?$",
+    r"^(ช่องทาง)?ติดต่อ(ภาควิชา|สาขา|department)?(มีอะไรบ้าง|หน่อย|ครับ|ค่ะ|คับ)?$",
+    r"^(เบอร์|เบอร์โทร|เบอร์โทรศัพท์|โทรศัพท์)(ภาควิชา|สาขา|department)?(คืออะไร|อะไร|หน่อย|ครับ|ค่ะ|คับ)?$",
+    r"^(ที่อยู่|address|อีเมล|email|facebook|website|เว็บ)(ภาควิชา|สาขา|department)?(คืออะไร|อะไร|หน่อย|ครับ|ค่ะ|คับ)?$",
+    r"^ติดต่อ(ภาควิชา|สาขา|department)(ยังไง|อย่างไร|ได้ยังไง|หน่อย|ครับ|ค่ะ|คับ)?$",
+)
+
 OUT_OF_SCOPE_PATTERNS = (
     r"^(กินข้าวยัง|กินไรดี|ไปไหนมา|เป็นไงบ้าง|สบายดีไหม|ทำอะไรอยู่)$",
     r"^(เล่าเรื่องตลก|ดูดวง|แต่งเพลง|เขียนโค้ด|คำนวณหวย|แนะนำหนัง|สรุปข่าว)$",
@@ -236,25 +243,52 @@ OUT_OF_SCOPE_PATTERNS = (
 CONTACT_RESPONSE_TEMPLATES = (
     """ได้เลยครับ นี่คือข้อมูลติดต่อของ{domain_name}
 
-- โทรศัพท์: 034-219364-66 ต่อ 25520
-- มือถือ: 089-979-7911
-- โทรศัพท์/โทรสาร: 034-241971
-- Facebook: Department of Electrical Engineering - Silpakorn University
+- โทรศัพท์: {phone_main}
+- มือถือ: {mobile}
+- โทรศัพท์/โทรสาร: {fax}
+- Facebook: {facebook}
 
 หากต้องการ ผมช่วยสรุปเป็นรูปแบบสั้นสำหรับส่งต่อได้ครับ""",
     """ข้อมูลติดต่อ{domain_name}ที่ใช้ได้ตอนนี้มีดังนี้ครับ
 
-- เบอร์หลัก: 034-219364-66 ต่อ 25520
-- มือถือ: 089-979-7911
-- โทรศัพท์/โทรสาร: 034-241971
-- Facebook: Department of Electrical Engineering - Silpakorn University
+- เบอร์หลัก: {phone_main}
+- มือถือ: {mobile}
+- โทรศัพท์/โทรสาร: {fax}
+- Facebook: {facebook}
 
 ถ้าต้องการ ผมช่วยจัดรูปแบบให้พร้อมส่งต่อได้ครับ""",
+    """สำหรับการติดต่อ{domain_name} ใช้ช่องทางเหล่านี้ได้ครับ
+
+- โทรศัพท์: {phone_main}
+- มือถือ: {mobile}
+- โทรศัพท์/โทรสาร: {fax}
+- Facebook: {facebook}
+
+หากต้องการ ผมช่วยแยกเฉพาะเบอร์หรือช่องทางออนไลน์ให้ได้ครับ""",
+    """นี่คือช่องทางติดต่อของ{domain_name}ครับ
+
+- เบอร์โทรหลัก: {phone_main}
+- เบอร์มือถือ: {mobile}
+- โทรสาร/โทรศัพท์: {fax}
+- Facebook: {facebook}
+
+ถ้าต้องการข้อมูลที่อยู่หรือการเดินทางเพิ่มเติม ผมช่วยต่อได้ครับ""",
+    """ติดต่อ{domain_name}ได้ตามนี้ครับ
+
+- โทรศัพท์: {phone_main}
+- มือถือ: {mobile}
+- โทรศัพท์/โทรสาร: {fax}
+- Facebook: {facebook}
+
+หากต้องการ ผมช่วยสรุปให้เป็นข้อความสั้นสำหรับส่งต่อได้ครับ""",
 )
 
 GREETING_RESPONSE_TEMPLATES = (
     "สวัสดีครับ ผมคือ {bot_name} ผู้ช่วยข้อมูลของ{domain_name} ถามเรื่องหลักสูตร รายวิชา อาจารย์ ระเบียบ หรือข้อมูลติดต่อได้เลยครับ",
     "สวัสดีครับ ผมช่วยตอบคำถามเกี่ยวกับ{domain_name}ได้ เช่น หลักสูตร อาจารย์ เอกสาร และข้อมูลติดต่อครับ",
+    "สวัสดีครับ ยินดีช่วยตอบคำถามเกี่ยวกับ{domain_name}ครับ ถามได้ทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ",
+    "สวัสดีครับ ผมเป็นผู้ช่วยข้อมูลของ{domain_name}ครับ หากต้องการข้อมูลจากภาควิชา ส่งคำถามมาได้เลยครับ",
+    "สวัสดีครับ ถ้าคุณต้องการข้อมูลเกี่ยวกับ{domain_name} เช่น หลักสูตร อาจารย์ หรือการติดต่อ ผมช่วยได้ครับ",
 )
 
 OUT_OF_SCOPE_RESPONSE_TEMPLATES = (
@@ -267,7 +301,17 @@ OUT_OF_SCOPE_RESPONSE_TEMPLATES = (
 
 ถ้าคุณมีคำถามเกี่ยวกับภาควิชาหรือมหาวิทยาลัยในส่วนนี้ ส่งมาได้เลยครับ""",
     """คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ ตอนนี้ผมช่วยได้เฉพาะเรื่องของ{domain_name} เช่น หลักสูตร รายวิชา อาจารย์ เอกสาร และข้อมูลติดต่อภาควิชาเท่านั้นครับ""",
+    """ขออภัยครับ เรื่องนี้อยู่นอกขอบเขตของผม ตอนนี้ผมเน้นช่วยตอบเฉพาะข้อมูลของ{domain_name}และข้อมูลที่เกี่ยวข้องกับภาควิชาครับ""",
+    """ผมยังไม่สามารถช่วยในเรื่องนี้ได้ครับ เพราะขอบเขตของผมจำกัดอยู่ที่ข้อมูลของ{domain_name} เช่น หลักสูตร อาจารย์ เอกสาร และการติดต่อครับ""",
+    """ขออภัยครับ คำถามนี้ไม่อยู่ในขอบเขตที่ผมรองรับ ตอนนี้ผมตอบได้เฉพาะข้อมูลที่เกี่ยวข้องกับ{domain_name}และข้อมูลภายในภาควิชาครับ""",
 )
+
+CONTACT_TEMPLATE_VALUES = {
+    "phone_main": "034-219364-66 ต่อ 25520",
+    "mobile": "089-979-7911",
+    "fax": "034-241971",
+    "facebook": "Department of Electrical Engineering - Silpakorn University",
+}
 
 
 def should_enhance_query(original_query: str) -> tuple[bool, str]:
@@ -296,7 +340,10 @@ def should_enhance_query(original_query: str) -> tuple[bool, str]:
 
 
 def build_contact_response() -> str:
-    return random.choice(CONTACT_RESPONSE_TEMPLATES).format(domain_name=DOMAIN_NAME)
+    return random.choice(CONTACT_RESPONSE_TEMPLATES).format(
+        domain_name=DOMAIN_NAME,
+        **CONTACT_TEMPLATE_VALUES,
+    )
 
 
 def build_greeting_response() -> str:
@@ -319,15 +366,13 @@ def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "gr
     if not normalized:
         return "greeting", "Empty input treated as a greeting/help prompt."
 
-    has_domain_hint = any(term in normalized for term in DOMAIN_HINTS)
-    has_contact_hint = any(term in normalized for term in CONTACT_HINTS)
-
     for pattern in GREETING_PATTERNS:
         if re.fullmatch(pattern, normalized):
             return "greeting", "Greeting matched a direct template response."
 
-    if has_domain_hint and has_contact_hint:
-        return "contact", "Contact keywords matched a direct template response."
+    for pattern in CONTACT_SHORT_PATTERNS:
+        if re.fullmatch(pattern, normalized):
+            return "contact", "Short direct contact request matched a template shortcut."
 
     for pattern in OUT_OF_SCOPE_PATTERNS:
         if re.fullmatch(pattern, normalized):
