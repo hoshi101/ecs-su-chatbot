@@ -222,16 +222,7 @@ CONTACT_HINTS = (
     "สถานที่ตั้ง",
 )
 
-GREETING_BASE_TERMS = (
-    "hi",
-    "hello",
-    "hey",
-    "yo",
-    "สวัสดี",
-    "หวัดดี",
-)
-
-GREETING_SUFFIX_TERMS = (
+POLITE_SUFFIX_TERMS = (
     "ครับ",
     "ค่ะ",
     "คับ",
@@ -242,19 +233,89 @@ GREETING_SUFFIX_TERMS = (
     "นะ",
     "นะครับ",
     "นะคะ",
+    "หน่อย",
+    "หน่อยครับ",
+    "หน่อยค่ะ",
+    "ที",
+    "ทีครับ",
+    "ทีค่ะ",
 )
 
-CONTACT_SHORT_PATTERNS = (
-    r"^(ขอ)?(ข้อมูล)?ติดต่อ(ภาควิชา|สาขา|department)?(หน่อย|ครับ|ค่ะ|คับ)?$",
-    r"^(ช่องทาง)?ติดต่อ(ภาควิชา|สาขา|department)?(มีอะไรบ้าง|หน่อย|ครับ|ค่ะ|คับ)?$",
-    r"^(เบอร์|เบอร์โทร|เบอร์โทรศัพท์|โทรศัพท์)(ภาควิชา|สาขา|department)?(คืออะไร|อะไร|หน่อย|ครับ|ค่ะ|คับ)?$",
-    r"^(ที่อยู่|address|อีเมล|email|facebook|website|เว็บ)(ภาควิชา|สาขา|department)?(คืออะไร|อะไร|หน่อย|ครับ|ค่ะ|คับ)?$",
-    r"^ติดต่อ(ภาควิชา|สาขา|department)(ยังไง|อย่างไร|ได้ยังไง|หน่อย|ครับ|ค่ะ|คับ)?$",
+GREETING_BASE_TERMS = (
+    "hi",
+    "hello",
+    "hey",
+    "yo",
+    "สวัสดี",
+    "หวัดดี",
 )
 
-OUT_OF_SCOPE_PATTERNS = (
-    r"^(กินข้าวยัง|กินไรดี|ไปไหนมา|เป็นไงบ้าง|สบายดีไหม|ทำอะไรอยู่)$",
-    r"^(เล่าเรื่องตลก|ดูดวง|แต่งเพลง|เขียนโค้ด|คำนวณหวย|แนะนำหนัง|สรุปข่าว)$",
+CONTACT_SHORT_EXACT_TERMS = (
+    "ติดต่อ",
+    "ติดต่อภาควิชา",
+    "ติดต่อสาขา",
+    "ช่องทางติดต่อ",
+    "ช่องทางติดต่อภาควิชา",
+    "ช่องทางติดต่อสาขา",
+    "ข้อมูลติดต่อ",
+    "ข้อมูลติดต่อภาควิชา",
+    "ข้อมูลติดต่อสาขา",
+    "เบอร์",
+    "เบอร์โทร",
+    "เบอร์โทรศัพท์",
+    "โทรศัพท์",
+    "เบอร์โทรภาควิชา",
+    "เบอร์โทรศัพท์ภาควิชา",
+    "โทรศัพท์ภาควิชา",
+    "ที่อยู่",
+    "ที่อยู่ภาควิชา",
+    "อีเมล",
+    "อีเมลภาควิชา",
+    "email",
+    "email ภาควิชา",
+    "facebook",
+    "facebook ภาควิชา",
+    "website",
+    "website ภาควิชา",
+    "เว็บ",
+    "เว็บภาควิชา",
+)
+
+CONTACT_SHORT_PREFIXES = (
+    "ขอข้อมูลติดต่อ",
+    "ขอข้อมูลการติดต่อ",
+    "ขอช่องทางติดต่อ",
+    "ขอเบอร์ติดต่อ",
+    "ขอเบอร์โทร",
+    "ขอเบอร์โทรศัพท์",
+    "ขอที่อยู่",
+    "ขออีเมล",
+    "ขอ email",
+    "ขอ facebook",
+    "ขอ website",
+    "ขอเว็บ",
+    "ติดต่อภาควิชายังไง",
+    "ติดต่อภาควิชาอย่างไร",
+    "ติดต่อภาควิชาได้ยังไง",
+    "ติดต่อสาขายังไง",
+    "ติดต่อสาขาอย่างไร",
+    "ติดต่อสาขาได้ยังไง",
+)
+
+OUT_OF_SCOPE_BASE_TERMS = (
+    "กินข้าวยัง",
+    "กินไรดี",
+    "ไปไหนมา",
+    "เป็นไงบ้าง",
+    "สบายดีไหม",
+    "ทำอะไรอยู่",
+    "เล่าเรื่องตลก",
+    "ดูดวง",
+    "แต่งเพลง",
+    "เขียนโค้ด",
+    "คำนวณหวย",
+    "แนะนำหนัง",
+    "สรุปข่าว",
 )
 
 CONTACT_RESPONSE_TEMPLATES = (
@@ -389,7 +450,7 @@ def is_greeting_query(original_query: str) -> bool:
     tokens = normalized.split()
     if tokens and tokens[0] in GREETING_BASE_TERMS:
         trailing_tokens = tokens[1:]
-        if trailing_tokens and all(token in GREETING_SUFFIX_TERMS for token in trailing_tokens):
+        if trailing_tokens and all(token in POLITE_SUFFIX_TERMS for token in trailing_tokens):
             return True
         return False
 
@@ -399,10 +460,57 @@ def is_greeting_query(original_query: str) -> bool:
             return True
         if compact.startswith(greeting):
             suffix = compact[len(greeting):]
-            if suffix and suffix in GREETING_SUFFIX_TERMS:
+            if suffix and suffix in POLITE_SUFFIX_TERMS:
                 return True
 
     return False
+
+
+def strip_known_suffixes(text: str, suffix_terms: tuple[str, ...]) -> str:
+    compact = text
+    changed = True
+    while changed and compact:
+        changed = False
+        for suffix in sorted(suffix_terms, key=len, reverse=True):
+            if compact.endswith(suffix):
+                compact = compact[: -len(suffix)].strip()
+                changed = True
+                break
+    return compact
+
+
+def is_contact_shortcut_query(original_query: str) -> bool:
+    normalized = normalize_for_rules(original_query)
+    if not normalized:
+        return False
+
+    compact = strip_known_suffixes(normalized.replace(" ", ""), POLITE_SUFFIX_TERMS)
+    if compact in {term.replace(" ", "") for term in CONTACT_SHORT_EXACT_TERMS}:
+        return True
+
+    if any(keyword in compact for keyword in ("พร้อม", "และ", "ด้วย", "ของอาจารย์", "สำนักงาน", "ผู้ประสานงาน")):
+        return False
+
+    for prefix in CONTACT_SHORT_PREFIXES:
+        normalized_prefix = prefix.replace(" ", "")
+        if compact == normalized_prefix:
+            return True
+        if compact.startswith(normalized_prefix):
+            remainder = compact[len(normalized_prefix):]
+            if not remainder:
+                return True
+            if remainder in {"ภาควิชา", "สาขา", "department"}:
+                return True
+    return False
+
+
+def is_out_of_scope_query(original_query: str) -> bool:
+    normalized = normalize_for_rules(original_query)
+    if not normalized:
+        return False
+
+    compact = strip_known_suffixes(normalized.replace(" ", ""), POLITE_SUFFIX_TERMS)
+    return compact in {term.replace(" ", "") for term in OUT_OF_SCOPE_BASE_TERMS}
 
 
 def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str]:
@@ -413,13 +521,11 @@ def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "gr
     if is_greeting_query(normalized):
         return "greeting", "Greeting matched a direct template response."
 
-    for pattern in CONTACT_SHORT_PATTERNS:
-        if re.fullmatch(pattern, normalized):
-            return "contact", "Short direct contact request matched a template shortcut."
+    if is_contact_shortcut_query(normalized):
+        return "contact", "Short direct contact request matched a template shortcut."
 
-    for pattern in OUT_OF_SCOPE_PATTERNS:
-        if re.fullmatch(pattern, normalized):
-            return "out_of_scope", "Clearly outside the chatbot scope."
+    if is_out_of_scope_query(normalized):
+        return "out_of_scope", "Clearly outside the chatbot scope."
 
     return "domain_question", "Query appears related to the department knowledge domain."
 
