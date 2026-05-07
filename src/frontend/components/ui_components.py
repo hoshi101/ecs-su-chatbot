@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -136,7 +137,7 @@ def display_query_enhancement():
     if st.session_state.get("enhanced_query"):
         enhancement_data = st.session_state.enhanced_query
 
-        with st.expander("Query Enhancement", expanded=False):
+        with st.expander("Query Rewrite", expanded=False):
             st.markdown("**Original Query:**")
             st.code(enhancement_data.get("original_query", ""), language="text")
 
@@ -148,31 +149,31 @@ def display_query_enhancement():
                 st.info(enhancement_data["enhancement_reason"])
 
 
-def _render_source_file_access(doc: Dict[str, Any], index: int) -> None:
+def _build_compact_source_row(doc: Dict[str, Any]) -> Dict[str, Any]:
     file_path = doc.get("file_path")
-    if not file_path:
-        return
+    resolved_path = None
+    if file_path:
+        path = Path(file_path)
+        if not path.is_absolute():
+            path = PROJECT_ROOT / path
+        resolved_path = str(path)
 
-    path = Path(file_path)
-    if not path.is_absolute():
-        path = PROJECT_ROOT / path
-    st.caption(f"File path: {path}")
-
-    if not path.exists() or not path.is_file():
-        return
-
-    if path.suffix.lower() not in {".pdf", ".md", ".txt", ".json", ".csv"}:
-        return
-
-    with path.open("rb") as handle:
-        st.download_button(
-            label="Download source file",
-            data=handle.read(),
-            file_name=path.name,
-            mime="application/octet-stream",
-            key=f"download-source-{index}-{path.name}",
-            use_container_width=True,
-        )
+    return {
+        "title": doc.get("title"),
+        "file_name": doc.get("file_name"),
+        "page": doc.get("page_label") or doc.get("page"),
+        "chunk": (
+            f"{doc['chunk_index'] + 1}/{doc['total_chunks']}"
+            if doc.get("chunk_index") is not None and doc.get("total_chunks") is not None
+            else None
+        ),
+        "source_type": doc.get("source_type"),
+        "score": round(float(doc["relevance_score"]), 4)
+        if doc.get("relevance_score") is not None
+        else None,
+        "source_url": doc.get("source_url"),
+        "file_path": resolved_path,
+    }
 
 
 def display_source_documents():
@@ -180,43 +181,12 @@ def display_source_documents():
     if st.session_state.get("source_documents"):
         source_docs: List[Dict[str, Any]] = st.session_state.source_documents
 
-        with st.expander("Source Documents", expanded=False):
-            st.markdown(f"**Found {len(source_docs)} relevant sources:**")
-
-            for i, doc in enumerate(source_docs, 1):
-                with st.container():
-                    st.markdown(f"**{i}. {doc.get('title', 'Untitled Document')}**")
-
-                    if doc.get("snippet"):
-                        st.markdown(doc["snippet"])
-
-                    meta_parts = []
-                    if doc.get("source_type"):
-                        meta_parts.append(f"Type: {doc['source_type']}")
-                    if doc.get("file_name"):
-                        meta_parts.append(f"File: {doc['file_name']}")
-                    if doc.get("page_label"):
-                        meta_parts.append(f"Page: {doc['page_label']}")
-                    elif doc.get("page") is not None:
-                        meta_parts.append(f"Page: {doc['page']}")
-                    if doc.get("chunk_index") is not None and doc.get("total_chunks") is not None:
-                        meta_parts.append(f"Chunk: {doc['chunk_index'] + 1}/{doc['total_chunks']}")
-                    if doc.get("relevance_score") is not None:
-                        try:
-                            meta_parts.append(f"Score: {float(doc['relevance_score']):.4f}")
-                        except (TypeError, ValueError):
-                            meta_parts.append(f"Score: {doc['relevance_score']}")
-
-                    if meta_parts:
-                        st.caption(" | ".join(meta_parts))
-
-                    if doc.get("source_url"):
-                        st.markdown(f"Source URL: {doc['source_url']}")
-
-                    _render_source_file_access(doc, i)
-
-                    if i < len(source_docs):
-                        st.divider()
+        compact_rows = [_build_compact_source_row(doc) for doc in source_docs]
+        with st.expander("Source Trace", expanded=False):
+            st.caption(f"{len(source_docs)} source(s) used for the latest answer")
+            st.dataframe(compact_rows, use_container_width=True, hide_index=True)
+            st.caption("Raw JSON")
+            st.code(json.dumps(compact_rows, ensure_ascii=False, indent=2), language="json")
 
 
 def display_chat_history():
@@ -234,42 +204,26 @@ def display_trace_events(trace_events):
     if not trace_events:
         return
 
-    with st.expander("Assistant Workflow Trace", expanded=False):
-        st.markdown("See how the assistant processed your question:")
+    summarized_events = []
+    for i, event in enumerate(trace_events, 1):
+        details = event.get("details", {}) or {}
+        summarized_events.append(
+            {
+                "step": event.get("step", i),
+                "stage": event.get("event_type", "generic_node_execution"),
+                "node": event.get("node_name", "node"),
+                "description": event.get("description", ""),
+                "shortcut": details.get("shortcut_type"),
+                "decision": details.get("decision") or details.get("final_decision"),
+                "enhancement": details.get("query_enhancement_status"),
+                "rag_verdict": details.get("sufficiency_verdict"),
+                "provider": details.get("llm_provider"),
+                "model": details.get("llm_model"),
+            }
+        )
 
-        for i, event in enumerate(trace_events, 1):
-            event_type = event.get("event_type", "generic_node_execution")
-            step = event.get("step", i)
-            description = event.get("description", "")
-            details = event.get("details", {}) or {}
-            node_name = event.get("node_name", "node")
-
-            with st.container():
-                if event_type == "routing":
-                    st.markdown(f"**Step {step}: Router Decision**")
-                elif event_type == "rag_search":
-                    st.markdown(f"**Step {step}: Knowledge Base Search**")
-                elif event_type == "web_search":
-                    st.markdown(f"**Step {step}: Official Website Search**")
-                elif event_type == "response_generation":
-                    st.markdown(f"**Step {step}: Response Generation**")
-                else:
-                    st.markdown(f"**Step {step}: {node_name}**")
-
-                st.markdown(f"_{description}_")
-
-                if details:
-                    with st.expander("Details", expanded=False):
-                        for key, value in details.items():
-                            if key == "query_enhanced" and value:
-                                st.success("Query was enhanced for better search results")
-                            elif key in {"retrieved_documents", "search_results"} and isinstance(value, list):
-                                st.caption(f"{key}: {len(value)} item(s)")
-                            else:
-                                st.text(f"{key}: {value}")
-
-                if i < len(trace_events):
-                    st.markdown("↓")
-
-        st.markdown("---")
-        st.caption("This trace shows routing, retrieval, and response-generation steps for debugging and transparency.")
+    with st.expander("Workflow Trace", expanded=False):
+        st.caption("Compact execution trace for the latest answer")
+        st.dataframe(summarized_events, use_container_width=True, hide_index=True)
+        st.caption("Raw JSON")
+        st.code(json.dumps(trace_events, ensure_ascii=False, indent=2), language="json")

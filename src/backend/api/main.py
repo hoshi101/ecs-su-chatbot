@@ -570,12 +570,10 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_description = f"Shortcut response selected for '{precheck_intent}'."
                     event_details = {
                         "decision": route_decision,
+                        "shortcut_type": precheck_intent,
                         "precheck_intent": precheck_intent,
                         "precheck_reason": precheck_reason,
                         "original_query": original_query,
-                        "enhanced_query": enhanced_query,
-                        "query_enhanced": False,
-                        "query_enhancement_status": enhancement_status,
                         "llm_provider": node_output_state.get("llm_provider"),
                         "llm_model": node_output_state.get("llm_model"),
                     }
