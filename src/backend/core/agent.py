@@ -1,6 +1,7 @@
 import os
 import random
 import re
+import math
 from typing import Any, Dict, List, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
@@ -30,7 +31,7 @@ from src.backend.core.config import (
     normalize_provider,
     resolve_model_name,
 )
-from src.backend.services.vectorstore import retrieve_documents
+from src.backend.services.vectorstore import embeddings, retrieve_documents
 from src.backend.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
@@ -79,6 +80,7 @@ class AgentState(TypedDict, total=False):
     query_enhancement_reason: str
     precheck_intent: Literal["contact", "greeting", "out_of_scope", "domain_question"]
     precheck_reason: str
+    precheck_variant: str
 
 
 def get_available_model_suggestions() -> Dict[str, List[str]]:
@@ -186,6 +188,14 @@ DOMAIN_HINTS = (
     "มหาลัย",
     "มหาวิทยาลัย",
     "คณะ",
+    "สมัคร",
+    "รับสมัคร",
+    "admission",
+    "tuition",
+    "ค่าเทอม",
+    "หน่วยกิต",
+    "ตารางเรียน",
+    "แผนการเรียน",
     "หลักสูตร",
     "รายวิชา",
     "อาจารย์",
@@ -318,8 +328,52 @@ OUT_OF_SCOPE_BASE_TERMS = (
     "สรุปข่าว",
 )
 
+OUT_OF_SCOPE_SOFT_TERMS = (
+    "หิวข้าวจัง",
+    "หิวจัง",
+    "ง่วงจัง",
+    "เหนื่อยจัง",
+    "เบื่อจัง",
+    "เครียดจัง",
+)
+
+OUT_OF_SCOPE_SOFT_HINTS = {
+    "food": ("หิว", "ข้าว", "กิน", "หิวข้าว"),
+    "rest": ("ง่วง", "เหนื่อย", "เพลีย", "พัก"),
+    "stress": ("เครียด", "ท้อ", "เบื่อ"),
+}
+
+DOMAIN_SEMANTIC_EXAMPLES = (
+    "หลักสูตรสาขามีอะไรบ้าง",
+    "ข้อมูลรายวิชาของภาควิชา",
+    "อาจารย์ประจำภาควิชามีใครบ้าง",
+    "ตารางเรียนและเอกสารการศึกษา",
+    "ข้อมูลติดต่อภาควิชา",
+    "ฝึกงานและสหกิจศึกษาของสาขา",
+    "รับสมัครนักศึกษาและรายละเอียดหลักสูตร",
+)
+
+OUT_OF_SCOPE_HARD_EXAMPLES = (
+    "ใครคือนายก",
+    "ราคาทองวันนี้เท่าไหร่",
+    "ช่วยเขียนโค้ด python ให้หน่อย",
+    "สรุปข่าววันนี้ให้หน่อย",
+    "วิเคราะห์บอลคืนนี้",
+    "แนะนำหนังสนุกๆ",
+    "แต่งเพลงรักให้หน่อย",
+)
+
+OUT_OF_SCOPE_SOFT_EXAMPLES = (
+    "หิวข้าวจัง",
+    "ง่วงมากเลย",
+    "เหนื่อยจังวันนี้",
+    "เบื่อจัง",
+    "เครียดจัง",
+    "กินอะไรดี",
+)
+
 CONTACT_RESPONSE_TEMPLATES = (
-    """ได้เลยครับ นี่คือข้อมูลติดต่อของ{domain_name}
+    """นี่คือข้อมูลติดต่อของ{domain_name}
 
 - โทรศัพท์: {phone_main}
 - มือถือ: {mobile}
@@ -361,27 +415,81 @@ CONTACT_RESPONSE_TEMPLATES = (
 หากต้องการ ผมช่วยสรุปให้เป็นข้อความสั้นสำหรับส่งต่อได้ครับ""",
 )
 
-GREETING_RESPONSE_TEMPLATES = (
-    "สวัสดีครับ ผมคือ {bot_name} ผู้ช่วยข้อมูลของ{domain_name} ถามเรื่องหลักสูตร รายวิชา อาจารย์ ระเบียบ หรือข้อมูลติดต่อได้เลยครับ",
-    "สวัสดีครับ ผมช่วยตอบคำถามเกี่ยวกับ{domain_name}ได้ เช่น หลักสูตร อาจารย์ เอกสาร และข้อมูลติดต่อครับ",
-    "สวัสดีครับ ยินดีช่วยตอบคำถามเกี่ยวกับ{domain_name}ครับ ถามได้ทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ",
-    "สวัสดีครับ ผมเป็นผู้ช่วยข้อมูลของ{domain_name}ครับ หากต้องการข้อมูลจากภาควิชา ส่งคำถามมาได้เลยครับ",
-    "สวัสดีครับ ถ้าคุณต้องการข้อมูลเกี่ยวกับ{domain_name} เช่น หลักสูตร อาจารย์ หรือการติดต่อ ผมช่วยได้ครับ",
+GREETING_OPENINGS = (
+    "สวัสดีครับ",
+    "สวัสดีครับ ยินดีที่ได้คุยกันครับ",
+    "สวัสดีครับ น้องไฟฟ้ายินดีช่วยครับ",
 )
 
-OUT_OF_SCOPE_RESPONSE_TEMPLATES = (
-    """ขออภัยครับ ผมช่วยได้เฉพาะข้อมูลที่เกี่ยวข้องกับ{domain_name} เช่น
+GREETING_BODIES = (
+    "ผมคือ {bot_name} ผู้ช่วยข้อมูลของ{domain_name}",
+    "ผมช่วยตอบคำถามเกี่ยวกับ{domain_name}ได้",
+    "หากต้องการข้อมูลจาก{domain_name} ผมช่วยได้ครับ",
+)
 
-- หลักสูตรและรายวิชา
-- อาจารย์และบุคลากร
-- ระเบียบและเอกสาร
-- ข้อมูลติดต่อภาควิชา
+GREETING_CLOSES = (
+    "ถามได้เลยทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ",
+    "ถ้าต้องการข้อมูลเรื่องหลักสูตร อาจารย์ เอกสาร หรือการติดต่อ ส่งคำถามมาได้เลยครับ",
+    "อยากให้ผมช่วยเรื่องหลักสูตร อาจารย์ หรือข้อมูลภาควิชา ถามต่อได้เลยครับ",
+)
 
-ถ้าคุณมีคำถามเกี่ยวกับภาควิชาหรือมหาวิทยาลัยในส่วนนี้ ส่งมาได้เลยครับ""",
-    """คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ ตอนนี้ผมช่วยได้เฉพาะเรื่องของ{domain_name} เช่น หลักสูตร รายวิชา อาจารย์ เอกสาร และข้อมูลติดต่อภาควิชาเท่านั้นครับ""",
-    """ขออภัยครับ เรื่องนี้อยู่นอกขอบเขตของผม ตอนนี้ผมเน้นช่วยตอบเฉพาะข้อมูลของ{domain_name}และข้อมูลที่เกี่ยวข้องกับภาควิชาครับ""",
-    """ผมยังไม่สามารถช่วยในเรื่องนี้ได้ครับ เพราะขอบเขตของผมจำกัดอยู่ที่ข้อมูลของ{domain_name} เช่น หลักสูตร อาจารย์ เอกสาร และการติดต่อครับ""",
-    """ขออภัยครับ คำถามนี้ไม่อยู่ในขอบเขตที่ผมรองรับ ตอนนี้ผมตอบได้เฉพาะข้อมูลที่เกี่ยวข้องกับ{domain_name}และข้อมูลภายในภาควิชาครับ""",
+CONTACT_OPENINGS = (
+    "ได้เลยครับ",
+    "ยินดีครับ",
+    "นี่คือข้อมูลติดต่อที่ผมมีตอนนี้ครับ",
+)
+
+CONTACT_CLOSES = (
+    "ถ้าต้องการ ผมช่วยสรุปเฉพาะเบอร์หรือช่องทางออนไลน์ให้ต่อได้ครับ",
+    "หากต้องการ ผมช่วยจัดรูปแบบให้พร้อมส่งต่อได้ครับ",
+    "ถ้าอยากได้เฉพาะข้อมูลที่อยู่หรือ Facebook ผมช่วยแยกให้ต่อได้ครับ",
+)
+
+OUT_OF_SCOPE_SOFT_OPENINGS = (
+    "ขอโทษด้วยครับ",
+    "ขออภัยนะครับ",
+    "น้องไฟฟ้ายังช่วยเรื่องนี้ไม่ได้ครับ",
+)
+
+OUT_OF_SCOPE_SOFT_CLOSES = {
+    "food": (
+        "แต่ก็อย่าลืมหาอะไรกินด้วยนะครับ",
+        "ถ้าหิวอยู่ ลองหาอะไรรองท้องก่อนนะครับ",
+        "แต่อย่าปล่อยให้ท้องว่างนานนะครับ",
+    ),
+    "rest": (
+        "พักสักนิดก็น่าจะช่วยได้นะครับ",
+        "ถ้าไหวลองพักสายตาหรือพักผ่อนสักหน่อยนะครับ",
+        "อย่าลืมดูแลตัวเองและพักบ้างนะครับ",
+    ),
+    "stress": (
+        "ค่อยๆ พักหายใจลึกๆ สักนิดก็ดีนะครับ",
+        "ถ้ารู้สึกหนักเกินไป ลองพักก่อนสักหน่อยนะครับ",
+        "ดูแลตัวเองด้วยนะครับ ถ้าพักได้ลองพักก่อนครับ",
+    ),
+    "generic": (
+        "ถ้ามีคำถามเกี่ยวกับภาควิชาเมื่อไร ทักมาได้เลยครับ",
+        "ถ้าต้องการข้อมูลเกี่ยวกับภาควิชา ผมพร้อมช่วยต่อครับ",
+        "ถ้าอยากคุยเรื่องหลักสูตร อาจารย์ หรือข้อมูลภาควิชา ผมช่วยได้ครับ",
+    ),
+}
+
+OUT_OF_SCOPE_HARD_OPENINGS = (
+    "ขออภัยครับ",
+    "ขอโทษครับ",
+    "น้องไฟฟ้ายังไม่สามารถช่วยเรื่องนี้ได้ครับ",
+)
+
+OUT_OF_SCOPE_HARD_BODIES = (
+    "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับ",
+    "ตอนนี้ผมยังตอบเรื่องนี้ไม่ได้",
+    "เรื่องนี้ไม่ใช่ขอบเขตที่ผมถูกออกแบบมาให้ช่วยตอบครับ",
+)
+
+OUT_OF_SCOPE_HARD_CLOSES = (
+    "ถ้าต้องการข้อมูลเกี่ยวกับหลักสูตร อาจารย์ เอกสาร หรือข้อมูลติดต่อของ{domain_name} ผมช่วยได้ครับ",
+    "หากอยากสอบถามเรื่องของ{domain_name} เช่น รายวิชา หลักสูตร หรือการติดต่อ ผมช่วยต่อได้ครับ",
+    "ถ้าคุณมีคำถามเกี่ยวกับ{domain_name}หรือข้อมูลภาควิชา ส่งมาได้เลยครับ",
 )
 
 CONTACT_TEMPLATE_VALUES = {
@@ -418,21 +526,79 @@ def should_enhance_query(original_query: str) -> tuple[bool, str]:
 
 
 def build_contact_response() -> str:
-    return random.choice(CONTACT_RESPONSE_TEMPLATES).format(
+    body = random.choice(CONTACT_RESPONSE_TEMPLATES).format(
         domain_name=DOMAIN_NAME,
         **CONTACT_TEMPLATE_VALUES,
     )
+    return f"{random.choice(CONTACT_OPENINGS)} {body}\n\n{random.choice(CONTACT_CLOSES)}"
 
 
 def build_greeting_response() -> str:
-    return random.choice(GREETING_RESPONSE_TEMPLATES).format(
-        bot_name=BOT_NAME,
-        domain_name=DOMAIN_NAME,
+    return " ".join(
+        [
+            random.choice(GREETING_OPENINGS),
+            random.choice(GREETING_BODIES).format(
+                bot_name=BOT_NAME,
+                domain_name=DOMAIN_NAME,
+            ),
+            random.choice(GREETING_CLOSES),
+        ]
     )
 
 
-def build_out_of_scope_response() -> str:
-    return random.choice(OUT_OF_SCOPE_RESPONSE_TEMPLATES).format(domain_name=DOMAIN_NAME)
+def get_soft_oob_theme(normalized_query: str) -> str:
+    for theme, hints in OUT_OF_SCOPE_SOFT_HINTS.items():
+        if any(hint in normalized_query for hint in hints):
+            return theme
+    return "generic"
+
+
+def build_soft_out_of_scope_response(original_query: str) -> str:
+    normalized = normalize_for_rules(original_query)
+    theme = get_soft_oob_theme(normalized)
+    close = random.choice(OUT_OF_SCOPE_SOFT_CLOSES[theme])
+    return f"{random.choice(OUT_OF_SCOPE_SOFT_OPENINGS)} {close}"
+
+
+def build_hard_out_of_scope_response() -> str:
+    return " ".join(
+        [
+            random.choice(OUT_OF_SCOPE_HARD_OPENINGS),
+            random.choice(OUT_OF_SCOPE_HARD_BODIES),
+            random.choice(OUT_OF_SCOPE_HARD_CLOSES).format(domain_name=DOMAIN_NAME),
+        ]
+    )
+
+
+def build_out_of_scope_response(original_query: str, variant: str) -> str:
+    if variant == "soft_oob":
+        return build_soft_out_of_scope_response(original_query)
+    return build_hard_out_of_scope_response()
+
+
+def cosine_similarity(left: List[float], right: List[float]) -> float:
+    numerator = sum(a * b for a, b in zip(left, right))
+    left_norm = math.sqrt(sum(a * a for a in left))
+    right_norm = math.sqrt(sum(b * b for b in right))
+    if not left_norm or not right_norm:
+        return 0.0
+    return numerator / (left_norm * right_norm)
+
+
+def average_embedding(texts: tuple[str, ...]) -> List[float]:
+    vectors = [embeddings.embed_query(text) for text in texts]
+    dimensions = len(vectors[0])
+    return [
+        sum(vector[index] for vector in vectors) / len(vectors)
+        for index in range(dimensions)
+    ]
+
+
+SEMANTIC_OOB_PROTOTYPES = {
+    "domain_question": average_embedding(DOMAIN_SEMANTIC_EXAMPLES),
+    "soft_oob": average_embedding(OUT_OF_SCOPE_SOFT_EXAMPLES),
+    "hard_oob": average_embedding(OUT_OF_SCOPE_HARD_EXAMPLES),
+}
 
 
 def normalize_for_rules(text: str) -> str:
@@ -513,6 +679,46 @@ def is_out_of_scope_query(original_query: str) -> bool:
     return compact in {term.replace(" ", "") for term in OUT_OF_SCOPE_BASE_TERMS}
 
 
+def semantic_out_of_scope_variant(original_query: str) -> str | None:
+    normalized = normalize_for_rules(original_query)
+    if not normalized:
+        return None
+
+    if any(term in normalized for term in DOMAIN_HINTS):
+        return None
+
+    try:
+        query_embedding = embeddings.embed_query(original_query)
+    except Exception as exc:
+        logger.warning("Semantic OOB classification failed | error=%s", exc)
+        return None
+
+    scores = {
+        name: cosine_similarity(query_embedding, prototype)
+        for name, prototype in SEMANTIC_OOB_PROTOTYPES.items()
+    }
+    domain_score = scores["domain_question"]
+    soft_score = scores["soft_oob"]
+    hard_score = scores["hard_oob"]
+    best_oob_variant = "soft_oob" if soft_score >= hard_score else "hard_oob"
+    best_oob_score = max(soft_score, hard_score)
+
+    if best_oob_score >= 0.55 and best_oob_score > domain_score + 0.05:
+        return best_oob_variant
+    return None
+
+
+def resolve_out_of_scope_variant(original_query: str) -> str:
+    normalized = normalize_for_rules(original_query)
+    if any(term in normalized for term in OUT_OF_SCOPE_SOFT_TERMS):
+        return "soft_oob"
+    if is_out_of_scope_query(original_query):
+        if get_soft_oob_theme(normalized) != "generic":
+            return "soft_oob"
+        return "hard_oob"
+    return semantic_out_of_scope_variant(original_query) or "hard_oob"
+
+
 def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str]:
     normalized = normalize_for_rules(original_query)
     if not normalized:
@@ -526,6 +732,12 @@ def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "gr
 
     if is_out_of_scope_query(normalized):
         return "out_of_scope", "Clearly outside the chatbot scope."
+
+    semantic_oob_variant = semantic_out_of_scope_variant(original_query)
+    if semantic_oob_variant == "soft_oob":
+        return "out_of_scope", "Semantic classifier identified friendly small-talk outside the chatbot scope."
+    if semantic_oob_variant == "hard_oob":
+        return "out_of_scope", "Semantic classifier identified a non-department question outside the chatbot scope."
 
     return "domain_question", "Query appears related to the department knowledge domain."
 
@@ -591,6 +803,13 @@ def router_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
     runtime_settings = get_runtime_settings_from_state(state)
     precheck_intent, precheck_reason = classify_query_precheck(original_query)
+    precheck_variant = ""
+    if precheck_intent == "greeting":
+        precheck_variant = "greeting_template"
+    elif precheck_intent == "contact":
+        precheck_variant = "contact_template"
+    elif precheck_intent == "out_of_scope":
+        precheck_variant = resolve_out_of_scope_variant(original_query)
 
     base_state: AgentState = {
         "messages": state["messages"],
@@ -606,6 +825,7 @@ def router_node(state: AgentState) -> AgentState:
         "query_enhancement_reason": "Template or shortcut response does not need query rewriting.",
         "precheck_intent": precheck_intent,
         "precheck_reason": precheck_reason,
+        "precheck_variant": precheck_variant,
     }
 
     if precheck_intent == "contact":
@@ -626,7 +846,7 @@ def router_node(state: AgentState) -> AgentState:
         return {
             **base_state,
             "route": "end",
-            "messages": state["messages"] + [AIMessage(content=build_out_of_scope_response())],
+            "messages": state["messages"] + [AIMessage(content=build_out_of_scope_response(original_query, precheck_variant))],
         }
 
     should_enhance, enhancement_reason = should_enhance_query(original_query)
@@ -704,6 +924,7 @@ Safety policy:
         "query_enhancement_reason": enhancement_reason,
         "precheck_intent": precheck_intent,
         "precheck_reason": precheck_reason,
+        "precheck_variant": precheck_variant,
     }
 
     if result.route == "end":

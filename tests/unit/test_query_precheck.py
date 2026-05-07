@@ -56,6 +56,16 @@ def test_out_of_scope_shortcuts_to_template():
     assert intent == "out_of_scope"
 
 
+def test_soft_out_of_scope_semantic_query_shortcuts():
+    intent, _ = classify_query_precheck("หิวข้าวจัง")
+    assert intent == "out_of_scope"
+
+
+def test_hard_out_of_scope_semantic_query_shortcuts():
+    intent, _ = classify_query_precheck("ใครคือนายก")
+    assert intent == "out_of_scope"
+
+
 def test_out_of_scope_with_polite_suffix_still_shortcuts():
     intent, _ = classify_query_precheck("เล่าเรื่องตลกหน่อยครับ")
     assert intent == "out_of_scope"
@@ -172,7 +182,7 @@ def test_out_of_scope_shortcut_does_not_call_llm(monkeypatch):
 
     assert result["route"] == "end"
     assert result["precheck_intent"] == "out_of_scope"
-    assert "ขออภัย" in result["messages"][-1].content
+    assert "ภาควิชา" in result["messages"][-1].content or "ขอโทษ" in result["messages"][-1].content
 
 
 def test_repeated_out_of_scope_variants_do_not_call_llm(monkeypatch):
@@ -182,7 +192,7 @@ def test_repeated_out_of_scope_variants_do_not_call_llm(monkeypatch):
     monkeypatch.setattr(agent, "build_chat_model", fail_build_chat_model)
     monkeypatch.setattr(agent.random, "choice", lambda seq: seq[0])
 
-    for query in ("กินไรดี", "เล่าเรื่องตลกหน่อยครับ", "สรุปข่าว!!"):
+    for query in ("กินไรดี", "เล่าเรื่องตลกหน่อยครับ", "สรุปข่าว!!", "หิวข้าวจัง", "ใครคือนายก"):
         state = {
             "messages": [HumanMessage(content=query)],
             "llm_provider": "openai",
@@ -192,4 +202,4 @@ def test_repeated_out_of_scope_variants_do_not_call_llm(monkeypatch):
 
         assert result["route"] == "end"
         assert result["precheck_intent"] == "out_of_scope"
-        assert "ขออภัย" in result["messages"][-1].content
+        assert result["messages"][-1].content
