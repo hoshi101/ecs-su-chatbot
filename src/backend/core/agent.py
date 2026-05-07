@@ -222,9 +222,26 @@ CONTACT_HINTS = (
     "สถานที่ตั้ง",
 )
 
-GREETING_PATTERNS = (
-    r"^(hi|hello|hey|yo|สวัสดี|หวัดดี)$",
-    r"^(hi|hello|hey|yo|สวัสดี|หวัดดี)\s+(ครับ|ค่ะ|คับ|จ้า)?$",
+GREETING_BASE_TERMS = (
+    "hi",
+    "hello",
+    "hey",
+    "yo",
+    "สวัสดี",
+    "หวัดดี",
+)
+
+GREETING_SUFFIX_TERMS = (
+    "ครับ",
+    "ค่ะ",
+    "คับ",
+    "จ้า",
+    "ครับผม",
+    "ค่า",
+    "ค้าบ",
+    "นะ",
+    "นะครับ",
+    "นะคะ",
 )
 
 CONTACT_SHORT_PATTERNS = (
@@ -361,14 +378,40 @@ def normalize_for_rules(text: str) -> str:
     return " ".join(text.strip().lower().split()).strip(" \t\n\r?!.,")
 
 
+def is_greeting_query(original_query: str) -> bool:
+    normalized = normalize_for_rules(original_query)
+    if not normalized:
+        return False
+
+    if normalized in GREETING_BASE_TERMS:
+        return True
+
+    tokens = normalized.split()
+    if tokens and tokens[0] in GREETING_BASE_TERMS:
+        trailing_tokens = tokens[1:]
+        if trailing_tokens and all(token in GREETING_SUFFIX_TERMS for token in trailing_tokens):
+            return True
+        return False
+
+    compact = normalized.replace(" ", "")
+    for greeting in GREETING_BASE_TERMS:
+        if compact == greeting:
+            return True
+        if compact.startswith(greeting):
+            suffix = compact[len(greeting):]
+            if suffix and suffix in GREETING_SUFFIX_TERMS:
+                return True
+
+    return False
+
+
 def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str]:
     normalized = normalize_for_rules(original_query)
     if not normalized:
         return "greeting", "Empty input treated as a greeting/help prompt."
 
-    for pattern in GREETING_PATTERNS:
-        if re.fullmatch(pattern, normalized):
-            return "greeting", "Greeting matched a direct template response."
+    if is_greeting_query(normalized):
+        return "greeting", "Greeting matched a direct template response."
 
     for pattern in CONTACT_SHORT_PATTERNS:
         if re.fullmatch(pattern, normalized):

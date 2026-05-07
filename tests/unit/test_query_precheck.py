@@ -21,6 +21,21 @@ def test_greeting_shortcuts_to_template():
     assert intent == "greeting"
 
 
+def test_greeting_with_polite_suffix_still_shortcuts():
+    intent, _ = classify_query_precheck("สวัสดีครับผม")
+    assert intent == "greeting"
+
+
+def test_english_greeting_with_punctuation_still_shortcuts():
+    intent, _ = classify_query_precheck("Hello!!")
+    assert intent == "greeting"
+
+
+def test_greeting_plus_real_question_does_not_shortcut():
+    intent, _ = classify_query_precheck("สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย")
+    assert intent == "domain_question"
+
+
 def test_out_of_scope_shortcuts_to_template():
     intent, _ = classify_query_precheck("กินข้าวยัง")
     assert intent == "out_of_scope"
@@ -74,6 +89,26 @@ def test_greeting_shortcut_does_not_call_llm(monkeypatch):
     assert result["route"] == "end"
     assert result["precheck_intent"] == "greeting"
     assert "สวัสดี" in result["messages"][-1].content
+
+
+def test_repeated_greeting_variants_do_not_call_llm(monkeypatch):
+    def fail_build_chat_model(*args, **kwargs):
+        raise AssertionError("LLM should not be called for greeting shortcut")
+
+    monkeypatch.setattr(agent, "build_chat_model", fail_build_chat_model)
+    monkeypatch.setattr(agent.random, "choice", lambda seq: seq[0])
+
+    for query in ("สวัสดีครับ", "สวัสดีครับผม", "Hello!!", "หวัดดีจ้า"):
+        state = {
+            "messages": [HumanMessage(content=query)],
+            "llm_provider": "openai",
+            "llm_model": "gpt-5.4-mini",
+        }
+        result = router_node(state)
+
+        assert result["route"] == "end"
+        assert result["precheck_intent"] == "greeting"
+        assert "สวัสดี" in result["messages"][-1].content
 
 
 def test_out_of_scope_shortcut_does_not_call_llm(monkeypatch):
