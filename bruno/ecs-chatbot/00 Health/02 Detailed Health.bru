@@ -1,0 +1,21 @@
+meta {
+  name: 02 Detailed Health
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/health/detailed
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

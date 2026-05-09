@@ -1,0 +1,33 @@
+meta {
+  name: 02 Embedding Test
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/debug/embedding-test
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "texts": [
+      "ข้อมูลติดต่อภาควิชา",
+      "เบอร์โทรภาควิชา"
+    ],
+    "reference_text": "ช่องทางติดต่อของภาควิชาวิศวกรรมไฟฟ้า",
+    "compute_similarities": true
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: 12 Greeting Plus Domain
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/chat/
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "{{sessionId}}",
+    "query": "สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย",
+    "enable_web_search": true,
+    "force_web_search": false,
+    "similarity_threshold": {{similarityThreshold}},
+    "llm_provider": "{{provider}}",
+    "llm_model": "{{model}}"
+  }
+}

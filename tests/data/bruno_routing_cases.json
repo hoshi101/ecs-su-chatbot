@@ -1,0 +1,74 @@
+[
+  {
+    "query": "สวัสดีครับ",
+    "expected_intent": "greeting",
+    "expected_variant": "greeting_template",
+    "notes": "ควรเป็น greeting shortcut"
+  },
+  {
+    "query": "Hello!!",
+    "expected_intent": "greeting",
+    "expected_variant": "greeting_template",
+    "notes": "ควรเป็น greeting shortcut แบบภาษาอังกฤษ"
+  },
+  {
+    "query": "ขอเบอร์โทรภาควิชา",
+    "expected_intent": "contact",
+    "expected_variant": "contact_template",
+    "notes": "ควรเป็น contact shortcut"
+  },
+  {
+    "query": "facebook ภาควิชา",
+    "expected_intent": "contact",
+    "expected_variant": "contact_template",
+    "notes": "ควรเป็น contact shortcut"
+  },
+  {
+    "query": "ขอข้อมูลติดต่ออาจารย์ประจำสาขาพร้อมอีเมล",
+    "expected_intent": "domain_question",
+    "expected_variant": "",
+    "notes": "ไม่ควรถูก shortcut เป็น contact"
+  },
+  {
+    "query": "หิวข้าวจัง",
+    "expected_intent": "out_of_scope",
+    "expected_variant": "soft_oob",
+    "notes": "พฤติกรรมที่ต้องการ แม้ตอนนี้ระบบอาจยังไม่ผ่าน"
+  },
+  {
+    "query": "กินไรดี",
+    "expected_intent": "out_of_scope",
+    "expected_variant": "soft_oob",
+    "notes": "ควรเป็น soft_oob shortcut"
+  },
+  {
+    "query": "ใครคือนายก",
+    "expected_intent": "out_of_scope",
+    "expected_variant": "hard_oob",
+    "notes": "พฤติกรรมที่ต้องการ แม้ตอนนี้ระบบอาจยังไม่ผ่าน"
+  },
+  {
+    "query": "สรุปข่าว!!",
+    "expected_intent": "out_of_scope",
+    "expected_variant": "hard_oob",
+    "notes": "ควรเป็น hard_oob shortcut"
+  },
+  {
+    "query": "รับสมัครเมื่อไหร่",
+    "expected_intent": "domain_question",
+    "expected_variant": "",
+    "notes": "ควรเป็นคำถามในขอบเขต"
+  },
+  {
+    "query": "หลักสูตรสาขามี prerequisite ไหม",
+    "expected_intent": "domain_question",
+    "expected_variant": "",
+    "notes": "ควรไป domain flow"
+  },
+  {
+    "query": "สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย",
+    "expected_intent": "domain_question",
+    "expected_variant": "",
+    "notes": "ไม่ควร shortcut เป็น greeting"
+  }
+]

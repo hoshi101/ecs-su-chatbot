@@ -1,0 +1,34 @@
+meta {
+  name: 01 Greeting TH
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/chat/
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "{{sessionId}}",
+    "query": "สวัสดีครับ",
+    "enable_web_search": true,
+    "force_web_search": false,
+    "similarity_threshold": {{similarityThreshold}},
+    "llm_provider": "{{provider}}",
+    "llm_model": "{{model}}"
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
