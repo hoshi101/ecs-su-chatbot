@@ -18,4 +18,10 @@ tests {
   test("status is 200", function() {
     expect(res.getStatus()).to.equal(200);
   });
+  test("has llm config fields", function() {
+    const body = JSON.parse(res.getBody());
+    if (!body.default_provider || !body.default_model || !body.providers) {
+      throw new Error("missing llm options fields");
+    }
+  });
 }

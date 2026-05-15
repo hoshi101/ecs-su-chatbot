@@ -14,17 +14,30 @@
 
 ## Base URL
 
-ค่าปัจจุบันในเครื่องนี้:
+ค่าที่ควรใช้:
 
-- `base_url = http://127.0.0.1:8001`
+- Windows Bruno: `http://localhost:8001`
+- Bruno ใน WSL: `http://127.0.0.1:8001`
 - `provider = openai`
 - `model = gpt-5.4-mini`
 
 ## Bruno Environment
 
-สร้าง environment ใน Bruno ชื่อ `local`
+สร้าง environment 2 อัน:
+
+- `local-windows`
+- `local-wsl`
 
 ตัวแปรที่ควรมี:
+
+```json
+{
+  "baseUrl": "http://localhost:8001",
+  "provider": "openai",
+  "model": "gpt-5.4-mini",
+  "sessionId": "bruno-routing-test"
+}
+```
 
 ```json
 {
@@ -35,7 +48,15 @@
 }
 ```
 
-## Requests ที่ควรสร้าง
+## โครงสร้าง Collection
+
+- `00 Health`
+- `01 Config`
+- `02 Routing`
+- `03 Domain`
+- `04 Debug`
+
+## Requests ที่ควรใช้
 
 ### 1. Health
 
@@ -65,7 +86,7 @@
 - มี `default_model`
 - มี `providers`
 
-### 3. Chat Routing Template
+### 3. Routing Requests
 
 - Method: `POST`
 - URL: `{{baseUrl}}/chat/`
@@ -75,7 +96,7 @@
 
 ```json
 {
-  "session_id": "{{sessionId}}",
+  "session_id": "{{sessionId}}-case-001",
   "query": "สวัสดีครับ",
   "enable_web_search": true,
   "force_web_search": false,
@@ -84,6 +105,12 @@
   "llm_model": "{{model}}"
 }
 ```
+
+สำคัญ:
+
+- ถ้าจะเทส `routing` แบบแยกเคส ห้ามใช้ `session_id` เดิมยิงหลายข้อความคนละ intent
+- ระบบมี memory ต่อบทสนทนา ดังนั้น `session_id` เดิมควรใช้เฉพาะเมื่อคุณต้องการจำบริบทของแชทเดียวกัน
+- สำหรับ Bruno ให้เปลี่ยน `session_id` ต่อเคส เช่น `{{sessionId}}-greeting-01`, `{{sessionId}}-contact-01`
 
 ## ฟิลด์ที่ต้องดูทุกครั้ง
 
@@ -111,26 +138,38 @@
 - `trace_events[0].details.decision` ควรเป็น `rag`, `web`, `answer` หรือ `end`
 - ต้องไม่ใช่ shortcut ผิด intent
 
-## ชุด Test แนะนำ
+## ชุด Request ที่ควรรัน
 
-ให้ใช้ชุดข้อมูลจากไฟล์:
+Routing:
 
-- [tests/data/bruno_routing_cases.json](/home/hoshi/hoshi/side-project/university-project/extracted_folder/ecs-chatbot/tests/data/bruno_routing_cases.json:1)
+- `01 Greeting TH`
+- `02 Greeting EN`
+- `03 Contact Phone TH`
+- `04 Contact Phone EN`
+- `05 Contact Facebook TH`
+- `06 Out Of Scope Soft TH`
+- `07 Out Of Scope Hard TH`
+- `08 Out Of Scope Hard EN`
+- `09 Mixed Greeting + Contact TH`
+- `10 Mixed Greeting + Contact EN`
+- `11 Mixed Contact + Detail TH`
 
-หลักการคือ:
+Domain:
 
-- `expected_intent` = พฤติกรรมที่ต้องการ
-- `expected_variant` = variant ที่ต้องการ
-- `notes` = สิ่งที่ควรสังเกต
+- `01 Admission TH`
+- `02 Prerequisite TH`
+- `03 Lecturer Contact Detailed TH`
+- `04 Institution Other Department TH`
+- `05 Institution Unknown TH`
 
 ## ขั้นตอนทำงานที่แนะนำ
 
 1. ยิง `GET /health`
 2. ยิง `GET /llm/options`
-3. สร้าง request `/chat/` 1 อัน แล้วเปลี่ยนแค่ค่า `query`
-4. รันตามรายการใน `bruno_routing_cases.json`
-5. จดผลว่าเคสไหน `pass/fail`
-6. ส่งกลับมาเป็นตารางหรือข้อความคู่ `query -> actual intent/variant`
+3. รัน `02 Routing` ทีละเคส
+4. ถ้า routing ผ่าน ค่อยรัน `03 Domain`
+5. ถ้าต้อง debug retrieval ค่อยใช้ `04 Debug`
+6. ส่งเฉพาะเคสที่ fail กลับมาเป็น `query -> actual intent/variant`
 
 ## รูปแบบรายงานที่ส่งกลับมา
 
@@ -145,6 +184,6 @@
 ## Step ถัดไปหลังจากคุณใส่ Bruno แล้ว
 
 1. รันเฉพาะ `Smoke` ก่อน
-2. รัน `Routing Regression` ตามไฟล์ test cases
+2. รัน `02 Routing` ตามลำดับ
 3. ส่งเฉพาะเคสที่ fail กลับมา
 4. ผมจะแก้ decision layer จากผลจริงของ Bruno ไม่ใช้ frontend เป็นตัว debug หลักอีก

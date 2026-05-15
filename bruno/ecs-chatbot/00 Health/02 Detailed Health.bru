@@ -18,4 +18,10 @@ tests {
   test("status is 200", function() {
     expect(res.getStatus()).to.equal(200);
   });
+  test("has overall status", function() {
+    const body = JSON.parse(res.getBody());
+    if (!body.overall_status) {
+      throw new Error("missing overall_status");
+    }
+  });
 }

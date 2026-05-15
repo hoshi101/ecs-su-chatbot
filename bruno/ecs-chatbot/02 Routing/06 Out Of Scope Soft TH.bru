@@ -1,7 +1,7 @@
 meta {
-  name: 01 Greeting TH
+  name: 06 Out Of Scope Soft TH
   type: http
-  seq: 1
+  seq: 6
 }
 
 post {
@@ -17,8 +17,8 @@ headers {
 
 body:json {
   {
-    "session_id": "{{sessionId}}",
-    "query": "สวัสดีครับ",
+    "session_id": "{{sessionId}}-oob-soft-th",
+    "query": "หิวข้าวจัง",
     "enable_web_search": true,
     "force_web_search": false,
     "similarity_threshold": {{similarityThreshold}},
@@ -30,5 +30,11 @@ body:json {
 tests {
   test("status is 200", function() {
     expect(res.getStatus()).to.equal(200);
+  });
+  test("routes to soft out-of-scope shortcut", function() {
+    const body = JSON.parse(res.getBody());
+    expect(body.trace_events[0].details.precheck_intent).to.equal("out_of_scope");
+    expect(body.trace_events[0].details.shortcut_variant).to.equal("soft_oob");
+    expect(body.sources.length).to.equal(0);
   });
 }
