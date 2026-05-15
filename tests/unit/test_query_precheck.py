@@ -26,6 +26,11 @@ def test_short_contact_channel_query_still_shortcuts():
     assert intent == "contact"
 
 
+def test_short_english_contact_channel_query_still_shortcuts():
+    intent, _ = classify_query_precheck("What is the department phone number?")
+    assert intent == "contact"
+
+
 def test_specific_contact_query_does_not_shortcut():
     intent, _ = classify_query_precheck("ขอข้อมูลติดต่ออาจารย์ประจำสาขาพร้อมอีเมล")
     assert intent == "domain_question"
@@ -48,6 +53,11 @@ def test_english_greeting_with_punctuation_still_shortcuts():
 
 def test_greeting_plus_real_question_does_not_shortcut():
     intent, _ = classify_query_precheck("สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย")
+    assert intent == "domain_question"
+
+
+def test_english_greeting_plus_real_question_does_not_shortcut():
+    intent, _ = classify_query_precheck("Hello, what is the department phone number?")
     assert intent == "domain_question"
 
 
@@ -78,6 +88,16 @@ def test_out_of_scope_question_with_punctuation_still_shortcuts():
 
 def test_domain_query_continues_to_rag_flow():
     intent, _ = classify_query_precheck("หลักสูตรสาขามี prerequisite ไหม")
+    assert intent == "domain_question"
+
+
+def test_institution_related_non_ee_query_stays_in_scope():
+    intent, _ = classify_query_precheck("ภาควิชาวิศวกรรมเครื่องกลอยู่ตึกไหน")
+    assert intent == "domain_question"
+
+
+def test_institution_related_unknown_query_stays_in_scope():
+    intent, _ = classify_query_precheck("ช่วยบอกคะแนนขั้นต่ำรอบล่าสุดของคณะให้หน่อย")
     assert intent == "domain_question"
 
 
@@ -114,7 +134,12 @@ def test_repeated_contact_variants_do_not_call_llm(monkeypatch):
     monkeypatch.setattr(agent, "build_chat_model", fail_build_chat_model)
     monkeypatch.setattr(agent.random, "choice", lambda seq: seq[0])
 
-    for query in ("ขอข้อมูลการติดต่อภาควิชาหน่อยครับ", "ขอเบอร์โทรภาควิชา", "facebook ภาควิชา"):
+    for query in (
+        "ขอข้อมูลการติดต่อภาควิชาหน่อยครับ",
+        "ขอเบอร์โทรภาควิชา",
+        "facebook ภาควิชา",
+        "What is the department phone number?",
+    ):
         state = {
             "messages": [HumanMessage(content=query)],
             "llm_provider": "openai",
@@ -163,7 +188,29 @@ def test_repeated_greeting_variants_do_not_call_llm(monkeypatch):
 
         assert result["route"] == "end"
         assert result["precheck_intent"] == "greeting"
-        assert "สวัสดี" in result["messages"][-1].content
+        assert result["messages"][-1].content
+
+
+def test_mixed_intent_does_not_call_shortcut_llm(monkeypatch):
+    class DummyStructured:
+        def invoke(self, _messages):
+            return agent.RouteDecision(route="answer", reply="Handled by normal flow")
+
+    class DummyLLM:
+        def with_structured_output(self, _schema):
+            return DummyStructured()
+
+    monkeypatch.setattr(agent, "build_chat_model", lambda *args, **kwargs: DummyLLM())
+
+    state = {
+        "messages": [HumanMessage(content="Hello, what is the department phone number?")],
+        "llm_provider": "openai",
+        "llm_model": "gpt-5.4-mini",
+    }
+    result = router_node(state)
+
+    assert result["route"] == "answer"
+    assert result["precheck_intent"] == "domain_question"
 
 
 def test_out_of_scope_shortcut_does_not_call_llm(monkeypatch):

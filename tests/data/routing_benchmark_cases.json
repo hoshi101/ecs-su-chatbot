@@ -1,0 +1,192 @@
+[
+  {
+    "id": "G01",
+    "family": "greeting",
+    "query": "สวัสดีครับ",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G02",
+    "family": "greeting",
+    "query": "หวัดดีจ้า",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G03",
+    "family": "greeting",
+    "query": "Hello!!",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G04",
+    "family": "greeting",
+    "query": "Hi",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G05",
+    "family": "greeting",
+    "query": "hello",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "C01",
+    "family": "contact",
+    "query": "ขอเบอร์โทรภาควิชา",
+    "expected_intent": "contact",
+    "expected_shortcut": true,
+    "expected_variant": "contact_template"
+  },
+  {
+    "id": "C02",
+    "family": "contact",
+    "query": "facebook ภาควิชา",
+    "expected_intent": "contact",
+    "expected_shortcut": true,
+    "expected_variant": "contact_template"
+  },
+  {
+    "id": "C03",
+    "family": "contact",
+    "query": "What is the department phone number?",
+    "expected_intent": "contact",
+    "expected_shortcut": true,
+    "expected_variant": "contact_template"
+  },
+  {
+    "id": "C04",
+    "family": "contact",
+    "query": "How can I contact the department?",
+    "expected_intent": "contact",
+    "expected_shortcut": true,
+    "expected_variant": "contact_template"
+  },
+  {
+    "id": "C05",
+    "family": "contact",
+    "query": "where is the department office",
+    "expected_intent": "contact",
+    "expected_shortcut": true,
+    "expected_variant": "contact_template"
+  },
+  {
+    "id": "O01",
+    "family": "out_of_scope",
+    "query": "วันนี้ฝนจะตกไหม",
+    "expected_intent": "out_of_scope",
+    "expected_shortcut": true,
+    "expected_variant": "hard_oob"
+  },
+  {
+    "id": "O02",
+    "family": "out_of_scope",
+    "query": "ช่วยแต่งกลอนวันสงกรานต์ให้หน่อย",
+    "expected_intent": "out_of_scope",
+    "expected_shortcut": true,
+    "expected_variant": "hard_oob"
+  },
+  {
+    "id": "O03",
+    "family": "out_of_scope",
+    "query": "หิวข้าวจัง",
+    "expected_intent": "out_of_scope",
+    "expected_shortcut": true,
+    "expected_variant": "soft_oob"
+  },
+  {
+    "id": "O04",
+    "family": "out_of_scope",
+    "query": "Who is the prime minister of Thailand?",
+    "expected_intent": "out_of_scope",
+    "expected_shortcut": true,
+    "expected_variant": "hard_oob"
+  },
+  {
+    "id": "O05",
+    "family": "out_of_scope",
+    "query": "เขียนโปรแกรมเกมงูด้วย Python ให้หน่อย",
+    "expected_intent": "out_of_scope",
+    "expected_shortcut": true,
+    "expected_variant": "hard_oob"
+  },
+  {
+    "id": "D01",
+    "family": "domain_question",
+    "query": "หลักสูตรสาขามี prerequisite ไหม",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "D02",
+    "family": "domain_question",
+    "query": "รับสมัครเมื่อไหร่",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "D03",
+    "family": "domain_question",
+    "query": "ขอข้อมูลติดต่ออาจารย์ประจำสาขาพร้อมอีเมล",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "D04",
+    "family": "domain_question",
+    "query": "ภาควิชาวิศวกรรมเครื่องกลอยู่ตึกไหน",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "D05",
+    "family": "domain_question",
+    "query": "ช่วยบอกคะแนนขั้นต่ำรอบล่าสุดของคณะให้หน่อย",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "M01",
+    "family": "mixed_intent",
+    "query": "สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "M02",
+    "family": "mixed_intent",
+    "query": "Hello, what is the department phone number?",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "M03",
+    "family": "mixed_intent",
+    "query": "ขอเบอร์โทรภาควิชาและข้อมูลอาจารย์ผู้ประสานงาน",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "M04",
+    "family": "mixed_intent",
+    "query": "Hi, when is the admission period?",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  },
+  {
+    "id": "M05",
+    "family": "mixed_intent",
+    "query": "สวัสดีครับ ถามเรื่องหลักสูตรหน่อย",
+    "expected_intent": "domain_question",
+    "expected_shortcut": false
+  }
+]

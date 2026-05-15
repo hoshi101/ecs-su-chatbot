@@ -583,6 +583,9 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_description = f"Query was refined for retrieval and routed to '{route_decision}'."
                     event_details = {
                         "decision": route_decision,
+                        "precheck_intent": precheck_intent,
+                        "precheck_reason": precheck_reason,
+                        "shortcut_variant": precheck_variant,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": True,
@@ -597,6 +600,9 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                         "initial_decision": initial_decision,
                         "final_decision": route_decision,
                         "override_reason": override_reason,
+                        "precheck_intent": precheck_intent,
+                        "precheck_reason": precheck_reason,
+                        "shortcut_variant": precheck_variant,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": query_enhanced,
@@ -610,6 +616,9 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_details = {
                         "decision": route_decision,
                         "reason": "Based on department information routing policy",
+                        "precheck_intent": precheck_intent,
+                        "precheck_reason": precheck_reason,
+                        "shortcut_variant": precheck_variant,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": False,
@@ -623,6 +632,9 @@ async def chat_with_agent(request: Request, body: QueryRequest):
                     event_details = {
                         "decision": route_decision,
                         "reason": "Based on department information routing policy",
+                        "precheck_intent": precheck_intent,
+                        "precheck_reason": precheck_reason,
+                        "shortcut_variant": precheck_variant,
                         "original_query": original_query,
                         "enhanced_query": enhanced_query,
                         "query_enhanced": query_enhanced,
