@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "ECS Chatbot API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
