@@ -286,6 +286,20 @@ GREETING_BASE_TERMS = (
     "yo",
     "สวัสดี",
     "หวัดดี",
+    "ฮัลโหล",
+)
+
+GREETING_PHRASE_TERMS = (
+    "good morning",
+    "good afternoon",
+    "good evening",
+    "good day",
+)
+
+GREETING_TRAILING_TERMS = (
+    "there",
+    "everyone",
+    "all",
 )
 
 CONTACT_SHORT_EXACT_TERMS = (
@@ -724,23 +738,37 @@ def normalize_for_rules(text: str) -> str:
     return " ".join(text.strip().lower().split()).strip(" \t\n\r?!.,")
 
 
+def normalize_greeting_candidate(text: str) -> str:
+    normalized = normalize_for_rules(text).replace("ๆ", "")
+    # Remove punctuation, symbols, and emoji-like trailing characters while keeping
+    # Thai/Latin letters and spaces for strict greeting matching.
+    normalized = re.sub(r"[^a-z0-9\u0E00-\u0E7F\s]", "", normalized)
+    return " ".join(normalized.split()).strip()
+
+
 def has_domain_hint(text: str) -> bool:
     normalized = normalize_for_rules(text)
     return any(term in normalized for term in DOMAIN_HINTS)
 
 
 def is_greeting_query(original_query: str) -> bool:
-    normalized = normalize_for_rules(original_query)
+    normalized = normalize_greeting_candidate(original_query)
     if not normalized:
         return False
 
     if normalized in GREETING_BASE_TERMS:
         return True
 
+    if normalized in GREETING_PHRASE_TERMS:
+        return True
+
     tokens = normalized.split()
     if tokens and tokens[0] in GREETING_BASE_TERMS:
         trailing_tokens = tokens[1:]
-        if trailing_tokens and all(token in POLITE_SUFFIX_TERMS for token in trailing_tokens):
+        if trailing_tokens and all(
+            token in POLITE_SUFFIX_TERMS or token in GREETING_TRAILING_TERMS
+            for token in trailing_tokens
+        ):
             return True
         return False
 

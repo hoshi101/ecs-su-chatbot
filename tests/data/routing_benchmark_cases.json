@@ -40,6 +40,38 @@
     "expected_variant": "greeting_template"
   },
   {
+    "id": "G06",
+    "family": "greeting",
+    "query": "hi there",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G07",
+    "family": "greeting",
+    "query": "Good morning!",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G08",
+    "family": "greeting",
+    "query": "ฮัลโหล",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
+    "id": "G09",
+    "family": "greeting",
+    "query": "สวัสดีๆ",
+    "expected_intent": "greeting",
+    "expected_shortcut": true,
+    "expected_variant": "greeting_template"
+  },
+  {
     "id": "C01",
     "family": "contact",
     "query": "ขอเบอร์โทรภาควิชา",

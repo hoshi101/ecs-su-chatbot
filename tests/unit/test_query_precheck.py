@@ -51,6 +51,31 @@ def test_english_greeting_with_punctuation_still_shortcuts():
     assert intent == "greeting"
 
 
+def test_english_greeting_phrase_still_shortcuts():
+    intent, _ = classify_query_precheck("Good morning!")
+    assert intent == "greeting"
+
+
+def test_english_greeting_with_there_still_shortcuts():
+    intent, _ = classify_query_precheck("hi there")
+    assert intent == "greeting"
+
+
+def test_thai_greeting_variant_still_shortcuts():
+    intent, _ = classify_query_precheck("ฮัลโหล")
+    assert intent == "greeting"
+
+
+def test_repeated_thai_greeting_marker_still_shortcuts():
+    intent, _ = classify_query_precheck("สวัสดีๆ")
+    assert intent == "greeting"
+
+
+def test_greeting_with_emoji_still_shortcuts():
+    intent, _ = classify_query_precheck("สวัสดีครับ 😊")
+    assert intent == "greeting"
+
+
 def test_greeting_plus_real_question_does_not_shortcut():
     intent, _ = classify_query_precheck("สวัสดี ขอข้อมูลติดต่อภาควิชาหน่อย")
     assert intent == "domain_question"
@@ -178,7 +203,7 @@ def test_repeated_greeting_variants_do_not_call_llm(monkeypatch):
     monkeypatch.setattr(agent, "build_chat_model", fail_build_chat_model)
     monkeypatch.setattr(agent.random, "choice", lambda seq: seq[0])
 
-    for query in ("สวัสดีครับ", "สวัสดีครับผม", "Hello!!", "หวัดดีจ้า"):
+    for query in ("สวัสดีครับ", "สวัสดีครับผม", "Hello!!", "หวัดดีจ้า", "Good morning!", "hi there", "ฮัลโหล", "สวัสดีๆ"):
         state = {
             "messages": [HumanMessage(content=query)],
             "llm_provider": "openai",
