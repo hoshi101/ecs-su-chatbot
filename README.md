@@ -2,12 +2,10 @@
 
 An AI-powered department support chatbot for Electrical Engineering / Electronic and Computer Systems Engineering, built with LangGraph, Qdrant, and switchable Gemini/OpenAI chat models.
 
-## Project Structure (Restructured)
-
-The project has been systematically restructured for better maintainability and clarity:
+## Project Structure
 
 ```
-fsshero-chatbot/
+ecs-chatbot/
 ├── .env                          # Environment variables (gitignored)
 ├── .env.example                  # Environment template
 ├── .python-version               # Python version
@@ -39,7 +37,9 @@ fsshero-chatbot/
 ├── scripts/                      # Development and utility scripts
 │   ├── run_backend.py           # Backend server launcher
 │   ├── run_frontend.py          # Frontend server launcher
-│   └── process_documents.py     # Document processing script
+│   ├── process_documents.py     # Document processing script
+│   ├── scrape_department_sources.py
+│   └── preflight_check.py
 │
 ├── tests/                        # Testing infrastructure
 │   ├── conftest.py              # Pytest configuration
@@ -63,11 +63,12 @@ fsshero-chatbot/
 │   └── testing/
 │
 ├── data/                         # Document storage
-│   ├── home_page/
-│   ├── popular_feature_page/
-│   └── คู่มือ/
+│   ├── web/                     # Scraped official web content
+│   ├── มคอ.2.pdf
+│   └── รายละเอียดของหลักสูตร_2565.pdf
 │
 ├── archive/                      # Archived/reference materials
+├── bruno/                        # Bruno API collection
 │
 └── README.md                     # This file
 ```
@@ -78,7 +79,7 @@ fsshero-chatbot/
 
 ```bash
 # Clone and navigate to the project
-cd fsshero-chatbot
+cd ecs-chatbot
 
 # Install dependencies
 pip install -r requirements.txt
@@ -93,19 +94,19 @@ cp .env.example .env
 # - TAVILY_API_KEY
 #
 # Optional defaults:
-# - LLM_PROVIDER=gemini|openai
+# - LLM_PROVIDER=openai|gemini
 # - GEMINI_MODEL=gemini-2.5-flash
-# - OPENAI_MODEL=chat-latest
+# - OPENAI_MODEL=<your preferred OpenAI chat model>
 ```
 
 ### 2. Process Documents (First Run)
 
 ```bash
 # Optional but recommended: scrape official department/faculty pages first
-python scripts/scrape_department_sources.py
+.venv/bin/python scripts/scrape_department_sources.py
 
 # Process documents and populate vector database
-python scripts/process_documents.py
+.venv/bin/python scripts/process_documents.py
 ```
 
 ### 3. Start the Application
@@ -114,10 +115,10 @@ python scripts/process_documents.py
 
 ```bash
 # Terminal 1: Start backend
-python scripts/run_backend.py --reload
+.venv/bin/python scripts/run_backend.py --host 0.0.0.0 --port 8001 --reload
 
 # Terminal 2: Start frontend
-python scripts/run_frontend.py
+.venv/bin/python scripts/run_frontend.py
 ```
 
 **Option B: Direct commands**
@@ -133,8 +134,8 @@ cd src/frontend && streamlit run app.py
 ### 4. Access the Application
 
 - **Frontend**: http://localhost:8501
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
+- **Backend API**: http://localhost:8001
+- **API Documentation**: http://localhost:8001/docs
 
 ## Key Features
 
@@ -166,11 +167,11 @@ the local knowledge base instead of relying on live web search for every query.
 Use:
 
 ```bash
-python scripts/scrape_department_sources.py
+.venv/bin/python scripts/scrape_department_sources.py
 ```
 
 This writes raw HTML, cleaned Markdown/JSON, and discovered downloads into
-`data/web/`. See [docs/guides/WEB_SCRAPING_GUIDE.md](/home/hoshi/hoshi/side-project/university-project/extracted_folder/ecs-chatbot/docs/guides/WEB_SCRAPING_GUIDE.md).
+`data/web/`. See `docs/guides/WEB_SCRAPING_GUIDE.md`.
 
 ### Project Structure Benefits
 
@@ -221,36 +222,32 @@ GET /health
 
 ## Testing
 
-The restructured project maintains all existing functionality with improved test organization:
+Run the automated test suite with pytest:
 
 ```bash
 # Run all tests
-pytest
+.venv/bin/python -m pytest
 
 # Run unit tests only
-pytest tests/unit/
+.venv/bin/python -m pytest tests/unit/
 
 # Run integration tests only
-pytest tests/integration/
+.venv/bin/python -m pytest tests/integration/ -v
 
 # Run specific test file
-pytest tests/unit/test_agent.py -v
+.venv/bin/python -m pytest tests/unit/test_agent.py -v
 
 # Run with coverage
-pytest --cov=src tests/
+.venv/bin/python -m pytest --cov=src tests/
 ```
 
-## Migration Notes
+Live service diagnostics are available as manual scripts and require valid `.env`
+credentials for Qdrant, Gemini/OpenAI, and Tavily:
 
-This restructured version:
-
-- **Preserves all existing functionality**
-- **Maintains API compatibility**
-- **Improves code organization**
-- **Enhances maintainability**
-- **Supports future growth**
-
-All original features continue to work exactly as before, with improved organization and clearer structure.
+```bash
+.venv/bin/python scripts/verify_imports.py
+.venv/bin/python scripts/check_connectivity.py
+```
 
 ## Environment Variables
 
@@ -260,7 +257,7 @@ Required environment variables in `.env` (at project root):
 # Qdrant Vector Database
 QDRANT_API_KEY=your_qdrant_api_key
 QDRANT_URL=your_qdrant_url
-QDRANT_COLLECTION_NAME=fsshero-chatbot-bge-m3
+QDRANT_COLLECTION_NAME=ecs-su-chatbot-bge-m3
 
 # Google/Gemini AI
 GOOGLE_API_KEY=your_google_api_key
@@ -269,7 +266,7 @@ GOOGLE_API_KEY=your_google_api_key
 TAVILY_API_KEY=your_tavily_api_key
 
 # Frontend Configuration
-FASTAPI_BASE_URL=http://localhost:8000
+FASTAPI_BASE_URL=http://localhost:8001
 
 # Optional: Document Processing
 DOC_SOURCE_DIR=data
@@ -288,7 +285,7 @@ Comprehensive documentation is available in the `docs/` directory:
 
 - **User Guides**: `docs/guides/` - API testing and Postman guides
 - **Architecture**: `docs/architecture/` - Technical architecture and design docs
-- **Implementation**: `docs/implementation/` - Implementation details and plans
+- **Operations**: `docs/operations/` - Debugging and release-readiness notes
 - **Testing**: `docs/testing/` - Test plans and reports
 
 ## Contributing
@@ -303,7 +300,3 @@ Comprehensive documentation is available in the `docs/` directory:
 ## License
 
 This project maintains the same license as the original implementation.
-
----
-
-**The FSS Hero Chatbot has been successfully restructured for better maintainability and future growth!**

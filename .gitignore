@@ -20,6 +20,8 @@ env/
 # IDE
 .vscode/
 .idea/
+.antigravitycli/
+.agents/
 *.swp
 *.swo
 *~
@@ -30,6 +32,7 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
 
 # Other
 project_example/
@@ -38,6 +41,8 @@ project_example/
 CLAUDE.md
 .kiro*
 data/web/downloads/
+evaluation_results.json
+final_evaluation.json
 
 # Test coverage
 .coverage

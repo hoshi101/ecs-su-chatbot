@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Backend Server Startup Script for FSS Hero Chatbot
-Starts the FastAPI backend server using the new restructured code.
+Backend server startup script for the ECS chatbot.
+Starts the FastAPI backend server.
 
 Usage:
-    python scripts/run_backend.py
+    .venv/bin/python scripts/run_backend.py
 
 Or with custom host/port:
-    python scripts/run_backend.py --host 0.0.0.0 --port 8001
+    .venv/bin/python scripts/run_backend.py --host 0.0.0.0 --port 8001
 """
 
 import uvicorn
@@ -20,14 +20,14 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 def main():
-    parser = argparse.ArgumentParser(description="Start FSS Hero Chatbot Backend")
+    parser = argparse.ArgumentParser(description="Start ECS chatbot backend")
     parser.add_argument("--host", default="127.0.0.1", help="Host to bind to")
     parser.add_argument("--port", type=int, default=8000, help="Port to bind to")
     parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
 
     args = parser.parse_args()
 
-    print("🚀 Starting FSS Hero Chatbot Backend (Restructured)")
+    print("Starting ECS chatbot backend")
     print(f"📍 Host: {args.host}")
     print(f"🔌 Port: {args.port}")
     print(f"🔄 Reload: {args.reload}")

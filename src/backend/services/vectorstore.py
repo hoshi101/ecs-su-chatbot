@@ -181,6 +181,27 @@ def add_documents_batch(documents: List, batch_size: int = 100):
     logger.info("All document batches uploaded successfully")
 
 
+def document_exists(file_path: str, content_hash: str | None = None) -> bool:
+    """
+    Check whether a document has already been indexed.
+    """
+    filters = {"file_path": file_path}
+    matches = get_documents_by_metadata(filters)
+    if not matches:
+        return False
+
+    if not content_hash:
+        return True
+
+    for match in matches:
+        metadata = match.get("metadata", {})
+        existing_hash = metadata.get("content_hash")
+        if existing_hash == content_hash or existing_hash is None:
+            return True
+
+    return False
+
+
 # --- Document Management Functions ---
 def get_documents_by_metadata(filters: Dict[str, Any]) -> List[Dict]:
     """

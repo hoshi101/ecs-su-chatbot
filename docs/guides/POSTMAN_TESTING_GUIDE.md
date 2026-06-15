@@ -1,4 +1,4 @@
-# Postman Testing Guide for FSS Hero Chatbot API
+# Postman Testing Guide for ECS Chatbot API
 
 Complete guide to testing the new testing/monitoring endpoints using Postman.
 
@@ -18,11 +18,11 @@ Complete guide to testing the new testing/monitoring endpoints using Postman.
 ### Prerequisites
 1. **Start your FastAPI server:**
    ```bash
-   python -m uvicorn src.backend.api.main:app --reload --port 8000
+   .venv/bin/python scripts/run_backend.py --host 0.0.0.0 --port 8001 --reload
    ```
 
 2. **Verify server is running:**
-   - Open browser: http://localhost:8000/docs
+   - Open browser: http://localhost:8001/docs
    - You should see the FastAPI Swagger documentation
 
 3. **Install Postman:**
@@ -30,7 +30,7 @@ Complete guide to testing the new testing/monitoring endpoints using Postman.
    - Or use web version: https://web.postman.com/
 
 ### Base URL
-All endpoints use: `http://localhost:8000`
+All endpoints use: `http://localhost:8001`
 
 ---
 
@@ -139,7 +139,7 @@ Test your RAG retrieval system to see which documents are being retrieved for a 
 }
 ```
 
-**What to look for:** Compare `original_query` vs `enhanced_query` in response to see how HERO Bot enhances short queries.
+**What to look for:** Compare `original_query` vs `enhanced_query` in response to see how the assistant enhances short queries.
 
 ---
 
@@ -246,7 +246,7 @@ That's it! GET requests are simple - no body required.
       "name": "Qdrant Vector Database",
       "status": "healthy",
       "latency_ms": 45.23,
-      "details": "Collection 'fsshero-chatbot-bge-m3' found with 1250 documents",
+      "details": "Collection 'ecs-su-chatbot-bge-m3' found with 1250 documents",
       "error": null
     },
     {
@@ -660,7 +660,7 @@ Text 2 (account)    0.34     0.31      1.00
 
 ### Workflow 4: Query Enhancement Testing
 
-**Goal:** See how HERO Bot enhances queries
+**Goal:** See how the assistant enhances queries
 
 1. **Test with short query:**
    ```json

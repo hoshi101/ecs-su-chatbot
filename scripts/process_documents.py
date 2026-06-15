@@ -15,8 +15,9 @@ Make sure to set the following environment variables in your .env file:
 
 import os
 import sys
+import argparse
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 from dotenv import load_dotenv
 
 # Add project root to path
@@ -38,7 +39,7 @@ from src.backend.core.config import (
     DOC_SOURCE_DIR,
     DOC_SUPPORTED_FORMATS
 )
-from src.backend.services.vectorstore import BGEEmbedder, add_documents_batch
+from src.backend.services.vectorstore import BGEEmbedder, add_documents_batch, document_exists
 from src.backend.services.document_processor import DocumentProcessor
 
 
@@ -78,14 +79,15 @@ def should_process_file(file_path: str) -> bool:
     return True
 
 
-def process_all_documents(data_path: str = None) -> List:
+def process_all_documents(data_path: str = None, reprocess_existing: bool = False) -> Tuple[List, dict]:
     """Process all documents in the data folder using DocumentProcessor."""
     data_path = data_path or DOC_SOURCE_DIR
     all_documents = []
+    summary = {"processed_files": 0, "skipped_existing": 0, "failed_files": 0, "total_chunks": 0}
 
     if not os.path.exists(data_path):
         print(f"❌ Data folder '{data_path}' not found")
-        return all_documents
+        return all_documents, summary
 
     # Count total files for progress tracking
     supported_extensions = tuple(f'.{ext}' for ext in DOC_SUPPORTED_FORMATS)
@@ -100,7 +102,7 @@ def process_all_documents(data_path: str = None) -> List:
 
     if total_files == 0:
         print("📁 No documents found in data folder")
-        return all_documents
+        return all_documents, summary
 
     print(f"📁 Found {total_files} documents to process...")
     processed_count = 0
@@ -117,23 +119,33 @@ def process_all_documents(data_path: str = None) -> List:
             print(f"📄 Processing: {file}")
 
             try:
+                file_hash = processor._compute_file_hash(file_path)
+                if not reprocess_existing and document_exists(file_path, file_hash):
+                    summary["skipped_existing"] += 1
+                    print(f"⏭️  Skipping already indexed file: {file}")
+                    continue
+
                 # Use DocumentProcessor to process the file
                 documents = processor.process_file(file_path, source="bulk")
 
                 if documents:
                     all_documents.extend(documents)
                     processed_count += 1
+                    summary["processed_files"] += 1
+                    summary["total_chunks"] += len(documents)
                     print(f"✅ Processed {file} ({processed_count}/{total_files}) - {len(documents)} chunks")
                 else:
                     print(f"⚠️  No content extracted from {file}")
 
             except Exception as e:
+                summary["failed_files"] += 1
                 print(f"❌ Error processing {file}: {str(e)}")
                 continue
 
     print(f"🎉 Successfully processed {processed_count}/{total_files} documents")
-    print(f"📊 Total document chunks created: {len(all_documents)}")
-    return all_documents
+    print(f"⏭️  Skipped already indexed documents: {summary['skipped_existing']}")
+    print(f"📊 Total document chunks created in this run: {len(all_documents)}")
+    return all_documents, summary
 
 
 def create_collection_if_needed(client, collection_name: str):
@@ -162,6 +174,14 @@ def create_collection_if_needed(client, collection_name: str):
 
 def main():
     """Main processing function."""
+    parser = argparse.ArgumentParser(description="Process documents into the ECS chatbot Qdrant collection.")
+    parser.add_argument(
+        "--reprocess-existing",
+        action="store_true",
+        help="Reprocess files even if they already exist in Qdrant."
+    )
+    args = parser.parse_args()
+
     print("🚀 Starting department support chatbot document processing...")
     print("=" * 60)
 
@@ -181,9 +201,12 @@ def main():
 
         # Process documents
         print(f"\n📁 Processing documents from '{DOC_SOURCE_DIR}' folder...")
-        documents = process_all_documents()
+        documents, summary = process_all_documents(reprocess_existing=args.reprocess_existing)
 
         if not documents:
+            if summary["skipped_existing"] > 0 and summary["failed_files"] == 0:
+                print("✅ No new documents required indexing. Existing Qdrant data is being reused.")
+                return
             print("❌ No documents to process. Make sure you have documents in the 'data/' folder.")
             print("💡 Supported formats: PDF, CSV, JSON, TXT, MD")
             return
@@ -193,6 +216,11 @@ def main():
         add_documents_batch(documents, batch_size=100)
 
         print(f"\n🎉 Document processing completed successfully!")
+        print(
+            f"📌 Run summary: processed={summary['processed_files']}, "
+            f"skipped_existing={summary['skipped_existing']}, failed={summary['failed_files']}, "
+            f"new_chunks={summary['total_chunks']}"
+        )
         print(f"📊 Collection '{QDRANT_COLLECTION_NAME}' is ready for the chat application")
         print("🚀 You can now run the chat application:")
         print("   - Backend: cd backend && uvicorn main:app --reload")

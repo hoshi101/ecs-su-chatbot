@@ -6,28 +6,28 @@ load_dotenv()
 
 SUPPORTED_LLM_PROVIDERS = ("gemini", "openai")
 
-# === NEW: Qdrant Vector Database Configuration ===
+# === Qdrant Vector Database Configuration ===
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 QDRANT_URL = os.getenv("QDRANT_URL")
-QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "fsshero-chatbot-bge-m3")
+QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "ecs-su-chatbot-bge-m3")
 
-# === NEW: Google/Gemini Configuration ===
+# === Google/Gemini Configuration ===
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
-# === NEW: OpenAI Configuration ===
+# === OpenAI Configuration ===
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "chat-latest")
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini").strip().lower() or "gemini"
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.4-mini")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").strip().lower() or "openai"
 
-# === EXISTING: Tavily (keeping for parity) ===
+# === Tavily Search Configuration ===
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
-# === NEW: BGE-M3 Embedding Model ===
+# === BGE-M3 Embedding Model ===
 EMBED_MODEL = os.getenv("EMBED_MODEL", "BAAI/bge-m3")
 EMBED_DIMENSIONS = 1024  # BGE-M3 embedding dimensions
 
-# === EXISTING: Paths ===
+# === Paths ===
 DOC_SOURCE_DIR = os.getenv("DOC_SOURCE_DIR", "data")
 WEB_CONTENT_DIR = os.getenv("WEB_CONTENT_DIR", "data/web/clean")
 
@@ -64,7 +64,7 @@ DEFAULT_SIMILARITY_THRESHOLD = float(os.getenv("DEFAULT_SIMILARITY_THRESHOLD", "
 FINANCIAL_TEMPERATURE = float(os.getenv("FINANCIAL_TEMPERATURE", "0.2"))
 ENABLE_QUERY_ENHANCEMENT = os.getenv("ENABLE_QUERY_ENHANCEMENT", "true").lower() == "true"
 
-# === NEW: Document Processing Configuration ===
+# === Document Processing Configuration ===
 DOC_CHUNK_SIZE = int(os.getenv("DOC_CHUNK_SIZE", "1000"))
 DOC_CHUNK_OVERLAP = int(os.getenv("DOC_CHUNK_OVERLAP", "200"))
 DOC_SUPPORTED_FORMATS = os.getenv("DOC_SUPPORTED_FORMATS", "pdf,csv,json,txt,md").split(',')
@@ -82,10 +82,10 @@ PROVIDER_MODEL_SUGGESTIONS = {
         "gemini-2.0-flash",
     ],
     "openai": [
-        "chat-latest",
-        "gpt-5.5",
-        "gpt-5.4",
         "gpt-5.4-mini",
+        "gpt-5.4",
+        "gpt-5.5",
+        "chat-latest",
         "gpt-4.1",
     ],
 }

@@ -174,7 +174,10 @@ def test_repeated_contact_variants_do_not_call_llm(monkeypatch):
 
         assert result["route"] == "end"
         assert result["precheck_intent"] == "contact"
-        assert "โทรศัพท์" in result["messages"][-1].content
+        if agent.detect_query_language(query) == "en":
+            assert "Phone" in result["messages"][-1].content
+        else:
+            assert "โทรศัพท์" in result["messages"][-1].content
 
 
 def test_greeting_shortcut_does_not_call_llm(monkeypatch):

@@ -1,6 +1,6 @@
-# FSS Hero Chatbot - Testing and Monitoring API Endpoints Guide
+# ECS Chatbot - Testing and Monitoring API Endpoints Guide
 
-This guide demonstrates how to use the three critical testing and monitoring endpoints implemented for the FSS Hero Chatbot RAG system.
+This guide demonstrates how to use the three critical testing and monitoring endpoints implemented for the ECS chatbot RAG system.
 
 ## Endpoints Overview
 
@@ -192,7 +192,7 @@ for component in data['components']:
       "name": "Qdrant Vector Database",
       "status": "healthy",
       "latency_ms": 45.2,
-      "details": "Collection 'fsshero-chatbot-bge-m3' found with 1000 documents",
+      "details": "Collection 'ecs-su-chatbot-bge-m3' found with 1000 documents",
       "error": null
     },
     {

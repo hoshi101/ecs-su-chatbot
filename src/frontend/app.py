@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import json
+import time
 from config.settings import FRONTEND_CONFIG
 from state.session_manager import init_session_state
 from components.ui_components import (
@@ -13,6 +14,22 @@ from components.ui_components import (
     display_trace_events
 )
 from api.backend_client import chat_with_backend_agent, get_llm_options
+
+
+def apply_minimum_response_delay(trace_events, started_at: float) -> None:
+    elapsed = time.monotonic() - started_at
+    first_event = trace_events[0] if trace_events else {}
+    details = first_event.get("details", {}) if isinstance(first_event, dict) else {}
+    is_shortcut = bool(details.get("shortcut_type"))
+
+    target_delay = (
+        FRONTEND_CONFIG["MIN_SHORTCUT_RESPONSE_SECONDS"]
+        if is_shortcut
+        else FRONTEND_CONFIG["MIN_STANDARD_RESPONSE_SECONDS"]
+    )
+    remaining_delay = target_delay - elapsed
+    if remaining_delay > 0:
+        time.sleep(remaining_delay)
 
 def main():
     """Main function to run the Streamlit application."""
@@ -38,7 +55,7 @@ def main():
         except requests.exceptions.RequestException:
             st.session_state.llm_options = {
                 "gemini": ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"],
-                "openai": ["chat-latest", "gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-4.1"],
+                "openai": ["gpt-5.4-mini", "gpt-5.4", "gpt-5.5", "chat-latest", "gpt-4.1"],
             }
 
     # Render sidebar with settings
@@ -69,8 +86,9 @@ def main():
 
         # Display assistant's response and trace
         with st.chat_message("assistant"):
-            with st.spinner("Assistant is preparing an answer..."):
+            with st.spinner("กำลังค้นข้อมูลจากเอกสารทางการและเรียบเรียงคำตอบ..."):
                 try:
+                    request_started_at = time.monotonic()
                     # Call the backend API for chat with enhanced parameters
                     agent_response, trace_events, enhancement_info, source_docs = chat_with_backend_agent(
                         fastapi_base_url,
@@ -82,6 +100,7 @@ def main():
                         force_web_search,
                         st.session_state.similarity_threshold
                     )
+                    apply_minimum_response_delay(trace_events, request_started_at)
 
                     # Store enhancement and source information in session state
                     st.session_state.enhanced_query = enhancement_info
@@ -92,15 +111,7 @@ def main():
                     st.markdown(agent_response)
                     # Add the agent's response to chat history
                     st.session_state.messages.append({"role": "assistant", "content": agent_response})
-
-                    # Display the workflow trace
-                    display_trace_events(trace_events)
-
-                    # Display enhancement and source info immediately after response
-                    if enhancement_info:
-                        display_query_enhancement()
-                    if source_docs:
-                        display_source_documents()
+                    st.rerun()
 
                 except requests.exceptions.ConnectionError:
                     st.error("Could not connect to the FastAPI backend. Please ensure it's running.")

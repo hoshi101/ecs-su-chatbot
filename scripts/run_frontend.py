@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Frontend Server Startup Script for FSS Hero Chatbot
-Starts the Streamlit frontend using the new restructured code.
+Frontend server startup script for the ECS chatbot.
+Starts the Streamlit frontend.
 
 Usage:
-    python scripts/run_frontend.py
+    .venv/bin/python scripts/run_frontend.py
 
 Or with custom port:
-    python scripts/run_frontend.py --port 8502
+    .venv/bin/python scripts/run_frontend.py --port 8502
 """
 
 import subprocess
@@ -20,12 +20,12 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
 def main():
-    parser = argparse.ArgumentParser(description="Start FSS Hero Chatbot Frontend")
+    parser = argparse.ArgumentParser(description="Start ECS chatbot frontend")
     parser.add_argument("--port", type=int, default=8501, help="Port to bind to")
 
     args = parser.parse_args()
 
-    print("🎨 Starting FSS Hero Chatbot Frontend (Restructured)")
+    print("Starting ECS chatbot frontend")
     print(f"🔌 Port: {args.port}")
     print(f"📁 App: src/frontend/app.py")
     print()
@@ -34,7 +34,7 @@ def main():
     frontend_dir = os.path.join(project_root, "src", "frontend")
 
     cmd = [
-        "streamlit", "run", "app.py",
+        sys.executable, "-m", "streamlit", "run", "app.py",
         "--server.port", str(args.port),
         "--server.address", "localhost"
     ]

@@ -28,6 +28,7 @@
 - The project already has session handling on the frontend side via `src/frontend/state/session_manager.py`.
 - The main remaining operational blocker is still ingestion/runtime validation against the configured `Qdrant` endpoint.
 - Test question assets have now been reorganized into a maintainable structure for repeated validation.
+- Workflow trace and source attribution UI logic have now been repaired at the code level, but full RAG validation is still blocked by Qdrant runtime access.
 
 ## Completed Work
 
@@ -41,6 +42,10 @@
   - contact
   - out of scope
 - Verified that the new question sets reference real sources already present in the repo.
+- Added dedicated source attribution payloads from backend to frontend.
+- Restored workflow trace persistence in Streamlit session state.
+- Added operator-facing preflight and debugging artifacts.
+- Added ingestion duplicate guards so `process_documents.py` can skip already indexed files.
 
 ## Canonical Data And Test Assets
 
@@ -67,10 +72,10 @@
 
 ## Current Focus
 
-1. Use the new categorized question sets to run actual chatbot validation.
-2. Confirm routing behavior for `answer`, `rag`, and `end` cases.
-3. Re-run ingestion/runtime validation once the `Qdrant` configuration issue is resolved.
-4. Summarize response quality, coverage, and failure cases for the next report/testing pass.
+1. Fix the live `Qdrant` endpoint/runtime issue so local RAG retrieval can work again.
+2. Re-run preflight until `health/detailed` and `retrieval-test` both pass.
+3. Validate source attribution on true RAG answers, not only web-fallback answers.
+4. Then run the categorized question sets for full chatbot validation.
 
 ## Next Validation Step
 
@@ -156,3 +161,33 @@
 - Residual issue during ingestion:
   - some `.json` files were skipped because Python package `jq` is not installed in `.venv`
   - markdown and PDF sources were still processed, so ingestion is not fully blocked
+
+### 2026-05-04
+
+- Implemented trace/source attribution repair across backend and frontend:
+  - backend now returns explicit `sources` alongside `trace_events`
+  - frontend now normalizes trace payloads correctly instead of assuming attribute-style objects
+  - trace events are stored in Streamlit session state and shown after reruns
+- Updated assistant naming defaults:
+  - default Thai/display name: `น้องไฟฟ้า (ECS AI Assistant)`
+  - English/transliterated name: `N' Faifa`
+- Improved source visibility for users:
+  - source panel now shows snippet, source type, file name, file path, page/chunk metadata when available, and source URL when available
+  - source file download button is available for local source files supported by Streamlit
+- Added ingestion deduplication:
+  - `DocumentProcessor` now adds `content_hash`
+  - `scripts/process_documents.py` now skips already indexed files by default
+  - use `--reprocess-existing` only when forced re-indexing is really needed
+- Added operator diagnostics:
+  - `scripts/preflight_check.py`
+  - `docs/operations/DEBUGGING_CHECKLIST.md`
+- Smoke/preflight result on `2026-05-04`:
+  - `GET /health`: pass
+  - `POST /chat/`: pass
+  - `trace_events`: present
+  - `sources`: present
+  - `GET /health/detailed`: fail due Qdrant collection access returning `404 page not found`
+  - `POST /debug/retrieval-test`: fail for the same Qdrant reason
+- Current blocker details:
+  - runtime requests to `QDRANT_URL` currently fail on `/collections`
+  - this means the trace/source UI fixes are ready, but true RAG retrieval validation cannot be signed off yet

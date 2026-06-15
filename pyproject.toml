@@ -1,7 +1,7 @@
 [project]
-name = "fsshero-chatbot"
+name = "ecs-chatbot"
 version = "0.1.0"
-description = "Add your description here"
+description = "Department support chatbot for Electrical Engineering and Electronic and Computer Systems Engineering."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []

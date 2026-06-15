@@ -1,5 +1,5 @@
 """
-Pytest configuration for FSS Hero Chatbot tests.
+Pytest configuration for ECS chatbot tests.
 
 This file contains shared fixtures and configuration for all tests.
 """

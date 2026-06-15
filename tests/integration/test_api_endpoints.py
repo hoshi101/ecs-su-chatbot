@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for FSS Hero Chatbot API endpoints
+Test script for ECS chatbot API endpoints.
 Tests the three new testing and monitoring endpoints:
 1. /debug/retrieval-test - Test RAG retrieval
 2. /health/detailed - Comprehensive health check
@@ -9,10 +9,14 @@ Tests the three new testing and monitoring endpoints:
 
 import requests
 import json
+import os
 from typing import Dict, Any
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # API base URL (adjust if needed)
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.getenv("FASTAPI_BASE_URL", "http://localhost:8001").rstrip("/")
 
 
 def print_response(title: str, response: requests.Response):
@@ -218,7 +222,7 @@ def test_embeddings_with_reference():
 def run_all_tests():
     """Run all endpoint tests"""
     print(f"\n{'#'*80}")
-    print(f"# FSS Hero Chatbot API - Testing and Monitoring Endpoints")
+    print(f"# ECS Chatbot API - Testing and Monitoring Endpoints")
     print(f"# Base URL: {BASE_URL}")
     print(f"{'#'*80}")
 

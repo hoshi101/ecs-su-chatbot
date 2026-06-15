@@ -1,13 +1,13 @@
 """
-Document Processing Service for FSS Hero Chatbot
+Document processing service for the ECS chatbot.
 Unified document processing logic for both bulk and API uploads.
 Handles PDF, CSV, JSON, TXT, and MD files with consistent chunking and metadata.
 """
 
 import os
-import io
 import json
 import tempfile
+import hashlib
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from pathlib import Path
@@ -32,7 +32,7 @@ class DocumentProcessingError(Exception):
 
 class DocumentProcessor:
     """
-    Unified document processor for FSS Hero Chatbot.
+    Unified document processor for the ECS chatbot.
     Handles all document types with consistent chunking and metadata.
     """
 
@@ -84,6 +84,7 @@ class DocumentProcessor:
         file_ext = Path(file_path).suffix.lower().lstrip('.')
         file_name = os.path.basename(file_path)
         derived_metadata = self._derive_metadata_from_path(file_path)
+        content_hash = self._compute_file_hash(file_path)
 
         # Base metadata
         base_metadata = {
@@ -92,6 +93,7 @@ class DocumentProcessor:
             "upload_source": source,
             "timestamp": datetime.now().isoformat(),
             "file_path": file_path,
+            "content_hash": content_hash,
         }
         base_metadata.update(derived_metadata)
 
@@ -165,7 +167,8 @@ class DocumentProcessor:
             "source_type": file_ext,
             "upload_source": "api",
             "timestamp": datetime.now().isoformat(),
-            "file_size": file_size
+            "file_size": file_size,
+            "content_hash": hashlib.sha256(file_content).hexdigest(),
         }
 
         # Add any additional metadata
@@ -389,10 +392,38 @@ class DocumentProcessor:
             category = "policy"
 
         title = stem.replace("_", " ").strip()
-        return {
+        metadata = {
             "document_category": category,
             "title": title,
+            "source_key": stem,
         }
+        metadata.update(self._load_sidecar_metadata(path))
+        return metadata
+
+    def _load_sidecar_metadata(self, path: Path) -> Dict[str, Any]:
+        sidecar_path = path.with_suffix(".json")
+        if path.suffix.lower() == ".json" or not sidecar_path.exists():
+            return {}
+
+        try:
+            with open(sidecar_path, "r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except Exception:
+            return {}
+
+        metadata: Dict[str, Any] = {}
+        for key in ("source_url", "title", "category", "kind"):
+            value = payload.get(key)
+            if value:
+                metadata[key if key != "category" else "document_category"] = value
+        return metadata
+
+    def _compute_file_hash(self, file_path: str) -> str:
+        hasher = hashlib.sha256()
+        with open(file_path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                hasher.update(chunk)
+        return hasher.hexdigest()
 
 
 # Global instance for use across the application
