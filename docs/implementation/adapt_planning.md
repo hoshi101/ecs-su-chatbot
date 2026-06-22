@@ -1,6 +1,6 @@
 # Final Project(4th)
 
-***Old Project Name**: AI Assistant Chatbot for Finansia Hero Application*
+***Earlier Prototype**: AI assistant chatbot architecture adapted for this department project*
 
 **New Project Name:** AI Assistant/Support Chatbot for Department of Electrical Engineering
 

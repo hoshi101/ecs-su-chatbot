@@ -147,8 +147,8 @@ Test your RAG retrieval system to see which documents are being retrieved for a 
 
 ```json
 {
-  "original_query": "How to set stop loss?",
-  "enhanced_query": "How to set up and configure stop loss orders in the Finansia Hero trading platform?",
+  "original_query": "What is ECS?",
+  "enhanced_query": "What is the Electronic and Computer Systems Engineering program at Silpakorn University?",
   "query_enhancement_enabled": true,
   "results": [
     {
@@ -674,8 +674,8 @@ Text 2 (account)    0.34     0.31      1.00
    ```
 
 2. **Compare in response:**
-   - `original_query`: "stop loss"
-   - `enhanced_query`: "How to set up and configure stop loss orders in the Finansia Hero trading platform..."
+   - `original_query`: "ECS"
+   - `enhanced_query`: "What is the Electronic and Computer Systems Engineering program at Silpakorn University?"
 
 3. **Check results:**
    - Enhanced query should retrieve more relevant platform-specific documents

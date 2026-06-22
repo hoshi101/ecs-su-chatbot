@@ -40,7 +40,23 @@ project_example/
 .codex
 CLAUDE.md
 .kiro*
+archive/
 data/web/downloads/
+data/web/raw/
+docs/reports/*.pdf
+noted.txt
+docs/BILINGUAL_PRESENTATION_SCRIPT.md
+docs/Current_Poster.md
+docs/POSTER_CONTENT.md
+docs/PRESENTATION_SCRIPT.md
+docs/Q&A_Preparation.md
+docs/architecture/SENIOR_ENGINEER_PRESENTATION.md
+docs/implementation/IMPLEMENTATION_PLAN.md
+docs/migration/MIGRATION_COMPLETE.md
+docs/project-analysis/2025-09-26-comprehensive-project-analysis.md
+docs/testing/COMPREHENSIVE_TEST_REPORT.md
+docs/testing/test_plan_functional_parity.md
+SESSION_MANAGEMENT.md
 evaluation_results.json
 final_evaluation.json
 

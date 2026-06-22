@@ -1,18 +1,18 @@
 ECS Chatbot Test Document
 
-This is a test document for the Finansia Hero Trading Platform.
+This is a test document for the Electrical Engineering Department chatbot.
 
 Key Features:
-- Advanced trading tools
-- Real-time market data
-- Risk management systems
-- Technical analysis charts
-- Order management interface
+- Curriculum information
+- Lecturer and staff directory support
+- Department contact information
+- Academic regulations and forms
+- Student service guidance
 
-Platform Navigation:
-1. Login to your account
-2. Access the trading dashboard
-3. Use the order placement panel
-4. Monitor your portfolio
+Department Navigation:
+1. Review the program overview
+2. Check curriculum and course details
+3. Find lecturer or staff contacts
+4. Locate relevant academic documents
 
 This document is used to test the RAG system functionality.
