@@ -77,7 +77,7 @@ class AgentState(TypedDict, total=False):
     rag_error: str
     query_enhancement_status: Literal["enhanced", "skipped", "unchanged"]
     query_enhancement_reason: str
-    precheck_intent: Literal["contact", "greeting", "out_of_scope", "domain_question"]
+    precheck_intent: Literal["contact", "greeting", "capability", "out_of_scope", "domain_question"]
     precheck_reason: str
     precheck_variant: str
     response_language: Literal["th", "en"]
@@ -487,9 +487,9 @@ GREETING_OPENINGS = (
 )
 
 GREETING_BODIES = (
-    "ผมคือ {bot_name} ผู้ช่วยข้อมูลของ{domain_name}",
-    "ผมช่วยตอบคำถามเกี่ยวกับ{domain_name}ได้",
-    "หากต้องการข้อมูลจาก{domain_name} ผมช่วยได้ครับ",
+    "ผมคือ {bot_name} ผู้ช่วยข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร",
+    "ผมช่วยตอบคำถามเกี่ยวกับภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรได้",
+    "หากต้องการข้อมูลจากภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร ผมช่วยได้ครับ",
 )
 
 GREETING_CLOSES = (
@@ -589,7 +589,7 @@ OUT_OF_SCOPE_HARD_OPENINGS_EN = (
 
 OUT_OF_SCOPE_HARD_BODIES = (
     "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับ",
-    "ตอนนี้ผมยังตอบเรื่องนี้ไม่ได้",
+    "คำถามนี้อยู่นอกขอบเขตของระบบ ตอนนี้ผมยังตอบเรื่องนี้ไม่ได้",
     "เรื่องนี้ไม่ใช่ขอบเขตที่ผมถูกออกแบบมาให้ช่วยตอบครับ",
 )
 
@@ -656,6 +656,12 @@ def build_contact_response(language: Literal["th", "en"]) -> str:
 
 
 def build_greeting_response(language: Literal["th", "en"]) -> str:
+    if language == "th":
+        return (
+            f"สวัสดีครับ ผมคือ {get_bot_name_for_language(language)} "
+            "ผู้ช่วยข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร "
+            "ถามได้เลยทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ"
+        )
     openings = GREETING_OPENINGS if language == "th" else GREETING_OPENINGS_EN
     bodies = GREETING_BODIES if language == "th" else GREETING_BODIES_EN
     closes = GREETING_CLOSES if language == "th" else GREETING_CLOSES_EN
@@ -668,6 +674,34 @@ def build_greeting_response(language: Literal["th", "en"]) -> str:
             ),
             random.choice(closes),
         ]
+    )
+
+
+def is_capability_query(original_query: str) -> bool:
+    normalized = normalize_for_rules(original_query)
+    capability_terms = (
+        "ช่วยอะไรได้บ้าง",
+        "ตอบเรื่องอะไรได้บ้าง",
+        "ถามอะไรได้บ้าง",
+        "ทำอะไรได้บ้าง",
+        "แชตบอทนี้ตอบ",
+        "ขอบเขตระบบ",
+        "what can you help",
+        "what can you answer",
+    )
+    return any(term in normalized for term in capability_terms)
+
+
+def build_capability_response(language: Literal["th", "en"]) -> str:
+    if language == "en":
+        return (
+            "I can help with official information about the Department of Electrical Engineering, "
+            "Silpakorn University, including curriculum, lecturers, staff, courses, documents, "
+            "and department contact details."
+        )
+    return (
+        "ผมช่วยตอบคำถามเกี่ยวกับข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรได้ครับ "
+        "เช่น หลักสูตร รายวิชา อาจารย์ บุคลากร เอกสาร และข้อมูลติดต่อของภาควิชา"
     )
 
 
@@ -729,6 +763,20 @@ def build_hard_out_of_scope_response(language: Literal["th", "en"]) -> str:
 
 
 def build_out_of_scope_response(original_query: str, variant: str, language: Literal["th", "en"]) -> str:
+    normalized = normalize_for_rules(original_query)
+    if language == "th":
+        if any(keyword in normalized for keyword in OUT_OF_SCOPE_KEYWORD_GROUPS["weather"]):
+            return (
+                "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ เพราะเป็นคำถามเกี่ยวกับสภาพอากาศ "
+                "ถ้าต้องการข้อมูลเกี่ยวกับหลักสูตร อาจารย์ เอกสาร หรือข้อมูลติดต่อของ"
+                f"{DOMAIN_NAME} ผมช่วยได้ครับ"
+            )
+        if any(keyword in normalized for keyword in OUT_OF_SCOPE_KEYWORD_GROUPS["coding"]):
+            return (
+                "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ เพราะเป็นคำขอเขียนโค้ดทั่วไป "
+                "ถ้าต้องการข้อมูลเกี่ยวกับหลักสูตร อาจารย์ เอกสาร หรือข้อมูลติดต่อของ"
+                f"{DOMAIN_NAME} ผมช่วยได้ครับ"
+            )
     if variant == "soft_oob":
         return build_soft_out_of_scope_response(original_query, language)
     return build_hard_out_of_scope_response(language)
@@ -860,6 +908,25 @@ def is_out_of_scope_query(original_query: str) -> bool:
     return False
 
 
+def should_prefer_local_rag(original_query: str) -> bool:
+    normalized = normalize_for_rules(original_query)
+    local_rag_terms = (
+        "หัวหน้าภาค",
+        "หัวหน้าภาควิชา",
+        "กิตติธัช",
+        "สนใจวิจัย",
+        "งานวิจัย",
+        "research",
+        "เว็บไซต์ภาควิชา",
+        "website ภาควิชา",
+        "เว็บภาควิชา",
+        "facebook ภาควิชา",
+        "เบอร์ติดต่อภาควิชา",
+        "ที่อยู่ของภาควิชา",
+    )
+    return any(term in normalized for term in local_rag_terms)
+
+
 def resolve_out_of_scope_variant(original_query: str) -> str:
     normalized = normalize_for_rules(original_query)
     if any(term in normalized for term in OUT_OF_SCOPE_SOFT_TERMS):
@@ -875,13 +942,16 @@ def resolve_out_of_scope_variant(original_query: str) -> str:
     return "hard_oob"
 
 
-def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "out_of_scope", "domain_question"], str]:
+def classify_query_precheck(original_query: str) -> tuple[Literal["contact", "greeting", "capability", "out_of_scope", "domain_question"], str]:
     normalized = normalize_for_rules(original_query)
     if not normalized:
         return "greeting", "Empty input treated as a greeting/help prompt."
 
     if is_greeting_query(normalized):
         return "greeting", "Greeting matched a direct template response."
+
+    if is_capability_query(normalized):
+        return "capability", "Capability question matched a direct template response."
 
     if is_contact_shortcut_query(normalized):
         return "contact", "Short direct contact request matched a template shortcut."
@@ -957,6 +1027,8 @@ def router_node(state: AgentState) -> AgentState:
     precheck_variant = ""
     if precheck_intent == "greeting":
         precheck_variant = "greeting_template"
+    elif precheck_intent == "capability":
+        precheck_variant = "capability_template"
     elif precheck_intent == "contact":
         precheck_variant = "contact_template"
     elif precheck_intent == "out_of_scope":
@@ -994,6 +1066,13 @@ def router_node(state: AgentState) -> AgentState:
             "messages": state["messages"] + [AIMessage(content=build_greeting_response(response_language))],
         }
 
+    if precheck_intent == "capability":
+        return {
+            **base_state,
+            "route": "end",
+            "messages": state["messages"] + [AIMessage(content=build_capability_response(response_language))],
+        }
+
     if precheck_intent == "out_of_scope":
         return {
             **base_state,
@@ -1014,7 +1093,11 @@ def router_node(state: AgentState) -> AgentState:
             enhancement_reason = "The original wording was already suitable for retrieval."
     else:
         enhanced_query = original_query
-    query = enhanced_query or original_query
+    query = (
+        f"{original_query}\n{enhanced_query}"
+        if enhanced_query and enhanced_query != original_query
+        else original_query
+    )
 
     web_search_enabled = state.get("web_search_enabled", True)
     force_web_search = state.get("force_web_search", False)
@@ -1057,6 +1140,9 @@ Safety policy:
     if force_web_search and web_search_enabled and result.route in {"rag", "answer"}:
         result.route = "web"
         override_reason = "User forced web search."
+    elif result.route == "web" and should_prefer_local_rag(original_query):
+        result.route = "rag"
+        override_reason = "Local official knowledge base preferred for stable department facts."
     elif not web_search_enabled and result.route == "web":
         result.route = "rag"
         override_reason = "Web search disabled by user."
@@ -1105,7 +1191,11 @@ def rag_node(state: AgentState) -> AgentState:
     original_query, enhanced_query = get_query_context(state)
     similarity_threshold = state.get("similarity_threshold", 0.7)
     runtime_settings = get_runtime_settings_from_state(state)
-    query = enhanced_query or original_query
+    query = (
+        f"{original_query}\n{enhanced_query}"
+        if enhanced_query and enhanced_query != original_query
+        else original_query
+    )
 
     try:
         documents = retrieve_documents(

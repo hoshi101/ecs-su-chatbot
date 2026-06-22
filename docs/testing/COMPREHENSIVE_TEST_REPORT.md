@@ -33,6 +33,20 @@ The FSS Hero Chatbot API system has been meticulously tested and validated. All 
 
 ## Detailed Test Results
 
+### System Test Results
+
+| Test Case | API Request | Expected Result | Actual Result | Response Time | Status |
+|---|---|---|---|---:|---|
+| Health check | `GET /health` | API reports basic service availability | Returned `200 OK` with `{"status": "ok"}` | 10.6 ms | PASS |
+| LLM options | `GET /llm/options` | Available providers and default model are returned | Returned `200 OK`; default provider `openai`, default model `gpt-5.4-mini` | 1.8 ms | PASS |
+| Detailed health | `GET /health/detailed` | All critical components report healthy status | Returned `200 OK`; overall status `unhealthy` because Qdrant returned `404 Not Found`; BGE-M3, Gemini, OpenAI, Tavily, and DocumentProcessor were healthy | 13,117.8 ms | FAIL |
+| Embedding similarity | `POST /debug/embedding-test` | BGE-M3 generates 1024-dimensional embeddings and similarity scores | Returned `200 OK`; generated 1024-dimensional embeddings for 2 texts; similarity scores to reference were `0.6320` and `0.8247` | 604.3 ms | PASS |
+| Knowledge retrieval | `POST /debug/retrieval-test` | Retrieve relevant curriculum documents from Qdrant | Returned `500`; retrieval failed because Qdrant returned `404 Not Found` | 2,040.4 ms | FAIL |
+| Greeting chat | `POST /chat/` | Thai greeting receives direct assistant greeting | Returned `200 OK`; routed to direct `end` response with 1 trace event and no sources | 11.2 ms | PASS |
+| Contact chat | `POST /chat/` | Contact query returns department contact information | Returned `200 OK`; response included phone/Facebook contact fallback, but RAG lookup failed because Qdrant returned `404 Not Found` | 4,816.2 ms | PARTIAL |
+| Capability chat | `POST /chat/` | Capability query explains supported department topics | Returned `200 OK`; routed to `answer` with 2 trace events, but response noted missing official context | 4,188.1 ms | PARTIAL |
+| Out-of-scope chat | `POST /chat/` | Weather query is rejected as out of scope | Returned `200 OK`; routed to direct `end` response with `out_of_scope` shortcut | 9.6 ms | PASS |
+
 ### 1. System Dependencies ✅ PASS
 - **Python Environment**: 3.10.18 ✅
 - **Virtual Environment**: Properly configured ✅

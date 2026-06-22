@@ -25,7 +25,8 @@ from src.backend.services.vectorstore import (
     delete_documents_by_metadata,
     get_collection_stats,
     embeddings,
-    _get_qdrant_client
+    _get_qdrant_client,
+    retrieve_documents,
 )
 from src.backend.services.document_processor import document_processor, DocumentProcessingError
 from src.backend.core.config import (
@@ -883,46 +884,21 @@ async def test_retrieval(request: RetrievalTestRequest):
             enhanced_query = original_query
             logger.info("Query enhancement disabled")
 
-        # Use enhanced query for retrieval
-        query_to_use = enhanced_query if enhanced_query else original_query
+        # Use both the original and enhanced forms so important user keywords are not lost.
+        query_to_use = (
+            f"{original_query}\n{enhanced_query}"
+            if enhanced_query and enhanced_query != original_query
+            else original_query
+        )
 
-        # Step 2: Perform similarity search using Qdrant
+        # Step 2: Perform retrieval using the same ranking logic as chat.
         try:
-            client = _get_qdrant_client()
-            vectorstore = QdrantVectorStore(
-                client=client,
-                collection_name=QDRANT_COLLECTION_NAME,
-                embedding=embeddings
-            )
-
-            # Configure retriever based on similarity threshold
-            if request.similarity_threshold < 1.0:
-                retriever = vectorstore.as_retriever(
-                    search_type="similarity_score_threshold",
-                    search_kwargs={
-                        "k": request.top_k,
-                        "score_threshold": request.similarity_threshold
-                    }
-                )
-            else:
-                retriever = vectorstore.as_retriever(
-                    search_kwargs={"k": request.top_k}
-                )
-
-            # Retrieve documents
             retrieval_start = time.time()
-
-            # Use similarity_search_with_score for detailed results
-            if request.return_scores:
-                search_results = vectorstore.similarity_search_with_score(
-                    query_to_use,
-                    k=request.top_k
-                )
-                documents = [(doc, score) for doc, score in search_results]
-            else:
-                docs = retriever.invoke(query_to_use)
-                documents = [(doc, None) for doc in docs]
-
+            documents = retrieve_documents(
+                query_to_use,
+                top_k=request.top_k,
+                similarity_threshold=request.similarity_threshold,
+            )
             retrieval_latency = (time.time() - retrieval_start) * 1000
 
             logger.info("Retrieval test completed | results=%s | latency_ms=%.2f", len(documents), retrieval_latency)
@@ -936,16 +912,17 @@ async def test_retrieval(request: RetrievalTestRequest):
 
         # Step 3: Build detailed results
         results = []
-        for doc, score in documents:
+        for item in documents:
+            metadata = item.get("metadata") or {}
             result = RetrievalResult(
-                content=doc.page_content,
-                score=float(score) if score is not None and request.return_scores else None,
-                metadata=doc.metadata if request.return_metadata else None,
+                content=item.get("content", ""),
+                score=float(item["score"]) if item.get("score") is not None and request.return_scores else None,
+                metadata=metadata if request.return_metadata else None,
                 chunk_info={
-                    "chunk_index": doc.metadata.get("chunk_index"),
-                    "total_chunks": doc.metadata.get("total_chunks"),
-                    "file_name": doc.metadata.get("file_name"),
-                    "source_type": doc.metadata.get("source_type")
+                    "chunk_index": metadata.get("chunk_index"),
+                    "total_chunks": metadata.get("total_chunks"),
+                    "file_name": metadata.get("file_name"),
+                    "source_type": metadata.get("source_type")
                 } if request.return_metadata else None
             )
             results.append(result)
