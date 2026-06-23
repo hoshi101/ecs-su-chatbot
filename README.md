@@ -67,8 +67,6 @@ ecs-chatbot/
 │   ├── มคอ.2.pdf
 │   └── รายละเอียดของหลักสูตร_2565.pdf
 │
-├── bruno/                        # Bruno API collection
-│
 └── README.md                     # This file
 ```
 

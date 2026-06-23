@@ -36,6 +36,8 @@ logs/
 
 # Other
 project_example/
+bruno/
+docs/testing/BRUNO_ROUTING_GUIDE.md
 .claude/
 .codex
 CLAUDE.md
