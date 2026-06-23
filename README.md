@@ -8,6 +8,8 @@ An AI-powered department support chatbot for Electrical Engineering / Electronic
 ecs-chatbot/
 ├── .env                          # Environment variables (gitignored)
 ├── .env.example                  # Environment template
+├── Dockerfile                    # Container image for backend/frontend
+├── docker-compose.yml            # Local Docker Compose stack
 ├── .python-version               # Python version
 ├── pyproject.toml                # Project metadata
 ├── requirements.txt              # Python dependencies
@@ -45,8 +47,9 @@ ecs-chatbot/
 │   ├── conftest.py              # Pytest configuration
 │   ├── unit/                    # Unit tests
 │   │   ├── test_agent.py       # Agent tests (consolidated)
-│   │   ├── test_connectivity.py
-│   │   └── test_imports.py
+│   │   ├── test_llm_config.py
+│   │   ├── test_gemini_structured.py
+│   │   └── test_query_precheck.py
 │   ├── integration/             # Integration tests
 │   │   └── test_api_endpoints.py
 │   └── migration/               # Migration tests
@@ -55,11 +58,8 @@ ecs-chatbot/
 │   ├── guides/                  # User guides
 │   │   ├── API_TESTING_GUIDE.md
 │   │   └── POSTMAN_TESTING_GUIDE.md
-│   ├── architecture/            # Architecture docs
-│   │   └── SENIOR_ENGINEER_PRESENTATION.md
 │   ├── implementation/
-│   ├── migration/
-│   ├── project-analysis/
+│   ├── operations/
 │   └── testing/
 │
 ├── data/                         # Document storage
@@ -67,7 +67,6 @@ ecs-chatbot/
 │   ├── มคอ.2.pdf
 │   └── รายละเอียดของหลักสูตร_2565.pdf
 │
-├── archive/                      # Archived/reference materials
 ├── bruno/                        # Bruno API collection
 │
 └── README.md                     # This file
@@ -137,6 +136,52 @@ cd src/frontend && streamlit run app.py
 - **Backend API**: http://localhost:8001
 - **API Documentation**: http://localhost:8001/docs
 
+## Docker
+
+Docker support is included for local review and demos. The Compose stack runs
+the FastAPI backend and Streamlit frontend as separate services using the same
+project image.
+
+```bash
+# Build and start backend + frontend
+docker compose up --build
+```
+
+If your Docker installation uses the legacy Compose plugin, use:
+
+```bash
+docker-compose up --build
+```
+
+The stack reads runtime configuration from `.env`, so create it from the sample
+first and add your local API credentials:
+
+```bash
+cp .env.example .env
+```
+
+Docker endpoints:
+
+- **Frontend**: http://localhost:8501
+- **Backend API**: http://localhost:8001
+- **API Documentation**: http://localhost:8001/docs
+
+Useful Docker commands:
+
+```bash
+# Stop containers
+docker compose down
+
+# Rebuild after dependency changes
+docker compose build --no-cache
+
+# Run tests in the image
+docker compose run --rm backend python -m pytest
+
+# Process documents from the mounted ./data directory
+docker compose run --rm backend python scripts/process_documents.py
+```
+
 ## Key Features
 
 ### Assistant Capabilities
@@ -170,8 +215,9 @@ Use:
 .venv/bin/python scripts/scrape_department_sources.py
 ```
 
-This writes raw HTML, cleaned Markdown/JSON, and discovered downloads into
-`data/web/`. See `docs/guides/WEB_SCRAPING_GUIDE.md`.
+This writes cleaned Markdown/JSON into `data/web/clean/`. Raw scrape output and
+downloaded source files are ignored for public releases. See
+`docs/guides/WEB_SCRAPING_GUIDE.md`.
 
 ### Project Structure Benefits
 
@@ -262,6 +308,12 @@ QDRANT_COLLECTION_NAME=ecs-su-chatbot-bge-m3
 # Google/Gemini AI
 GOOGLE_API_KEY=your_google_api_key
 
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+LLM_PROVIDER=openai
+OPENAI_MODEL=gpt-5.4-mini
+GEMINI_MODEL=gemini-2.5-flash
+
 # Web Search (Tavily)
 TAVILY_API_KEY=your_tavily_api_key
 
@@ -273,7 +325,8 @@ DOC_SOURCE_DIR=data
 
 # Optional: Assistant Configuration
 DOMAIN_NAME=Department of Electrical Engineering, Silpakorn University
-BOT_NAME=EE Support Assistant
+BOT_NAME=น้องไฟฟ้า (ECS AI Assistant)
+BOT_NAME_EN=N' Faifa
 SEARCH_DOMAINS=ee-eng.su.ac.th,eng2.su.ac.th
 FINANCIAL_TEMPERATURE=0.2
 ENABLE_QUERY_ENHANCEMENT=true
@@ -284,9 +337,8 @@ ENABLE_QUERY_ENHANCEMENT=true
 Comprehensive documentation is available in the `docs/` directory:
 
 - **User Guides**: `docs/guides/` - API testing and Postman guides
-- **Architecture**: `docs/architecture/` - Technical architecture and design docs
 - **Operations**: `docs/operations/` - Debugging and release-readiness notes
-- **Testing**: `docs/testing/` - Test plans and reports
+- **Testing**: `docs/testing/` - Routing guides and question sets
 
 ## Contributing
 

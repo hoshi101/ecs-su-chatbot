@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: .
+    env_file:
+      - .env
+    command: python scripts/run_backend.py --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build: .
+    env_file:
+      - .env
+    environment:
+      FASTAPI_BASE_URL: http://backend:8001
+    command: >
+      sh -c "cd src/frontend &&
+      python -m streamlit run app.py
+      --server.port 8501
+      --server.address 0.0.0.0"
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
