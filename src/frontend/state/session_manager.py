@@ -1,6 +1,6 @@
 import streamlit as st
 import uuid
-from config.settings import FRONTEND_CONFIG
+from src.frontend.config.settings import FRONTEND_CONFIG
 
 def init_session_state():
     """

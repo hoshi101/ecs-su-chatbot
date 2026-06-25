@@ -1,0 +1,814 @@
+{
+  "info": {
+    "_postman_id": "d4ceba6e-9e3d-4ed4-9b1d-b9d6e6a8f001",
+    "name": "ECS Chatbot API - System Modules",
+    "description": "System-level Postman collection for the ECS Chatbot FastAPI backend. Requests are organized by live backend modules and cover health, model configuration, chat routing/agent behavior, retrieval diagnostics, embedding diagnostics, and representative validation failures.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('session_id')) {",
+          "  pm.collectionVariables.set('session_id', 'postman-' + Date.now());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - System Health",
+      "item": [
+        {
+          "name": "Health - Basic Liveness",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('service reports ok', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('status', 'ok');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Fast liveness check for confirming the backend process is reachable."
+          },
+          "response": []
+        },
+        {
+          "name": "Health - Detailed Component Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('overall status is known', function () {",
+                  "  pm.expect(['healthy', 'degraded', 'unhealthy']).to.include(body.overall_status);",
+                  "});",
+                  "",
+                  "pm.test('components and summary are present', function () {",
+                  "  pm.expect(body.components).to.be.an('array').that.is.not.empty;",
+                  "  pm.expect(body.summary).to.be.an('object');",
+                  "  pm.expect(body.summary.total_components).to.eql(body.components.length);",
+                  "});",
+                  "",
+                  "pm.test('core components are reported', function () {",
+                  "  const names = body.components.map((component) => component.name);",
+                  "  pm.expect(names).to.include('Qdrant Vector Database');",
+                  "  pm.expect(names).to.include('BGE-M3 Embeddings');",
+                  "  pm.expect(names).to.include('DocumentProcessor');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health/detailed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health",
+                "detailed"
+              ]
+            },
+            "description": "Comprehensive health check for critical and non-critical backend dependencies."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - LLM Configuration",
+      "item": [
+        {
+          "name": "LLM Options - Providers and Defaults",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('default provider and model are returned', function () {",
+                  "  pm.expect(body.default_provider).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.default_model).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('supported providers include gemini and openai', function () {",
+                  "  pm.expect(body.providers).to.be.an('object');",
+                  "  pm.expect(body.providers.gemini).to.be.an('array').that.is.not.empty;",
+                  "  pm.expect(body.providers.openai).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "if (body.default_provider && body.default_model) {",
+                  "  pm.collectionVariables.set('llm_provider', body.default_provider);",
+                  "  pm.collectionVariables.set('llm_model', body.default_model);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/llm/options",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "llm",
+                "options"
+              ]
+            },
+            "description": "Returns default LLM configuration and selectable provider/model suggestions used by the frontend."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Chat Agent",
+      "item": [
+        {
+          "name": "Chat - Greeting Shortcut",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('response contract is valid', function () {",
+                  "  pm.expect(body.response).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.trace_events).to.be.an('array').that.is.not.empty;",
+                  "  pm.expect(body.sources).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('router shortcut handles greeting', function () {",
+                  "  const routing = body.trace_events.find((event) => event.event_type === 'routing');",
+                  "  pm.expect(routing).to.exist;",
+                  "  pm.expect(routing.details.precheck_intent).to.eql('greeting');",
+                  "  pm.expect(routing.details.decision).to.eql('end');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}-greeting\",\n  \"query\": \"Hello!\",\n  \"enable_web_search\": false,\n  \"force_web_search\": false,\n  \"similarity_threshold\": 0.7,\n  \"llm_provider\": \"{{llm_provider}}\",\n  \"llm_model\": \"{{llm_model}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                ""
+              ]
+            },
+            "description": "Verifies the precheck shortcut path for greetings, which should not require retrieval or web search."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat - Contact Shortcut",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('contact response is returned', function () {",
+                  "  pm.expect(body.response).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.trace_events).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('router shortcut handles contact intent', function () {",
+                  "  const routing = body.trace_events.find((event) => event.event_type === 'routing');",
+                  "  pm.expect(routing).to.exist;",
+                  "  pm.expect(routing.details.precheck_intent).to.eql('contact');",
+                  "  pm.expect(routing.details.decision).to.eql('end');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}-contact\",\n  \"query\": \"What is the department phone number?\",\n  \"enable_web_search\": false,\n  \"force_web_search\": false,\n  \"similarity_threshold\": 0.7,\n  \"llm_provider\": \"{{llm_provider}}\",\n  \"llm_model\": \"{{llm_model}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                ""
+              ]
+            },
+            "description": "Verifies the contact-information shortcut response used for short contact channel queries."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat - Department Knowledge Query",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('agent response contains expected fields', function () {",
+                  "  pm.expect(body.response).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.trace_events).to.be.an('array').that.is.not.empty;",
+                  "  pm.expect(body.sources).to.be.an('array');",
+                  "  pm.expect(body.llm_provider).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.llm_model).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('routing and response generation are traced', function () {",
+                  "  const eventTypes = body.trace_events.map((event) => event.event_type);",
+                  "  pm.expect(eventTypes).to.include('routing');",
+                  "  pm.expect(eventTypes).to.include('response_generation');",
+                  "});",
+                  "",
+                  "pm.test('trace steps are ordered', function () {",
+                  "  body.trace_events.forEach((event, index) => {",
+                  "    pm.expect(event.step).to.eql(index + 1);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}-knowledge\",\n  \"query\": \"What does the ECS program study?\",\n  \"enable_web_search\": true,\n  \"force_web_search\": false,\n  \"similarity_threshold\": 0.7,\n  \"llm_provider\": \"{{llm_provider}}\",\n  \"llm_model\": \"{{llm_model}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                ""
+              ]
+            },
+            "description": "Exercises the normal domain-question path through routing, retrieval and/or web search, and answer generation."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat - Force Official Website Search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('response and trace are returned', function () {",
+                  "  pm.expect(body.response).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.trace_events).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('forced search is visible in routing or web search trace', function () {",
+                  "  const hasWebSearch = body.trace_events.some((event) => event.event_type === 'web_search');",
+                  "  const routing = body.trace_events.find((event) => event.event_type === 'routing');",
+                  "  pm.expect(hasWebSearch || (routing && routing.details.final_decision === 'web_search') || (routing && routing.details.decision === 'web_search')).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}-force-web\",\n  \"query\": \"Find the latest department contact information from official sources.\",\n  \"enable_web_search\": true,\n  \"force_web_search\": true,\n  \"similarity_threshold\": 0.7,\n  \"llm_provider\": \"{{llm_provider}}\",\n  \"llm_model\": \"{{llm_model}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                ""
+              ]
+            },
+            "description": "Checks that the force_web_search flag can drive the official-website search path when configured."
+          },
+          "response": []
+        },
+        {
+          "name": "Chat - Unsupported LLM Provider Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('unsupported provider fails with server error', function () {",
+                  "  pm.response.to.have.status(500);",
+                  "});",
+                  "",
+                  "pm.test('error details mention unsupported provider', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.detail).to.include('Unsupported LLM provider');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}-bad-provider\",\n  \"query\": \"Hello\",\n  \"enable_web_search\": false,\n  \"force_web_search\": false,\n  \"similarity_threshold\": 0.7,\n  \"llm_provider\": \"anthropic\",\n  \"llm_model\": \"claude-test\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                ""
+              ]
+            },
+            "description": "Representative negative test for unsupported provider handling."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - RAG Retrieval Diagnostics",
+      "item": [
+        {
+          "name": "Retrieval - Department Query With Scores and Metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('retrieval response contract is valid', function () {",
+                  "  pm.expect(body.original_query).to.be.a('string').and.not.empty;",
+                  "  pm.expect(body.results).to.be.an('array');",
+                  "  pm.expect(body.total_results).to.eql(body.results.length);",
+                  "  pm.expect(body.retrieval_latency_ms).to.be.a('number');",
+                  "  pm.expect(body.collection_stats).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('search parameters echo request', function () {",
+                  "  pm.expect(body.search_parameters.similarity_threshold).to.eql(0.5);",
+                  "  pm.expect(body.search_parameters.top_k).to.eql(5);",
+                  "  pm.expect(body.search_parameters.return_scores).to.eql(true);",
+                  "  pm.expect(body.search_parameters.return_metadata).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('returned results include requested diagnostic detail', function () {",
+                  "  body.results.forEach((result) => {",
+                  "    pm.expect(result.content).to.be.a('string').and.not.empty;",
+                  "    pm.expect(result).to.have.property('score');",
+                  "    pm.expect(result).to.have.property('metadata');",
+                  "    pm.expect(result).to.have.property('chunk_info');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"ECS curriculum and program structure\",\n  \"similarity_threshold\": 0.5,\n  \"top_k\": 5,\n  \"return_scores\": true,\n  \"return_metadata\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/debug/retrieval-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debug",
+                "retrieval-test"
+              ]
+            },
+            "description": "Primary RAG diagnostic for verifying indexed knowledge-base retrieval with scores and metadata."
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieval - High Threshold No Metadata",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('response honors high-threshold request shape', function () {",
+                  "  pm.expect(body.results).to.be.an('array');",
+                  "  pm.expect(body.search_parameters.similarity_threshold).to.eql(0.9);",
+                  "  pm.expect(body.search_parameters.top_k).to.eql(3);",
+                  "  pm.expect(body.search_parameters.return_metadata).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test('metadata is omitted when disabled', function () {",
+                  "  body.results.forEach((result) => {",
+                  "    pm.expect(result.metadata).to.eql(null);",
+                  "    pm.expect(result.chunk_info).to.eql(null);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"lecturer email\",\n  \"similarity_threshold\": 0.9,\n  \"top_k\": 3,\n  \"return_scores\": true,\n  \"return_metadata\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/debug/retrieval-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debug",
+                "retrieval-test"
+              ]
+            },
+            "description": "Covers stricter retrieval settings and confirms optional metadata suppression."
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieval - Invalid top_k Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('invalid top_k returns 422', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('validation detail is returned', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.detail).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"program information\",\n  \"similarity_threshold\": 0.7,\n  \"top_k\": 25,\n  \"return_scores\": true,\n  \"return_metadata\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/debug/retrieval-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debug",
+                "retrieval-test"
+              ]
+            },
+            "description": "Representative FastAPI/Pydantic validation check for retrieval request bounds."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Embedding Diagnostics",
+      "item": [
+        {
+          "name": "Embedding - Similarity Matrix",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('embedding response contract is valid', function () {",
+                  "  pm.expect(body.results).to.be.an('array').with.lengthOf(3);",
+                  "  pm.expect(body.total_texts).to.eql(3);",
+                  "  pm.expect(body.processing_time_ms).to.be.a('number');",
+                  "  pm.expect(body.embedding_model).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('embedding dimensions are present', function () {",
+                  "  body.results.forEach((result) => {",
+                  "    pm.expect(result.text).to.be.a('string').and.not.empty;",
+                  "    pm.expect(result.text_preview).to.be.a('string').and.not.empty;",
+                  "    pm.expect(result.embedding_dimensions).to.be.above(0);",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test('similarity matrix is square', function () {",
+                  "  pm.expect(body.similarity_matrix).to.be.an('array').with.lengthOf(3);",
+                  "  body.similarity_matrix.forEach((row) => pm.expect(row).to.be.an('array').with.lengthOf(3));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texts\": [\n    \"ECS curriculum structure\",\n    \"Electrical and computer systems engineering courses\",\n    \"Department contact phone number\"\n  ],\n  \"compute_similarities\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/debug/embedding-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debug",
+                "embedding-test"
+              ]
+            },
+            "description": "Verifies embedding generation and pairwise cosine similarity output."
+          },
+          "response": []
+        },
+        {
+          "name": "Embedding - Reference Similarity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test('reference similarity is computed for each text', function () {",
+                  "  pm.expect(body.results).to.be.an('array').with.lengthOf(3);",
+                  "  body.results.forEach((result) => {",
+                  "    pm.expect(result.similarity_to_reference).to.be.a('number');",
+                  "  });",
+                  "});",
+                  "",
+                  "pm.test('similarity matrix is not returned when disabled', function () {",
+                  "  pm.expect(body.similarity_matrix).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texts\": [\n    \"Bachelor program curriculum\",\n    \"Lecturer and staff directory\",\n    \"Internship procedure\"\n  ],\n  \"reference_text\": \"Where can I find ECS academic program information?\",\n  \"compute_similarities\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/debug/embedding-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debug",
+                "embedding-test"
+              ]
+            },
+            "description": "Checks reference-text similarity scoring without returning a full pairwise matrix."
+          },
+          "response": []
+        },
+        {
+          "name": "Embedding - Too Many Texts Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('too many texts returns 422', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('validation detail is returned', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.detail).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texts\": [\n    \"one\",\n    \"two\",\n    \"three\",\n    \"four\",\n    \"five\",\n    \"six\",\n    \"seven\",\n    \"eight\",\n    \"nine\",\n    \"ten\",\n    \"eleven\"\n  ],\n  \"compute_similarities\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/debug/embedding-test",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "debug",
+                "embedding-test"
+              ]
+            },
+            "description": "Representative request-body validation test for the embedding text-count limit."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8001",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "postman-system-test",
+      "type": "string"
+    },
+    {
+      "key": "llm_provider",
+      "value": "openai",
+      "type": "string"
+    },
+    {
+      "key": "llm_model",
+      "value": "gpt-5.4-mini",
+      "type": "string"
+    }
+  ]
+}

@@ -30,17 +30,22 @@ def main():
     print(f"📁 App: src/frontend/app.py")
     print()
 
-    # Change to the frontend directory to ensure relative imports work
-    frontend_dir = os.path.join(project_root, "src", "frontend")
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH")
+    env["PYTHONPATH"] = (
+        project_root
+        if not existing_pythonpath
+        else os.pathsep.join([project_root, existing_pythonpath])
+    )
 
     cmd = [
-        sys.executable, "-m", "streamlit", "run", "app.py",
+        sys.executable, "-m", "streamlit", "run", "src/frontend/app.py",
         "--server.port", str(args.port),
         "--server.address", "localhost"
     ]
 
     try:
-        subprocess.run(cmd, cwd=frontend_dir, check=True)
+        subprocess.run(cmd, cwd=project_root, env=env, check=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ Failed to start frontend: {e}")
         sys.exit(1)

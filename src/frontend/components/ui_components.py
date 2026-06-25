@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 import streamlit as st
 
-from config.settings import FRONTEND_CONFIG
+from src.frontend.config.settings import FRONTEND_CONFIG
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
@@ -34,7 +34,7 @@ def render_sidebar_settings():
         st.header("Settings")
 
         if st.button("Clear Conversation", use_container_width=True):
-            from state.session_manager import clear_conversation
+            from src.frontend.state.session_manager import clear_conversation
 
             clear_conversation()
             st.rerun()

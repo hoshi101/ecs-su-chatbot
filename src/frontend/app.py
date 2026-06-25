@@ -2,9 +2,9 @@ import streamlit as st
 import requests
 import json
 import time
-from config.settings import FRONTEND_CONFIG
-from state.session_manager import init_session_state
-from components.ui_components import (
+from src.frontend.config.settings import FRONTEND_CONFIG
+from src.frontend.state.session_manager import init_session_state
+from src.frontend.components.ui_components import (
     display_header,
     render_sidebar_settings,
     render_force_web_search_toggle,
@@ -13,7 +13,7 @@ from components.ui_components import (
     display_source_documents,
     display_trace_events
 )
-from api.backend_client import chat_with_backend_agent, get_llm_options
+from src.frontend.api.backend_client import chat_with_backend_agent, get_llm_options
 
 
 def apply_minimum_response_delay(trace_events, started_at: float) -> None:
