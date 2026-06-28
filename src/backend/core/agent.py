@@ -30,6 +30,13 @@ from src.backend.core.config import (
     normalize_provider,
     resolve_model_name,
 )
+from src.backend.core.response_templates import (
+    build_capability_response,
+    build_contact_response,
+    build_greeting_response,
+    build_out_of_scope_response as build_out_of_scope_template_response,
+    get_bot_name_for_language,
+)
 from src.backend.services.vectorstore import retrieve_documents
 from src.backend.utils.logging_utils import get_logger
 
@@ -157,15 +164,11 @@ def build_default_greeting() -> str:
 def detect_query_language(text: str) -> Literal["th", "en"]:
     thai_chars = sum(1 for ch in text if "\u0E00" <= ch <= "\u0E7F")
     latin_chars = sum(1 for ch in text if ("a" <= ch.lower() <= "z"))
+    if thai_chars >= 3:
+        return "th"
     if thai_chars > latin_chars:
         return "th"
     return "en"
-
-
-def get_bot_name_for_language(language: Literal["th", "en"]) -> str:
-    if language == "en":
-        return "Nong Faifa (ECS AI Assistant)"
-    return BOT_NAME
 
 
 def build_query_enhancement_prompt(original_query: str) -> str:
@@ -410,215 +413,6 @@ OUT_OF_SCOPE_SOFT_HINTS = {
 }
 
 
-CONTACT_RESPONSE_TEMPLATES = (
-    """นี่คือข้อมูลติดต่อของ{domain_name}
-
-- โทรศัพท์: {phone_main}
-- มือถือ: {mobile}
-- โทรศัพท์/โทรสาร: {fax}
-- Facebook: {facebook}
-
-หากต้องการ ผมช่วยสรุปเป็นรูปแบบสั้นสำหรับส่งต่อได้ครับ""",
-    """ข้อมูลติดต่อ{domain_name}ที่ใช้ได้ตอนนี้มีดังนี้ครับ
-
-- เบอร์หลัก: {phone_main}
-- มือถือ: {mobile}
-- โทรศัพท์/โทรสาร: {fax}
-- Facebook: {facebook}
-
-ถ้าต้องการ ผมช่วยจัดรูปแบบให้พร้อมส่งต่อได้ครับ""",
-    """สำหรับการติดต่อ{domain_name} ใช้ช่องทางเหล่านี้ได้ครับ
-
-- โทรศัพท์: {phone_main}
-- มือถือ: {mobile}
-- โทรศัพท์/โทรสาร: {fax}
-- Facebook: {facebook}
-
-หากต้องการ ผมช่วยแยกเฉพาะเบอร์หรือช่องทางออนไลน์ให้ได้ครับ""",
-    """นี่คือช่องทางติดต่อของ{domain_name}ครับ
-
-- เบอร์โทรหลัก: {phone_main}
-- เบอร์มือถือ: {mobile}
-- โทรสาร/โทรศัพท์: {fax}
-- Facebook: {facebook}
-
-ถ้าต้องการข้อมูลที่อยู่หรือการเดินทางเพิ่มเติม ผมช่วยต่อได้ครับ""",
-    """ติดต่อ{domain_name}ได้ตามนี้ครับ
-
-- โทรศัพท์: {phone_main}
-- มือถือ: {mobile}
-- โทรศัพท์/โทรสาร: {fax}
-- Facebook: {facebook}
-
-หากต้องการ ผมช่วยสรุปให้เป็นข้อความสั้นสำหรับส่งต่อได้ครับ""",
-)
-
-CONTACT_RESPONSE_TEMPLATES_EN = (
-    """Here is the current contact information for {domain_name}
-
-- Phone: {phone_main}
-- Mobile: {mobile}
-- Phone/Fax: {fax}
-- Facebook: {facebook}
-
-If you want, I can also format this into a shorter message for sharing.""",
-    """The available contact details for {domain_name} are:
-
-- Main phone: {phone_main}
-- Mobile: {mobile}
-- Phone/Fax: {fax}
-- Facebook: {facebook}
-
-If needed, I can also turn this into a cleaner shareable summary.""",
-    """You can contact {domain_name} through these channels:
-
-- Phone: {phone_main}
-- Mobile: {mobile}
-- Phone/Fax: {fax}
-- Facebook: {facebook}
-
-If you want, I can also separate just the phone numbers or online channels.""",
-)
-
-GREETING_OPENINGS = (
-    "สวัสดีครับ",
-    "สวัสดีครับ ยินดีที่ได้คุยกันครับ",
-    "สวัสดีครับ น้องไฟฟ้ายินดีช่วยครับ",
-)
-
-GREETING_BODIES = (
-    "ผมคือ {bot_name} ผู้ช่วยข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร",
-    "ผมช่วยตอบคำถามเกี่ยวกับภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรได้",
-    "หากต้องการข้อมูลจากภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร ผมช่วยได้ครับ",
-)
-
-GREETING_CLOSES = (
-    "ถามได้เลยทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ",
-    "ถ้าต้องการข้อมูลเรื่องหลักสูตร อาจารย์ เอกสาร หรือการติดต่อ ส่งคำถามมาได้เลยครับ",
-    "อยากให้ผมช่วยเรื่องหลักสูตร อาจารย์ หรือข้อมูลภาควิชา ถามต่อได้เลยครับ",
-)
-
-GREETING_OPENINGS_EN = (
-    "Hello.",
-    "Hello, nice to meet you.",
-    "Hello, I'm happy to help.",
-)
-
-GREETING_BODIES_EN = (
-    "I'm {bot_name}, the information assistant for {domain_name}.",
-    "I can help with information about {domain_name}.",
-    "If you need official information about {domain_name}, I can help.",
-)
-
-GREETING_CLOSES_EN = (
-    "You can ask about the curriculum, courses, lecturers, or contact details.",
-    "Feel free to ask about courses, lecturers, documents, or department contact information.",
-    "If you want help with department information, just ask.",
-)
-
-CONTACT_OPENINGS = (
-    "ได้เลยครับ",
-    "ยินดีครับ",
-    "นี่คือข้อมูลติดต่อที่ผมมีตอนนี้ครับ",
-)
-
-CONTACT_CLOSES = (
-    "ถ้าต้องการ ผมช่วยสรุปเฉพาะเบอร์หรือช่องทางออนไลน์ให้ต่อได้ครับ",
-    "หากต้องการ ผมช่วยจัดรูปแบบให้พร้อมส่งต่อได้ครับ",
-    "ถ้าอยากได้เฉพาะข้อมูลที่อยู่หรือ Facebook ผมช่วยแยกให้ต่อได้ครับ",
-)
-
-CONTACT_OPENINGS_EN = (
-    "Sure.",
-    "Of course.",
-    "Here are the contact details I have right now.",
-)
-
-CONTACT_CLOSES_EN = (
-    "If you want, I can also summarize just the phone numbers or online channels.",
-    "If needed, I can format this into a shorter shareable message.",
-    "If you only want the address or Facebook page, I can separate that too.",
-)
-
-OUT_OF_SCOPE_SOFT_OPENINGS = (
-    "ขอโทษด้วยครับ",
-    "ขออภัยนะครับ",
-    "น้องไฟฟ้ายังช่วยเรื่องนี้ไม่ได้ครับ",
-)
-
-OUT_OF_SCOPE_SOFT_OPENINGS_EN = (
-    "Sorry about that.",
-    "Sorry.",
-    "I can't really help with that one.",
-)
-
-OUT_OF_SCOPE_SOFT_CLOSES = {
-    "food": (
-        "แต่ก็อย่าลืมหาอะไรกินด้วยนะครับ",
-        "ถ้าหิวอยู่ ลองหาอะไรรองท้องก่อนนะครับ",
-        "แต่อย่าปล่อยให้ท้องว่างนานนะครับ",
-    ),
-    "rest": (
-        "พักสักนิดก็น่าจะช่วยได้นะครับ",
-        "ถ้าไหวลองพักสายตาหรือพักผ่อนสักหน่อยนะครับ",
-        "อย่าลืมดูแลตัวเองและพักบ้างนะครับ",
-    ),
-    "stress": (
-        "ค่อยๆ พักหายใจลึกๆ สักนิดก็ดีนะครับ",
-        "ถ้ารู้สึกหนักเกินไป ลองพักก่อนสักหน่อยนะครับ",
-        "ดูแลตัวเองด้วยนะครับ ถ้าพักได้ลองพักก่อนครับ",
-    ),
-    "generic": (
-        "ถ้ามีคำถามเกี่ยวกับภาควิชาเมื่อไร ทักมาได้เลยครับ",
-        "ถ้าต้องการข้อมูลเกี่ยวกับภาควิชา ผมพร้อมช่วยต่อครับ",
-        "ถ้าอยากคุยเรื่องหลักสูตร อาจารย์ หรือข้อมูลภาควิชา ผมช่วยได้ครับ",
-    ),
-}
-
-OUT_OF_SCOPE_HARD_OPENINGS = (
-    "ขออภัยครับ",
-    "ขอโทษครับ",
-    "น้องไฟฟ้ายังไม่สามารถช่วยเรื่องนี้ได้ครับ",
-)
-
-OUT_OF_SCOPE_HARD_OPENINGS_EN = (
-    "Sorry.",
-    "I’m sorry.",
-    "I can’t help with that topic.",
-)
-
-OUT_OF_SCOPE_HARD_BODIES = (
-    "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับ",
-    "คำถามนี้อยู่นอกขอบเขตของระบบ ตอนนี้ผมยังตอบเรื่องนี้ไม่ได้",
-    "เรื่องนี้ไม่ใช่ขอบเขตที่ผมถูกออกแบบมาให้ช่วยตอบครับ",
-)
-
-OUT_OF_SCOPE_HARD_BODIES_EN = (
-    "That question is outside the scope I support.",
-    "I can't answer that right now.",
-    "That topic is outside what I was designed to help with.",
-)
-
-OUT_OF_SCOPE_HARD_CLOSES = (
-    "ถ้าต้องการข้อมูลเกี่ยวกับหลักสูตร อาจารย์ เอกสาร หรือข้อมูลติดต่อของ{domain_name} ผมช่วยได้ครับ",
-    "หากอยากสอบถามเรื่องของ{domain_name} เช่น รายวิชา หลักสูตร หรือการติดต่อ ผมช่วยต่อได้ครับ",
-    "ถ้าคุณมีคำถามเกี่ยวกับ{domain_name}หรือข้อมูลภาควิชา ส่งมาได้เลยครับ",
-)
-
-OUT_OF_SCOPE_HARD_CLOSES_EN = (
-    "If you need help with the curriculum, lecturers, documents, or contact information for {domain_name}, I can help.",
-    "If you want to ask about {domain_name}, such as courses, curriculum, or contact details, I can help with that.",
-    "If your question is about {domain_name} or department information, feel free to ask.",
-)
-
-CONTACT_TEMPLATE_VALUES = {
-    "phone_main": "034-219364-66 ต่อ 25520",
-    "mobile": "089-979-7911",
-    "fax": "034-241971",
-    "facebook": "Department of Electrical Engineering - Silpakorn University",
-}
-
-
 def should_enhance_query(original_query: str) -> tuple[bool, str]:
     query = " ".join(original_query.strip().split())
     normalized = query.lower().strip(" \t\n\r?!.,")
@@ -644,39 +438,6 @@ def should_enhance_query(original_query: str) -> tuple[bool, str]:
     return True, "Query may benefit from retrieval-oriented rewriting."
 
 
-def build_contact_response(language: Literal["th", "en"]) -> str:
-    templates = CONTACT_RESPONSE_TEMPLATES if language == "th" else CONTACT_RESPONSE_TEMPLATES_EN
-    openings = CONTACT_OPENINGS if language == "th" else CONTACT_OPENINGS_EN
-    closes = CONTACT_CLOSES if language == "th" else CONTACT_CLOSES_EN
-    body = random.choice(templates).format(
-        domain_name=DOMAIN_NAME,
-        **CONTACT_TEMPLATE_VALUES,
-    )
-    return f"{random.choice(openings)} {body}\n\n{random.choice(closes)}"
-
-
-def build_greeting_response(language: Literal["th", "en"]) -> str:
-    if language == "th":
-        return (
-            f"สวัสดีครับ ผมคือ {get_bot_name_for_language(language)} "
-            "ผู้ช่วยข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร "
-            "ถามได้เลยทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ"
-        )
-    openings = GREETING_OPENINGS if language == "th" else GREETING_OPENINGS_EN
-    bodies = GREETING_BODIES if language == "th" else GREETING_BODIES_EN
-    closes = GREETING_CLOSES if language == "th" else GREETING_CLOSES_EN
-    return " ".join(
-        [
-            random.choice(openings),
-            random.choice(bodies).format(
-                bot_name=get_bot_name_for_language(language),
-                domain_name=DOMAIN_NAME,
-            ),
-            random.choice(closes),
-        ]
-    )
-
-
 def is_capability_query(original_query: str) -> bool:
     normalized = normalize_for_rules(original_query)
     capability_terms = (
@@ -692,19 +453,6 @@ def is_capability_query(original_query: str) -> bool:
     return any(term in normalized for term in capability_terms)
 
 
-def build_capability_response(language: Literal["th", "en"]) -> str:
-    if language == "en":
-        return (
-            "I can help with official information about the Department of Electrical Engineering, "
-            "Silpakorn University, including curriculum, lecturers, staff, courses, documents, "
-            "and department contact details."
-        )
-    return (
-        "ผมช่วยตอบคำถามเกี่ยวกับข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรได้ครับ "
-        "เช่น หลักสูตร รายวิชา อาจารย์ บุคลากร เอกสาร และข้อมูลติดต่อของภาควิชา"
-    )
-
-
 def get_soft_oob_theme(normalized_query: str) -> str:
     for theme, hints in OUT_OF_SCOPE_SOFT_HINTS.items():
         if any(hint in normalized_query for hint in hints):
@@ -712,74 +460,19 @@ def get_soft_oob_theme(normalized_query: str) -> str:
     return "generic"
 
 
-def build_soft_out_of_scope_response(original_query: str, language: Literal["th", "en"]) -> str:
-    normalized = normalize_for_rules(original_query)
-    theme = get_soft_oob_theme(normalized)
-    if language == "en":
-        english_closes = {
-            "food": (
-                "Don’t forget to grab something to eat too.",
-                "If you're hungry, try getting a quick bite first.",
-                "Try not to stay hungry for too long.",
-            ),
-            "rest": (
-                "A short break might help.",
-                "If you can, try resting your eyes or taking a short break.",
-                "Don’t forget to take care of yourself and rest a bit.",
-            ),
-            "stress": (
-                "Try taking a slow breath and a short pause.",
-                "If it feels like too much, taking a short break may help.",
-                "Please take care of yourself and rest if you can.",
-            ),
-            "generic": (
-                "If you have a question about the department, feel free to ask.",
-                "If you need department information, I can help with that.",
-                "If you want to ask about courses, lecturers, or department information, I can help.",
-            ),
-        }
-        close = random.choice(english_closes[theme])
-        return f"{random.choice(OUT_OF_SCOPE_SOFT_OPENINGS_EN)} {close}"
-    close = random.choice(OUT_OF_SCOPE_SOFT_CLOSES[theme])
-    return f"{random.choice(OUT_OF_SCOPE_SOFT_OPENINGS)} {close}"
-
-
-def build_hard_out_of_scope_response(language: Literal["th", "en"]) -> str:
-    if language == "en":
-        return " ".join(
-            [
-                random.choice(OUT_OF_SCOPE_HARD_OPENINGS_EN),
-                random.choice(OUT_OF_SCOPE_HARD_BODIES_EN),
-                random.choice(OUT_OF_SCOPE_HARD_CLOSES_EN).format(domain_name=DOMAIN_NAME),
-            ]
-        )
-    return " ".join(
-        [
-            random.choice(OUT_OF_SCOPE_HARD_OPENINGS),
-            random.choice(OUT_OF_SCOPE_HARD_BODIES),
-            random.choice(OUT_OF_SCOPE_HARD_CLOSES).format(domain_name=DOMAIN_NAME),
-        ]
-    )
-
-
 def build_out_of_scope_response(original_query: str, variant: str, language: Literal["th", "en"]) -> str:
     normalized = normalize_for_rules(original_query)
-    if language == "th":
-        if any(keyword in normalized for keyword in OUT_OF_SCOPE_KEYWORD_GROUPS["weather"]):
-            return (
-                "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ เพราะเป็นคำถามเกี่ยวกับสภาพอากาศ "
-                "ถ้าต้องการข้อมูลเกี่ยวกับหลักสูตร อาจารย์ เอกสาร หรือข้อมูลติดต่อของ"
-                f"{DOMAIN_NAME} ผมช่วยได้ครับ"
-            )
-        if any(keyword in normalized for keyword in OUT_OF_SCOPE_KEYWORD_GROUPS["coding"]):
-            return (
-                "คำถามนี้อยู่นอกขอบเขตที่ผมรองรับครับ เพราะเป็นคำขอเขียนโค้ดทั่วไป "
-                "ถ้าต้องการข้อมูลเกี่ยวกับหลักสูตร อาจารย์ เอกสาร หรือข้อมูลติดต่อของ"
-                f"{DOMAIN_NAME} ผมช่วยได้ครับ"
-            )
-    if variant == "soft_oob":
-        return build_soft_out_of_scope_response(original_query, language)
-    return build_hard_out_of_scope_response(language)
+    reason = None
+    if any(keyword in normalized for keyword in OUT_OF_SCOPE_KEYWORD_GROUPS["weather"]):
+        reason = "weather"
+    elif any(keyword in normalized for keyword in OUT_OF_SCOPE_KEYWORD_GROUPS["coding"]):
+        reason = "coding"
+    return build_out_of_scope_template_response(
+        variant=variant,
+        language=language,
+        theme=get_soft_oob_theme(normalized),
+        reason=reason,
+    )
 
 
 def normalize_for_rules(text: str) -> str:
@@ -1003,7 +696,8 @@ def web_search_tool(query: str) -> str:
                 title = item.get("title", "No title")
                 content = item.get("content", "No content")
                 url = item.get("url", "")
-                formatted_results.append(f"Title: {title}\nContent: {content}\nURL: {url}")
+                score = item.get("score")
+                formatted_results.append(f"Title: {title}\nContent: {content}\nURL: {url}\nScore: {score}")
             return "\n\n".join(formatted_results) if formatted_results else ""
         return str(result)
     except Exception as exc:
@@ -1056,7 +750,7 @@ def router_node(state: AgentState) -> AgentState:
         return {
             **base_state,
             "route": "end",
-            "messages": state["messages"] + [AIMessage(content=build_contact_response(response_language))],
+            "messages": state["messages"] + [AIMessage(content=build_contact_response(response_language, original_query))],
         }
 
     if precheck_intent == "greeting":
@@ -1281,6 +975,7 @@ def web_node(state: AgentState) -> AgentState:
         title = ""
         content = ""
         url = ""
+        score = None
         for line in block.splitlines():
             if line.startswith("Title: "):
                 title = line.replace("Title: ", "", 1).strip()
@@ -1288,7 +983,13 @@ def web_node(state: AgentState) -> AgentState:
                 content = line.replace("Content: ", "", 1).strip()
             elif line.startswith("URL: "):
                 url = line.replace("URL: ", "", 1).strip()
-        web_results.append({"title": title, "snippet": content, "url": url})
+            elif line.startswith("Score: "):
+                raw_score = line.replace("Score: ", "", 1).strip()
+                try:
+                    score = float(raw_score) if raw_score and raw_score != "None" else None
+                except ValueError:
+                    score = None
+        web_results.append({"title": title, "snippet": content, "url": url, "relevance": score})
 
     return {
         **state,
@@ -1327,6 +1028,8 @@ Use this policy:
 - {response_language_instruction}
 - Keep the tone friendly, clear, and similar to a helpful department staff member.
 - Prefer bullet points or short sections when it improves readability.
+- Answer the user's exact request first. Keep the answer concise and avoid extra background unless it is needed.
+- For mixed questions, separate only the requested points; do not add unrelated department details.
 - If the answer is uncertain or missing from the context, say so clearly.
 - Do not invent facts.
 - Do not provide sensitive personal information beyond official public data.

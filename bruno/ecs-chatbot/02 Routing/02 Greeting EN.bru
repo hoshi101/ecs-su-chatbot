@@ -32,7 +32,8 @@ tests {
     expect(res.getStatus()).to.equal(200);
   });
   test("routes to greeting shortcut", function() {
-    const body = JSON.parse(res.getBody());
+    const rawBody = res.getBody();
+    const body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
     expect(body.trace_events[0].details.precheck_intent).to.equal("greeting");
     expect(body.trace_events[0].details.shortcut_variant).to.equal("greeting_template");
     expect(body.sources.length).to.equal(0);

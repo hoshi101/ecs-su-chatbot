@@ -32,7 +32,8 @@ tests {
     expect(res.getStatus()).to.equal(200);
   });
   test("stays in domain flow", function() {
-    const body = JSON.parse(res.getBody());
+    const rawBody = res.getBody();
+    const body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
     expect(body.trace_events[0].details.precheck_intent).to.equal("domain_question");
     if (body.trace_events[0].description.startsWith("Shortcut response selected")) {
       throw new Error("expected non-shortcut route");

@@ -31,7 +31,8 @@ tests {
     expect(res.getStatus()).to.equal(200);
   });
   test("has embedding result shape", function() {
-    const body = JSON.parse(res.getBody());
+    const rawBody = res.getBody();
+    const body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
     if (!Array.isArray(body.results)) {
       throw new Error("missing results array");
     }

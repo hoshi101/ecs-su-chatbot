@@ -19,7 +19,8 @@ tests {
     expect(res.getStatus()).to.equal(200);
   });
   test("health status is ok", function() {
-    const body = JSON.parse(res.getBody());
+    const rawBody = res.getBody();
+    const body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
     expect(body.status).to.equal("ok");
   });
 }
