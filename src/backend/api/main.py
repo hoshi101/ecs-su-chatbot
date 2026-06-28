@@ -45,6 +45,7 @@ from src.backend.core.config import (
 )
 from langchain_qdrant import QdrantVectorStore
 from src.backend.utils.logging_utils import get_logger, setup_logging
+from src.backend.utils.usage_tracking import record_chat_usage
 
 setup_logging()
 logger = get_logger(__name__)
@@ -508,6 +509,9 @@ class EmbeddingTestResponse(BaseModel):
 @limiter.limit(f"{RATE_LIMIT_PER_MINUTE}/minute" if RATE_LIMIT_ENABLED else "1000000/minute")
 async def chat_with_agent(request: Request, body: QueryRequest):
     trace_events_for_frontend: List[TraceEvent] = []
+    request_started_at = time.time()
+    llm_provider = None
+    llm_model = None
 
     try:
         llm_provider = normalize_provider(body.llm_provider)
@@ -799,6 +803,19 @@ async def chat_with_agent(request: Request, body: QueryRequest):
             final_message[:200],
             len(final_sources),
         )
+        record_chat_usage(
+            session_id=body.session_id,
+            query=body.query,
+            llm_provider=final_actual_state_dict.get("llm_provider") if final_actual_state_dict else llm_provider,
+            llm_model=final_actual_state_dict.get("llm_model") if final_actual_state_dict else llm_model,
+            enable_web_search=body.enable_web_search,
+            force_web_search=body.force_web_search,
+            similarity_threshold=body.similarity_threshold,
+            trace_events=trace_events_for_frontend,
+            sources=final_sources,
+            latency_ms=(time.time() - request_started_at) * 1000,
+            status="success",
+        )
 
         return AgentResponse(
             response=final_message,
@@ -812,6 +829,20 @@ async def chat_with_agent(request: Request, body: QueryRequest):
         traceback.print_exc()
         error_details = f"Error during agent invocation: {e}"
         logger.exception("%s | session_id=%s", error_details, body.session_id)
+        record_chat_usage(
+            session_id=body.session_id,
+            query=body.query,
+            llm_provider=llm_provider,
+            llm_model=llm_model,
+            enable_web_search=body.enable_web_search,
+            force_web_search=body.force_web_search,
+            similarity_threshold=body.similarity_threshold,
+            trace_events=trace_events_for_frontend,
+            sources=[],
+            latency_ms=(time.time() - request_started_at) * 1000,
+            status="error",
+            error=str(e),
+        )
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
 
 
