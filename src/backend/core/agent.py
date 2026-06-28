@@ -412,6 +412,27 @@ OUT_OF_SCOPE_SOFT_HINTS = {
     "stress": ("เครียด", "ท้อ", "เบื่อ"),
 }
 
+CURRENT_PUBLIC_INFO_HINTS = (
+    "ล่าสุด",
+    "ปัจจุบัน",
+    "ตอนนี้",
+    "ปีนี้",
+    "รอบล่าสุด",
+    "current",
+    "latest",
+    "this year",
+)
+
+ADMISSION_PUBLIC_INFO_HINTS = (
+    "รับสมัคร",
+    "สมัคร",
+    "tcas",
+    "admission",
+    "คะแนน",
+    "เกณฑ์",
+    "รอบ",
+)
+
 
 def should_enhance_query(original_query: str) -> tuple[bool, str]:
     query = " ".join(original_query.strip().split())
@@ -438,6 +459,13 @@ def should_enhance_query(original_query: str) -> tuple[bool, str]:
     return True, "Query may benefit from retrieval-oriented rewriting."
 
 
+def should_prefer_web_for_public_updates(original_query: str) -> bool:
+    normalized = normalize_for_rules(original_query)
+    has_current_hint = any(term in normalized for term in CURRENT_PUBLIC_INFO_HINTS)
+    has_admission_hint = any(term in normalized for term in ADMISSION_PUBLIC_INFO_HINTS)
+    return has_current_hint or has_admission_hint
+
+
 def is_capability_query(original_query: str) -> bool:
     normalized = normalize_for_rules(original_query)
     capability_terms = (
@@ -445,10 +473,20 @@ def is_capability_query(original_query: str) -> bool:
         "ตอบเรื่องอะไรได้บ้าง",
         "ถามอะไรได้บ้าง",
         "ทำอะไรได้บ้าง",
+        "มีข้อมูลอะไรบ้าง",
+        "มีเอกสารอะไรบ้าง",
+        "มีข้อมูลอะไรในระบบ",
+        "มีเอกสารอะไรในระบบ",
+        "รู้อะไรบ้าง",
+        "รู้ข้อมูลอะไรบ้าง",
+        "มีหลักสูตรอะไรบ้างในระบบ",
+        "ข้อมูลในระบบมีอะไร",
         "แชตบอทนี้ตอบ",
         "ขอบเขตระบบ",
         "what can you help",
         "what can you answer",
+        "what information do you have",
+        "what documents do you have",
     )
     return any(term in normalized for term in capability_terms)
 
@@ -834,6 +872,9 @@ Safety policy:
     if force_web_search and web_search_enabled and result.route in {"rag", "answer"}:
         result.route = "web"
         override_reason = "User forced web search."
+    elif web_search_enabled and result.route in {"rag", "answer"} and should_prefer_web_for_public_updates(original_query):
+        result.route = "web"
+        override_reason = "Official website search preferred for current admission or public update information."
     elif result.route == "web" and should_prefer_local_rag(original_query):
         result.route = "rag"
         override_reason = "Local official knowledge base preferred for stable department facts."
@@ -1031,6 +1072,8 @@ Use this policy:
 - Answer the user's exact request first. Keep the answer concise and avoid extra background unless it is needed.
 - For mixed questions, separate only the requested points; do not add unrelated department details.
 - If the answer is uncertain or missing from the context, say so clearly.
+- For course codes, course descriptions, prerequisites, study plans, curriculum credits/year, and lecturer research interests, answer only when the provided context explicitly supports the exact detail.
+- For current or latest admission, TCAS, score, application round, and deadline questions, prefer official website search results in the context. If no current official result is available, say that the current information was not found in the available official sources.
 - Do not invent facts.
 - Do not provide sensitive personal information beyond official public data.
 - When helpful, suggest the user contact the department.

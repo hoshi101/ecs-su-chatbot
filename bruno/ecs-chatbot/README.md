@@ -19,6 +19,7 @@
 - `02 Routing`
 - `03 Domain`
 - `04 Debug`
+- `05 General Query`
 
 ลำดับที่แนะนำ:
 
@@ -27,10 +28,12 @@
 3. รัน `01 Config`
 4. รัน `02 Routing`
 5. ถ้า routing ผ่าน ค่อยไป `03 Domain`
-6. ใช้ `04 Debug` เมื่อจะไล่ retrieval/embedding โดยตรง
+6. รัน `05 General Query` เพื่อเช็กคำถามที่ผู้ใช้จริงน่าจะถามใน demo
+7. ใช้ `04 Debug` เมื่อจะไล่ retrieval/embedding โดยตรง
 
 ข้อสำคัญ:
 
 - request ใน `02 Routing` และ `03 Domain` ถูกตั้ง `session_id` แยกต่อเคสไว้แล้ว เพื่อไม่ให้ memory ของแชทปนกัน
+- request ใน `05 General Query` เน้นตรวจ API/RAG behavior เช่น route, response shape, sources, และ key fact สำคัญบางจุด ไม่ได้ล็อก wording ของคำตอบทั้งหมด
 - ถ้าคุณสร้าง request เองใน Bruno ให้เปลี่ยน `session_id` ทุกครั้งเมื่อเทสคนละเคส intent
 - ถ้า request ไหนเป็น shortcut ปกติ `sources` ควรเป็น `[]`

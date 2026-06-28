@@ -272,13 +272,23 @@ def build_greeting_response(language: Literal["th", "en"]) -> str:
 def build_capability_response(language: Literal["th", "en"]) -> str:
     if language == "en":
         return (
-            "I can help with official information about the Department of Electrical Engineering, "
-            "Silpakorn University, including curriculum, lecturers, staff, courses, documents, "
-            "and department contact details."
+            "I can answer from the official department knowledge base, including department overview, "
+            "contact details, lecturer/staff information, and curriculum information. The indexed "
+            "program data includes ECS/Electronics and Computer Systems Engineering curriculum 2565 "
+            "(147 credits), Electrical Communications Engineering curriculum 2565 (146 credits), "
+            "and the master's program in Electrical and Computer Engineering. You can ask about "
+            "program names, curriculum year, credits, study plans, course details, lecturers, "
+            "research interests, and official website information. If a detail is not found in the "
+            "available official sources, I should say so instead of guessing."
         )
     return (
-        "ผมช่วยตอบคำถามเกี่ยวกับข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรได้ครับ "
-        "เช่น หลักสูตร รายวิชา อาจารย์ บุคลากร เอกสาร และข้อมูลติดต่อของภาควิชา"
+        "ผมตอบจากฐานข้อมูลเอกสารและข้อมูลทางการของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรครับ "
+        "ข้อมูลที่มีในระบบครอบคลุมภาพรวมภาควิชา ข้อมูลติดต่อ อาจารย์ บุคลากร และข้อมูลหลักสูตร "
+        "เช่น หลักสูตร ECS/วิศวกรรมอิเล็กทรอนิกส์และระบบคอมพิวเตอร์ พ.ศ. 2565 รวม 147 หน่วยกิต, "
+        "หลักสูตรวิศวกรรมไฟฟ้าสื่อสาร พ.ศ. 2565 รวม 146 หน่วยกิต, และหลักสูตรปริญญาโทวิศวกรรมไฟฟ้าและคอมพิวเตอร์ "
+        "คุณถามได้ทั้งชื่อหลักสูตร ปีหลักสูตร หน่วยกิต แผนการศึกษา รายวิชา คำอธิบายรายวิชา อาจารย์ผู้รับผิดชอบ "
+        "งานวิจัย/ความเชี่ยวชาญของอาจารย์ และข้อมูลจากเว็บไซต์ภาควิชา หากข้อมูลไหนไม่พบในแหล่งข้อมูลทางการที่มี "
+        "ผมควรบอกว่าไม่พบข้อมูลแทนการเดาครับ"
     )
 
 

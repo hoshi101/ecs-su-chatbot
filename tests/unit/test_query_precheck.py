@@ -1,7 +1,12 @@
 from langchain_core.messages import HumanMessage
 
 from src.backend.core import agent
-from src.backend.core.agent import classify_query_precheck, router_node, should_enhance_query
+from src.backend.core.agent import (
+    classify_query_precheck,
+    router_node,
+    should_enhance_query,
+    should_prefer_web_for_public_updates,
+)
 
 
 def test_contact_query_shortcuts_to_template():
@@ -81,6 +86,17 @@ def test_greeting_plus_real_question_does_not_shortcut():
     assert intent == "domain_question"
 
 
+def test_knowledge_inventory_question_shortcuts_to_capability():
+    for query in (
+        "น้องไฟฟ้ามีเอกสารอะไรบ้างในระบบ",
+        "มีข้อมูลอะไรในระบบ",
+        "รู้อะไรบ้าง",
+        "What documents do you have?",
+    ):
+        intent, _ = classify_query_precheck(query)
+        assert intent == "capability"
+
+
 def test_english_greeting_plus_real_question_does_not_shortcut():
     intent, _ = classify_query_precheck("Hello, what is the department phone number?")
     assert intent == "domain_question"
@@ -131,6 +147,25 @@ def test_specific_query_skips_enhancement():
         "ขอข้อมูลติดต่อภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร เบอร์โทร อีเมล ที่อยู่สำนักงาน"
     )
     assert should_enhance is False
+
+
+def test_public_update_queries_prefer_web_search():
+    for query in (
+        "รับสมัครเมื่อไหร่",
+        "TCAS รอบล่าสุดใช้คะแนนเท่าไร",
+        "คะแนนขั้นต่ำปีนี้ของคณะคือเท่าไร",
+        "latest admission deadline",
+    ):
+        assert should_prefer_web_for_public_updates(query) is True
+
+
+def test_stable_curriculum_queries_do_not_force_web_search():
+    for query in (
+        "หลักสูตร ECS รวมกี่หน่วยกิต",
+        "ประธานหลักสูตร ECS คือใคร",
+        "ภาควิชามีหลักสูตรปริญญาตรีอะไรบ้าง",
+    ):
+        assert should_prefer_web_for_public_updates(query) is False
 
 
 def test_contact_shortcut_does_not_call_llm(monkeypatch):

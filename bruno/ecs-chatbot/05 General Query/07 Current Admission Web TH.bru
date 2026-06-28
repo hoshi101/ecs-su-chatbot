@@ -1,0 +1,41 @@
+meta {
+  name: 07 Current Admission Web TH
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/chat/
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "{{sessionId}}-general-current-admission-web-th",
+    "query": "TCAS รอบล่าสุดของภาควิชาวิศวกรรมไฟฟ้าใช้คะแนนอะไรบ้าง",
+    "enable_web_search": true,
+    "force_web_search": false,
+    "similarity_threshold": {{similarityThreshold}},
+    "llm_provider": "{{provider}}",
+    "llm_model": "{{model}}"
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("prefers web route for current admission detail", function() {
+    const rawBody = res.getBody();
+    const body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
+    expect(body.trace_events[0].details.precheck_intent).to.equal("domain_question");
+    const route = body.trace_events[0].details.final_decision || body.trace_events[0].details.decision;
+    expect(route).to.equal("web");
+  });
+}

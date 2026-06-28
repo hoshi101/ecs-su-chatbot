@@ -1,0 +1,42 @@
+meta {
+  name: 05 Program Chair TH
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/chat/
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "session_id": "{{sessionId}}-general-program-chair-th",
+    "query": "ประธานหลักสูตร ECS คือใคร",
+    "enable_web_search": true,
+    "force_web_search": false,
+    "similarity_threshold": {{similarityThreshold}},
+    "llm_provider": "{{provider}}",
+    "llm_model": "{{model}}"
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("uses domain flow with lecturer evidence", function() {
+    const rawBody = res.getBody();
+    const body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
+    expect(body.trace_events[0].details.precheck_intent).to.equal("domain_question");
+    if (!Array.isArray(body.sources) || body.sources.length === 0) {
+      throw new Error("expected at least one lecturer/source reference");
+    }
+  });
+}

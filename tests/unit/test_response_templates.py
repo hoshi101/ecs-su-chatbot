@@ -34,6 +34,29 @@ def test_english_greeting_variants_stay_consistent(monkeypatch):
         assert "}" not in response
 
 
+def test_thai_capability_response_describes_indexed_knowledge():
+    response = response_templates.build_capability_response("th")
+
+    assert "ECS" in response
+    assert "2565" in response
+    assert "147 หน่วยกิต" in response
+    assert "146 หน่วยกิต" in response
+    assert "คำอธิบายรายวิชา" in response
+    assert "ไม่พบข้อมูล" in response
+
+
+def test_english_capability_response_describes_indexed_knowledge():
+    response = response_templates.build_capability_response("en")
+    normalized = response.lower()
+
+    assert "ecs" in normalized
+    assert "2565" in normalized
+    assert "147 credits" in normalized
+    assert "146 credits" in normalized
+    assert "course details" in normalized
+    assert "instead of guessing" in normalized
+
+
 def test_thai_soft_out_of_scope_generic_closes_are_not_food_specific():
     food_terms = ("กิน", "ข้าว", "อาหาร", "ท้อง")
 
