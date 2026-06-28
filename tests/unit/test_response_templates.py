@@ -32,3 +32,38 @@ def test_english_greeting_variants_stay_consistent(monkeypatch):
         assert any(term in normalized for term in ("curriculum", "course", "lecturer", "contact", "department question"))
         assert "{" not in response
         assert "}" not in response
+
+
+def test_thai_soft_out_of_scope_generic_closes_are_not_food_specific():
+    food_terms = ("กิน", "ข้าว", "อาหาร", "ท้อง")
+
+    for close in response_templates.OUT_OF_SCOPE_SOFT_CLOSES["generic"]:
+        assert not any(term in close for term in food_terms)
+        assert "ภาควิชา" in close or "หลักสูตร" in close
+        assert "ครับ" in close
+
+
+def test_thai_soft_out_of_scope_themed_closes_cover_distinct_situations():
+    expected_terms = {
+        "food": ("กิน", "อาหาร", "ท้อง"),
+        "rest": ("พัก", "ล้า", "ดูแลตัวเอง"),
+        "stress": ("หายใจ", "หนัก", "ดูแลตัวเอง"),
+    }
+
+    for theme, terms in expected_terms.items():
+        for close in response_templates.OUT_OF_SCOPE_SOFT_CLOSES[theme]:
+            assert any(term in close for term in terms)
+            assert "ครับ" in close
+
+
+def test_thai_soft_out_of_scope_response_keeps_original_shape(monkeypatch):
+    monkeypatch.setattr(response_templates.random, "choice", lambda seq: seq[0])
+
+    response = response_templates.build_out_of_scope_response(
+        variant="soft_oob",
+        language="th",
+        theme="generic",
+    )
+
+    assert response.startswith(response_templates.OUT_OF_SCOPE_SOFT_OPENINGS[0])
+    assert response_templates.OUT_OF_SCOPE_SOFT_CLOSES["generic"][0] in response
