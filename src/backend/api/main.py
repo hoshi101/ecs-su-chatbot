@@ -525,6 +525,13 @@ async def chat_with_agent(request: Request, body: QueryRequest):
         }
         inputs = {
             "messages": [HumanMessage(content=body.query)],
+            "original_query": body.query,
+            "enhanced_query": body.query,
+            "precheck_intent": None,
+            "precheck_reason": "",
+            "precheck_variant": "",
+            "query_enhancement_status": "unchanged",
+            "query_enhancement_reason": "",
             "web_search_enabled": body.enable_web_search,
             "force_web_search": body.force_web_search,
             "similarity_threshold": body.similarity_threshold,
