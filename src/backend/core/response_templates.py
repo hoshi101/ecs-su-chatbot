@@ -16,40 +16,24 @@ CONTACT_TEMPLATE_VALUES = {
     ),
 }
 
-GREETING_OPENINGS = (
-    "สวัสดีครับ",
-    "สวัสดีครับ ยินดีที่ได้คุยกันครับ",
-    "สวัสดีครับ น้องไฟฟ้ายินดีช่วยครับ",
+THAI_DOMAIN_NAME = "ภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร"
+
+GREETING_TEMPLATES = (
+    "สวัสดีครับ ผมคือ {bot_name} ผู้ช่วยข้อมูลของ{domain_name} ถามเรื่องหลักสูตร รายวิชา อาจารย์ หรือช่องทางติดต่อได้เลยครับ",
+    "สวัสดีครับ ผมคือ {bot_name} ช่วยดูข้อมูลเกี่ยวกับ{domain_name}ได้ ทั้งหลักสูตร รายวิชา อาจารย์ เอกสาร และข้อมูลติดต่อครับ",
+    "สวัสดีครับ {bot_name} พร้อมช่วยครับ ถ้าต้องการข้อมูลของ{domain_name} เช่น หลักสูตร อาจารย์ รายวิชา หรือการติดต่อ ส่งคำถามมาได้เลยครับ",
+    "สวัสดีครับ ผมคือ {bot_name} ยินดีให้ข้อมูลของ{domain_name} ถามได้ทั้งเรื่องหลักสูตร รายวิชา อาจารย์ เอกสาร และข้อมูลติดต่อครับ",
+    "สวัสดีครับ ผมคือ {bot_name} ถามข้อมูลเกี่ยวกับ{domain_name}ได้เลยครับ ไม่ว่าจะเป็นหลักสูตร รายวิชา อาจารย์ หรือช่องทางติดต่อครับ",
+    "สวัสดีครับ {bot_name} ยินดีช่วยค้นข้อมูลของ{domain_name}ครับ เรื่องหลักสูตร รายวิชา อาจารย์ เอกสาร หรือการติดต่อ ถามมาได้เลยครับ",
 )
 
-GREETING_BODIES = (
-    "ผมคือ {bot_name} ผู้ช่วยข้อมูลของภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร",
-    "ผมช่วยตอบคำถามเกี่ยวกับภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากรได้",
-    "หากต้องการข้อมูลจากภาควิชาวิศวกรรมไฟฟ้า มหาวิทยาลัยศิลปากร ผมช่วยได้ครับ",
-)
-
-GREETING_CLOSES = (
-    "ถามได้เลยทั้งเรื่องหลักสูตร รายวิชา อาจารย์ และข้อมูลติดต่อครับ",
-    "ส่งคำถามเรื่องหลักสูตร อาจารย์ เอกสาร หรือการติดต่อมาได้เลยครับ",
-    "อยากให้ช่วยเรื่องหลักสูตร อาจารย์ หรือข้อมูลภาควิชา ถามต่อได้เลยครับ",
-)
-
-GREETING_OPENINGS_EN = (
-    "Hello.",
-    "Hello, nice to meet you.",
-    "Hello, I'm happy to help.",
-)
-
-GREETING_BODIES_EN = (
-    "I'm {bot_name}, the information assistant for {domain_name}.",
-    "I can help with information about {domain_name}.",
-    "If you need official information about {domain_name}, I can help.",
-)
-
-GREETING_CLOSES_EN = (
-    "You can ask about the curriculum, courses, lecturers, or contact details.",
-    "Feel free to ask about courses, lecturers, documents, or department contact information.",
-    "If you want help with department information, just ask.",
+GREETING_TEMPLATES_EN = (
+    "Hello. I'm {bot_name}, the information assistant for {domain_name}. You can ask about the curriculum, courses, lecturers, or contact details.",
+    "Hello, nice to meet you. I'm {bot_name}, the information assistant for {domain_name}. Feel free to ask about courses, lecturers, documents, or department contact information.",
+    "Hello. {bot_name} can help with official information about {domain_name}, including curriculum, courses, lecturers, documents, and contact details.",
+    "Hello. I'm {bot_name}, here to help with {domain_name}. Ask me about curriculum, courses, lecturers, documents, or department contact information.",
+    "Hello, I'm happy to help. I'm {bot_name}, the information assistant for {domain_name}. Send any department question my way.",
+    "Hello. {bot_name} is ready to help with {domain_name} information, such as curriculum, courses, lecturers, and contact details.",
 )
 
 CONTACT_GENERAL_TEMPLATES = (
@@ -276,18 +260,11 @@ def build_contact_response(language: Literal["th", "en"], original_query: str = 
 
 
 def build_greeting_response(language: Literal["th", "en"]) -> str:
-    openings = GREETING_OPENINGS if language == "th" else GREETING_OPENINGS_EN
-    bodies = GREETING_BODIES if language == "th" else GREETING_BODIES_EN
-    closes = GREETING_CLOSES if language == "th" else GREETING_CLOSES_EN
-    return " ".join(
-        [
-            random.choice(openings),
-            random.choice(bodies).format(
-                bot_name=get_bot_name_for_language(language),
-                domain_name=DOMAIN_NAME,
-            ),
-            random.choice(closes),
-        ]
+    templates = GREETING_TEMPLATES if language == "th" else GREETING_TEMPLATES_EN
+    domain_name = THAI_DOMAIN_NAME if language == "th" else DOMAIN_NAME
+    return random.choice(templates).format(
+        bot_name=get_bot_name_for_language(language),
+        domain_name=domain_name,
     )
 
 
