@@ -30,7 +30,7 @@ def print_response(title: str, response: requests.Response):
     print(f"{'='*80}\n")
 
 
-def test_retrieval(query: str = "How to set stop loss?", threshold: float = 0.7, top_k: int = 5):
+def test_retrieval(query: str = "เบอร์ติดต่อภาควิชาวิศวกรรมไฟฟ้าคืออะไร", threshold: float = 0.7, top_k: int = 5):
     """
     Test the retrieval endpoint with a sample query
 
@@ -147,9 +147,9 @@ def test_embeddings_basic():
     url = f"{BASE_URL}/debug/embedding-test"
     payload = {
         "texts": [
-            "How to set stop loss?",
-            "Stop loss configuration guide",
-            "Account management features"
+            "หลักสูตรวิศวกรรมไฟฟ้าและระบบคอมพิวเตอร์",
+            "ข้อมูลติดต่อภาควิชาวิศวกรรมไฟฟ้า",
+            "รายชื่ออาจารย์ประจำภาควิชา"
         ],
         "compute_similarities": True
     }
@@ -191,11 +191,11 @@ def test_embeddings_with_reference():
     url = f"{BASE_URL}/debug/embedding-test"
     payload = {
         "texts": [
-            "Trading platform features",
-            "Account management tools",
-            "Market analysis capabilities"
+            "ข้อมูลหลักสูตรระดับปริญญาตรี",
+            "ข้อมูลติดต่อภาควิชา",
+            "งานวิจัยของอาจารย์"
         ],
-        "reference_text": "How to use the trading platform?",
+        "reference_text": "อยากทราบข้อมูลหลักสูตรของภาควิชาวิศวกรรมไฟฟ้า",
         "compute_similarities": False
     }
 
@@ -234,7 +234,7 @@ def run_all_tests():
 
     # Test 3: Retrieval Test (with different threshold)
     test_retrieval(
-        query="What are the platform features?",
+        query="หลักสูตร ECS เรียนเกี่ยวกับอะไร",
         threshold=0.5,
         top_k=3
     )

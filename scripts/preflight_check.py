@@ -18,7 +18,7 @@ def check(name: str, condition: bool, details: str) -> bool:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run local preflight checks for the ECS chatbot backend.")
-    parser.add_argument("--base-url", default="http://127.0.0.1:8000", help="Backend base URL")
+    parser.add_argument("--base-url", default="http://127.0.0.1:8001", help="Backend base URL")
     parser.add_argument(
         "--query",
         default="เบอร์ติดต่อภาควิชาวิศวกรรมไฟฟ้าคืออะไร",
