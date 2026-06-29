@@ -1,0 +1,51 @@
+﻿id,category,query,status_code,result,latency_seconds,source_count,matched_keyword_count,expected_keyword_count,reference_source,notes
+1,greeting,สวัสดีครับ,200,PASS,0.025,0,2,3,system_prompt,ทดสอบ greeting เบื้องต้น
+2,greeting,ช่วยอะไรได้บ้าง,200,PASS,0.01,0,3,4,system_prompt,ทดสอบความสามารถที่ระบบประกาศขอบเขต
+3,contact,ภาควิชาวิศวกรรมไฟฟ้าตั้งอยู่ที่ไหน,200,PASS,6.555,8,3,3,department_contact.md,ทดสอบข้อมูลที่ตั้ง
+4,contact,เบอร์ติดต่อภาควิชามีเบอร์อะไรบ้าง,200,PASS,6.245,8,3,3,department_contact.md,ทดสอบหลายหมายเลขในคำตอบเดียว
+5,contact,ภาควิชามี Facebook ไหม,200,PASS,4.219,1,2,2,department_contact.md,ทดสอบช่องทางออนไลน์
+6,contact,สำนักงานภาควิชาอยู่ชั้นไหน,200,PASS,6.401,13,2,2,faculty_department_overview.md,ทดสอบข้อมูลจาก faculty overview
+7,contact,คณะวิศวกรรมศาสตร์และเทคโนโลยีอุตสาหกรรมติดต่ออีเมลอะไร,200,PASS,5.335,5,1,1,faculty_department_overview.md,ทดสอบข้อมูลระดับคณะ
+8,contact,เว็บไซต์ภาควิชาคืออะไร,200,PASS,5.348,8,1,1,faculty_department_overview.md,ทดสอบ URL หน่วยงาน
+9,overview,ภาควิชาวิศวกรรมไฟฟ้าก่อตั้งเมื่อปีอะไร,200,PASS,5.913,5,1,1,faculty_department_overview.md,ทดสอบประวัติภาควิชา
+10,overview,ภาควิชาเปิดรับนักศึกษาปริญญาโทครั้งแรกปีไหน,200,PASS,6.747,13,1,1,faculty_department_overview.md,ทดสอบประวัติการเปิดหลักสูตร
+11,overview,ตอนนี้ภาควิชาเปิดสอนกี่หลักสูตร,200,PASS,9.014,5,1,1,faculty_department_overview.md,ทดสอบข้อมูลภาพรวม
+12,ecs_program,หลักสูตร ECS ชื่อเต็มคืออะไร,200,PASS,5.605,8,2,2,program_ecs.md,ทดสอบชื่อหลักสูตร
+13,ecs_program,หลักสูตร ECS ฉบับปรับปรุงล่าสุดปีอะไร,200,PASS,5.674,1,0,1,program_ecs.md,ทดสอบปีหลักสูตร
+14,ecs_program,หลักสูตร ECS ปกติต้องเรียนกี่หน่วยกิต,200,PASS,6.028,8,1,1,program_ecs.md,ทดสอบจำนวนหน่วยกิตรวม
+15,ecs_program,หลักสูตร ECS ใช้เวลาเรียนกี่ปี,200,PASS,6.334,8,2,2,program_ecs.md,ทดสอบระยะเวลาศึกษา
+16,ecs_program,หมวดวิชาศึกษาทั่วไปของ ECS ต้องเรียนอย่างน้อยกี่หน่วยกิต,200,PASS,6.046,8,1,1,program_ecs.md,ทดสอบโครงสร้างหลักสูตร
+17,ecs_program,กลุ่มวิชาบังคับของ ECS แบบสหกิจมีกี่หน่วยกิต,200,PASS,6.079,8,1,1,program_ecs.md,ทดสอบโครงสร้างหลักสูตรสหกิจ
+18,ecs_program,หลักสูตร ECS มี PLO เรื่องการออกแบบโปรแกรมคอมพิวเตอร์ไหม,200,PASS,5.838,8,2,2,program_ecs.md,ทดสอบผลลัพธ์การเรียนรู้
+19,ecs_program,หลักสูตร ECS มี PLO เกี่ยวกับระบบควบคุมอัตโนมัติไหม,200,PASS,6.696,8,2,2,program_ecs.md,ทดสอบ PLO เฉพาะด้าน
+20,ecs_program,หลักสูตร ECS เน้นเรื่องระบบอิเล็กทรอนิกส์ฝังตัวหรือไม่,200,PASS,7.901,8,2,2,program_ecs.md,ทดสอบ PLO เฉพาะด้าน
+21,ecom_program,หลักสูตรวิศวกรรมไฟฟ้าสื่อสารชื่อเต็มคืออะไร,200,PASS,6.909,8,2,2,program_electrical_communications.md,ทดสอบชื่อหลักสูตร
+22,ecom_program,หลักสูตรไฟฟ้าสื่อสารเป็นหลักสูตรปีอะไร,200,PASS,9.403,8,1,1,program_electrical_communications.md,ทดสอบปีหลักสูตร
+23,ecom_program,หลักสูตรไฟฟ้าสื่อสารรวมกี่หน่วยกิต,200,PASS,5.921,8,1,1,program_electrical_communications.md,ทดสอบจำนวนหน่วยกิตรวม
+24,ecom_program,หลักสูตรไฟฟ้าสื่อสารแบบปกติมีกลุ่มวิชาพื้นฐานวิชาชีพกี่หน่วยกิต,200,PASS,5.34,8,1,1,program_electrical_communications.md,ทดสอบโครงสร้างหลักสูตร
+25,ecom_program,หลักสูตรไฟฟ้าสื่อสารแบบสหกิจมีกลุ่มวิชาบังคับกี่หน่วยกิต,200,PASS,8.162,8,1,1,program_electrical_communications.md,ทดสอบโครงสร้างหลักสูตรสหกิจ
+26,ecom_program,หลักสูตรไฟฟ้าสื่อสารมี PLO เรื่องออกแบบและพัฒนาระบบไหม,200,PASS,7.275,8,2,2,program_electrical_communications.md,ทดสอบ PLO
+27,master_program,หลักสูตรปริญญาโทของภาควิชาคือสาขาอะไร,200,PASS,7.998,8,2,2,program_master_ece.md,ทดสอบชื่อหลักสูตรปริญญาโท
+28,master_program,หลักสูตรปริญญาโทฉบับปรับปรุงปีอะไร,200,PASS,5.799,8,1,1,program_master_ece.md,ทดสอบปีหลักสูตรปริญญาโท
+29,master_program,หลักสูตรปริญญาโทใช้เวลากี่ปี,200,PASS,5.763,8,1,1,program_master_ece.md,ทดสอบระยะเวลาศึกษา
+30,master_program,หลักสูตรปริญญาโทแบ่งเป็นกี่แผน,200,PASS,7.832,8,3,3,program_master_ece.md,ทดสอบโครงสร้างแผนการเรียน
+31,master_program,แผน ก แบบ ก 1 ของปริญญาโทรวมกี่หน่วยกิต,200,PASS,6.92,8,1,1,program_master_ece.md,ทดสอบจำนวนหน่วยกิต
+32,lecturer,หัวหน้าภาควิชาวิศวกรรมไฟฟ้าคือใคร,200,PASS,6.544,8,2,2,department_lecturers.md,ทดสอบตำแหน่งผู้บริหาร
+33,lecturer,อีเมลอาจารย์โสภณคืออะไร,200,PASS,6.629,8,1,1,department_lecturers.md,ทดสอบข้อมูลติดต่ออาจารย์
+34,lecturer,ประธานหลักสูตร ECS คือใคร,200,PASS,7.924,9,0,2,department_lecturers.md,ทดสอบบทบาทอาจารย์
+35,lecturer,ประธานหลักสูตรวิศวกรรมไฟฟ้าสื่อสารคือใคร,200,PASS,8.678,13,1,2,department_lecturers.md,ทดสอบบทบาทอาจารย์
+36,lecturer,ประธานหลักสูตรปริญญาโทวิศวกรรมไฟฟ้าและคอมพิวเตอร์คือใคร,200,PASS,8.267,13,1,1,department_lecturers.md,ทดสอบบทบาทอาจารย์
+37,lecturer,อาจารย์ชูเกียรติ สอดศรีมีอีเมลอะไร,200,PASS,7.078,8,1,1,department_lecturers.md,ทดสอบอีเมลอาจารย์
+38,lecturer,อาจารย์ปาริฉัตร เสริมวุฒิสารใช้อีเมลอะไร,200,PASS,5.781,8,1,1,department_lecturers.md,ทดสอบอีเมลอาจารย์
+39,support_staff,เจ้าหน้าที่สายสนับสนุนมีใครบ้าง,200,PASS,7.056,8,7,7,department_support_staff.md,ทดสอบรายชื่อบุคลากร
+40,support_staff,นักการเงินปฏิบัติการของภาควิชาคือใคร,200,PASS,5.905,8,1,1,department_support_staff.md,ทดสอบบทบาทสายสนับสนุน
+41,support_staff,ใครเป็นวิศวกรปฏิบัติการของภาควิชา,200,PASS,9.015,13,0,1,department_support_staff.md,ทดสอบบทบาทสายสนับสนุน
+42,support_staff,อีเมลของนายธชทัต จวงสอนคืออะไร,200,PASS,6.879,9,0,1,department_support_staff.md,ทดสอบอีเมลสายสนับสนุน
+43,mixed,ภาควิชามีหลักสูตรปริญญาตรีอะไรบ้าง,200,PASS,11.021,8,2,2,program_ecs.md,ทดสอบคำถามรวมหลายหลักสูตร
+44,mixed,ภาควิชามีหลักสูตรปริญญาโทอะไรบ้าง,200,PASS,10.808,8,1,1,program_master_ece.md,ทดสอบคำถามรวมระดับการศึกษา
+45,mixed,ภาควิชามีทั้งฝึกงานและสหกิจศึกษาหรือไม่,200,PASS,7.667,8,2,2,program_ecs.md,ทดสอบข้อมูลกิจกรรมในหลักสูตร
+46,out_of_scope,วันนี้ฝนจะตกไหม,200,PASS,0.011,0,1,2,none,ทดสอบคำถามนอกขอบเขต
+47,out_of_scope,ช่วยแต่งกลอนวันสงกรานต์ให้หน่อย,200,PASS,0.01,0,1,2,none,ทดสอบ small talk ที่ไม่เกี่ยวกับภาควิชา
+48,lecturer_detail,อาจารย์ยุทธนาทำวิจัยอะไร,200,PASS,7.08,8,3,3,staff_details/lecturer_5.md,ทดสอบข้อมูลรายละเอียดอาจารย์จากหน้ารายบุคคล
+49,lecturer_detail,อาจารย์คนไหนทำวิจัยด้าน FPGA หรือ VLSI บ้าง,200,PASS,10.451,8,3,3,staff_details/lecturer_5.md,ทดสอบค้นหาความเชี่ยวชาญจาก staff detail
+50,current_info,TCAS รอบล่าสุดใช้คะแนนอะไรบ้าง,200,PASS,6.088,5,2,3,official_web_search,ทดสอบข้อมูลปัจจุบันที่ควรค้นจากเว็บไซต์ทางการหรือชี้แจงข้อจำกัด

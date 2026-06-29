@@ -12,11 +12,12 @@ The ECS chatbot project is ready for the final manual frontend demo test after r
 
 | Check | Result | Evidence |
 |---|---:|---|
-| Unit tests | Pass | `53 passed, 4 warnings` |
+| Unit tests | Pass | `60 passed, 4 warnings` |
 | Python syntax compile | Pass | `py_compile` passed for backend API, agent, templates, usage tracking, and run scripts |
-| Backend preflight | Pass | Health, detailed health, retrieval, chat response, workflow trace, and source attribution passed |
+| Backend preflight | Pass | Health, detailed health (`degraded` because Gemini quota is exhausted), retrieval, chat response, workflow trace, and source attribution passed |
 | Frontend smoke check | Pass | Streamlit returned HTTP `200` at `http://127.0.0.1:8501` |
 | Usage tracking summary script | Pass | `scripts/summarize_usage.py` runs successfully |
+| API 50-question evidence | Pass | `50/50` answered successfully, average latency `6.44s` in FastAPI TestClient evaluation |
 | Working tree before evidence generation | Clean | Branch was clean before evidence files were added |
 
 Commands used:
@@ -33,11 +34,11 @@ Backend preflight result:
 | Check | Result |
 |---|---|
 | Health | Pass |
-| Detailed health | Pass, `overall_status=healthy` |
+| Detailed health | Pass, `overall_status=degraded` because Gemini quota is exhausted; OpenAI remains healthy |
 | Retrieval test | Pass, `total_results=3` |
 | Chat response | Pass, `response_length=554` |
 | Workflow trace | Pass, `trace_events=3` |
-| Source attribution | Pass, `sources=5` |
+| Source attribution | Pass, `sources=8` |
 
 ## Bruno API Test Coverage
 
@@ -120,6 +121,9 @@ To show updated usage statistics:
 | API testing | Added Bruno `05 General Query` for realistic demo questions |
 | Usage monitoring | Added lightweight JSONL usage tracking and summary script |
 | Frontend session behavior | Fixed stale LangGraph checkpoint query state so each frontend message uses the current query |
+| Answer grounding | Reduced over-abstention by answering supported context first and marking only specific missing details as unavailable |
+| Retrieval breadth | Increased RAG answer context and added local priority sources for electrical communications and master's program queries |
+| Staff detail retrieval | Prioritizes scraped lecturer detail pages for lecturer name, email, research, and expertise questions |
 
 ## Final Frontend Demo Checklist
 

@@ -231,7 +231,7 @@ class SystemHealthResponse(BaseModel):
     summary: Dict[str, Any]
 
 class EmbeddingTestRequest(BaseModel):
-    texts: List[str] = Field(..., min_items=1, max_items=10, description="List of texts to embed (max 10)")
+    texts: List[str] = Field(..., min_length=1, max_length=10, description="List of texts to embed (max 10)")
     reference_text: Optional[str] = Field(None, description="Optional reference text to compare against")
     compute_similarities: bool = Field(False, description="Compute cosine similarities between all texts")
 
@@ -1040,6 +1040,7 @@ async def detailed_health_check():
     # Track critical component failures
     critical_failures = 0
     non_critical_failures = 0
+    default_provider = normalize_provider(None)
 
     # 1. Check Qdrant connection and collection
     logger.info("Checking Qdrant")
@@ -1158,14 +1159,19 @@ async def detailed_health_check():
                     logger.warning("Gemini degraded | empty response")
 
             except Exception as e:
+                gemini_status = "unhealthy" if default_provider == "gemini" else "degraded"
                 components.append(ComponentHealth(
                     name="Google Gemini API",
-                    status="unhealthy",
+                    status=gemini_status,
                     details=f"Failed to connect to Gemini model {GEMINI_MODEL}",
                     error=str(e)
                 ))
-                critical_failures += 1
-                logger.exception("Gemini unhealthy")
+                if default_provider == "gemini":
+                    critical_failures += 1
+                    logger.exception("Gemini unhealthy")
+                else:
+                    non_critical_failures += 1
+                    logger.warning("Gemini degraded | error=%s", e)
 
     # 4. Verify OpenAI connectivity if configured
     logger.info("Checking OpenAI API")
@@ -1204,14 +1210,19 @@ async def detailed_health_check():
                 logger.warning("OpenAI degraded | empty response")
 
         except Exception as e:
+            openai_status = "unhealthy" if default_provider == "openai" else "degraded"
             components.append(ComponentHealth(
                 name="OpenAI API",
-                status="unhealthy",
+                status=openai_status,
                 details=f"Failed to connect to OpenAI model {resolve_model_name('openai')}",
                 error=str(e)
             ))
-            critical_failures += 1
-            logger.exception("OpenAI unhealthy")
+            if default_provider == "openai":
+                critical_failures += 1
+                logger.exception("OpenAI unhealthy")
+            else:
+                non_critical_failures += 1
+                logger.warning("OpenAI degraded | error=%s", e)
 
     # 5. Test Tavily web search (if configured)
     logger.info("Checking Tavily web search")

@@ -46,3 +46,6 @@ id,category,expected_route,query,expected_keywords,reference_source,notes
 45,mixed,rag,ภาควิชามีทั้งฝึกงานและสหกิจศึกษาหรือไม่,"ฝึกงาน,สหกิจศึกษา",program_ecs.md,ทดสอบข้อมูลกิจกรรมในหลักสูตร
 46,out_of_scope,end,วันนี้ฝนจะตกไหม,"นอกขอบเขต,ข้อมูลสภาพอากาศ",none,ทดสอบคำถามนอกขอบเขต
 47,out_of_scope,end,ช่วยแต่งกลอนวันสงกรานต์ให้หน่อย,"นอกขอบเขต,small talk",none,ทดสอบ small talk ที่ไม่เกี่ยวกับภาควิชา
+48,lecturer_detail,rag,อาจารย์ยุทธนาทำวิจัยอะไร,"ยุทธนา,VLSI,FPGA",staff_details/lecturer_5.md,ทดสอบข้อมูลรายละเอียดอาจารย์จากหน้ารายบุคคล
+49,lecturer_detail,rag,อาจารย์คนไหนทำวิจัยด้าน FPGA หรือ VLSI บ้าง,"ยุทธนา,FPGA,VLSI",staff_details/lecturer_5.md,ทดสอบค้นหาความเชี่ยวชาญจาก staff detail
+50,current_info,rag,TCAS รอบล่าสุดใช้คะแนนอะไรบ้าง,"TCAS,แหล่งข้อมูล,ทางการ",official_web_search,ทดสอบข้อมูลปัจจุบันที่ควรค้นจากเว็บไซต์ทางการหรือชี้แจงข้อจำกัด

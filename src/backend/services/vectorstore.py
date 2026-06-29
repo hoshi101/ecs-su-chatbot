@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import List, Dict, Any
+import json
+import re
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from langchain_qdrant import QdrantVectorStore
@@ -214,6 +216,124 @@ def _load_local_priority_document(file_path: str, *, priority: float) -> Dict[st
     }
 
 
+def _staff_detail_priority_documents(query: str, *, max_results: int = 5) -> List[Dict[str, Any]]:
+    normalized_query = _normalize_query_text(query)
+    staff_dir = PROJECT_ROOT / "data/web/clean/staff_details"
+    if not staff_dir.exists():
+        return []
+
+    asks_staff_detail = any(
+        term in normalized_query
+        for term in (
+            "อาจารย์",
+            "lecturer",
+            "วิจัย",
+            "research",
+            "ความเชี่ยวชาญ",
+            "email",
+            "อีเมล",
+            "ประวัติ",
+            "education",
+        )
+    )
+    if not asks_staff_detail:
+        return []
+
+    candidates: List[Dict[str, Any]] = []
+    for json_path in sorted(staff_dir.glob("*.json")):
+        if "__.." in json_path.name:
+            continue
+        try:
+            payload = json.loads(json_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        searchable_parts = [
+            payload.get("name", ""),
+            payload.get("position", ""),
+            payload.get("email", ""),
+            payload.get("research_interests", ""),
+            " ".join(payload.get("education") or []),
+        ]
+        searchable = _normalize_query_text(" ".join(searchable_parts))
+
+        score = 0.0
+        name = str(payload.get("name") or "")
+        generic_name_tokens = {
+            "อาจารย์",
+            "ผู้ช่วยศาสตราจารย์",
+            "รองศาสตราจารย์",
+            "ศาสตราจารย์",
+            "ดร",
+            "asst",
+            "assoc",
+            "prof",
+            "professor",
+            "dr",
+        }
+        for token in re.split(r"[\s.:\-_()\[\]]+", name):
+            token = token.strip(" .:-_()[]")
+            token_lower = token.lower()
+            if token_lower in generic_name_tokens:
+                continue
+            if len(token) >= 3 and token_lower in normalized_query:
+                score += 1.2
+
+        email = str(payload.get("email") or "").lower()
+        if email and email in normalized_query:
+            score += 1.2
+
+        research = str(payload.get("research_interests") or "")
+        for phrase in re.split(r"[,;/]", research):
+            phrase = _normalize_query_text(phrase)
+            if len(phrase) >= 4 and phrase in normalized_query:
+                score += 1.0
+            else:
+                for word in phrase.split():
+                    if len(word) >= 5 and word in normalized_query:
+                        score += 0.35
+
+        for query_token in normalized_query.split():
+            if len(query_token) >= 4 and query_token in searchable:
+                score += 0.15
+
+        if score <= 0:
+            continue
+
+        md_path = json_path.with_suffix(".md")
+        markdown = payload.get("markdown")
+        if not markdown and md_path.exists():
+            try:
+                markdown = md_path.read_text(encoding="utf-8")
+            except OSError:
+                markdown = ""
+
+        relative_path = md_path if md_path.exists() else json_path
+        try:
+            file_path = relative_path.relative_to(PROJECT_ROOT).as_posix()
+        except ValueError:
+            file_path = relative_path.as_posix()
+
+        candidates.append(
+            {
+                "content": markdown or "",
+                "score": 0.0,
+                "ranking_priority": 1.2 + score,
+                "metadata": {
+                    "file_name": relative_path.name,
+                    "file_path": file_path,
+                    "source_url": payload.get("source_url"),
+                    "title": payload.get("title") or payload.get("name"),
+                    "document_category": payload.get("category") or "faculty",
+                    "source_type": "local_staff_detail",
+                },
+            }
+        )
+
+    candidates.sort(key=lambda item: -float(item.get("ranking_priority") or 0.0))
+    return candidates[:max_results]
+
+
 def _local_priority_documents(query: str) -> List[Dict[str, Any]]:
     normalized_query = _normalize_query_text(query)
     documents: List[Dict[str, Any]] = []
@@ -233,6 +353,70 @@ def _local_priority_documents(query: str) -> List[Dict[str, Any]]:
         if doc:
             documents.append(doc)
 
+    if any(
+        term in normalized_query
+        for term in (
+            "ไฟฟ้าสื่อสาร",
+            "electrical communications",
+            "communication engineering",
+            "communications engineering",
+        )
+    ):
+        doc = _load_local_priority_document("data/web/clean/program_electrical_communications.md", priority=1.0)
+        if doc:
+            documents.append(doc)
+
+    if any(
+        term in normalized_query
+        for term in (
+            "ปริญญาโท",
+            "มหาบัณฑิต",
+            "master",
+            "electrical and computer engineering",
+        )
+    ):
+        doc = _load_local_priority_document("data/web/clean/program_master_ece.md", priority=1.0)
+        if doc:
+            documents.append(doc)
+
+    if any(
+        term in normalized_query
+        for term in (
+            "ขอเอกสารหลักสูตร",
+            "เอกสารหลักสูตร",
+            "หลักสูตรปี 65",
+            "หลักสูตรปี 2565",
+            "หลักสูตร พ.ศ. 2565",
+            "download หลักสูตร",
+            "curriculum document",
+            "curriculum pdf",
+            "หลักสูตรอะไร",
+            "มีหลักสูตร",
+            "หลักสูตรทั้งหมด",
+            "เปิดสอน",
+            "programs",
+            "curriculum list",
+        )
+    ):
+        for file_path in (
+            "data/web/clean/faculty_department_overview.md",
+            "data/web/clean/program_ecs.md",
+            "data/web/clean/program_electrical_communications.md",
+            "data/web/clean/program_master_ece.md",
+        ):
+            doc = _load_local_priority_document(file_path, priority=1.05)
+            if doc:
+                documents.append(doc)
+
+    if any(term in normalized_query for term in ("ฝึกงาน", "internship", "ชั่วโมงฝึกงาน")):
+        for file_path in (
+            "data/web/clean/program_ecs.md",
+            "data/web/clean/program_electrical_communications.md",
+        ):
+            doc = _load_local_priority_document(file_path, priority=1.05)
+            if doc:
+                documents.append(doc)
+
     if any(term in normalized_query for term in ("นักการเงิน", "สายสนับสนุน", "support staff", "officials")):
         doc = _load_local_priority_document("data/web/clean/department_support_staff.md", priority=1.0)
         if doc:
@@ -243,7 +427,8 @@ def _local_priority_documents(query: str) -> List[Dict[str, Any]]:
         if doc:
             documents.append(doc)
 
-    if any(term in normalized_query for term in ("อาจารย์", "lecturer", "อีเมล", "email")):
+    if any(term in normalized_query for term in ("อาจารย์", "lecturer", "อีเมล", "email", "วิจัย", "research", "ความเชี่ยวชาญ")):
+        documents.extend(_staff_detail_priority_documents(query))
         doc = _load_local_priority_document("data/web/clean/department_lecturers.md", priority=0.9)
         if doc:
             documents.append(doc)

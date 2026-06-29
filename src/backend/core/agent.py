@@ -466,8 +466,54 @@ def should_prefer_web_for_public_updates(original_query: str) -> bool:
     return has_current_hint or has_admission_hint
 
 
+def has_course_code(original_query: str) -> bool:
+    query = original_query or ""
+    if re.search(r"\b[A-Z]{2,4}\s*\d{3}\b", query, flags=re.IGNORECASE):
+        return True
+    if re.search(r"(?<!\d)\d{3}[\s-]+\d{3}(?!\d)", query):
+        return True
+
+    normalized = normalize_for_rules(query)
+    course_hints = ("รหัสวิชา", "รายวิชา", "วิชา", "หน่วยกิต", "credit", "course code", "course")
+    return any(hint in normalized for hint in course_hints) and bool(re.search(r"(?<!\d)\d{6}(?!\d)", query))
+
+
 def is_capability_query(original_query: str) -> bool:
     normalized = normalize_for_rules(original_query)
+    if has_course_code(original_query):
+        return False
+
+    system_scope_terms = (
+        "น้องไฟฟ้า",
+        "ระบบ",
+        "แชตบอท",
+        "chatbot",
+        "bot",
+        "you",
+    )
+    specific_domain_terms = (
+        "หลักสูตร",
+        "ปริญญา",
+        "รายวิชา",
+        "อาจารย์",
+        "บุคลากร",
+        "ภาควิชา",
+        "สาขา",
+        "หน่วยกิต",
+        "curriculum",
+        "program",
+        "course",
+        "lecturer",
+    )
+
+    if (
+        any(term in normalized for term in ("มีข้อมูลอะไรบ้าง", "what information"))
+        and any(term in normalized for term in specific_domain_terms)
+        and not any(term in normalized for term in system_scope_terms)
+        and "ในระบบ" not in normalized
+    ):
+        return False
+
     capability_terms = (
         "ช่วยอะไรได้บ้าง",
         "ตอบเรื่องอะไรได้บ้าง",
@@ -641,6 +687,9 @@ def is_out_of_scope_query(original_query: str) -> bool:
 
 def should_prefer_local_rag(original_query: str) -> bool:
     normalized = normalize_for_rules(original_query)
+    if has_course_code(original_query):
+        return True
+
     local_rag_terms = (
         "หัวหน้าภาค",
         "หัวหน้าภาควิชา",
@@ -654,6 +703,17 @@ def should_prefer_local_rag(original_query: str) -> bool:
         "facebook ภาควิชา",
         "เบอร์ติดต่อภาควิชา",
         "ที่อยู่ของภาควิชา",
+        "ขอเอกสารหลักสูตร",
+        "เอกสารหลักสูตร",
+        "หลักสูตรปี 65",
+        "หลักสูตรปี 2565",
+        "หลักสูตร พ.ศ. 2565",
+        "download หลักสูตร",
+        "curriculum document",
+        "curriculum pdf",
+        "ฝึกงาน",
+        "internship",
+        "ชั่วโมงฝึกงาน",
     )
     return any(term in normalized for term in local_rag_terms)
 
@@ -935,7 +995,7 @@ def rag_node(state: AgentState) -> AgentState:
     try:
         documents = retrieve_documents(
             query,
-            top_k=5,
+            top_k=8,
             similarity_threshold=similarity_threshold,
         )
     except Exception as exc:
@@ -973,8 +1033,9 @@ Enhanced query: {query}
 Retrieved information:
 {rag_text}
 
-Return sufficient=true only if the retrieved content is enough to answer accurately without guessing.
-If the content is incomplete, unrelated, or too weak, return sufficient=false.
+Return sufficient=true when the retrieved content contains directly relevant official facts that can answer the main question or a clear part of a mixed question.
+Return sufficient=false only when the retrieved content is unrelated, too vague, or missing the key fact needed for the user's main question.
+It is acceptable for the final answer to answer supported parts and clearly mark only unsupported sub-parts as not found.
 """
 
     judge_llm = build_chat_model(
@@ -1071,9 +1132,10 @@ Use this policy:
 - Prefer bullet points or short sections when it improves readability.
 - Answer the user's exact request first. Keep the answer concise and avoid extra background unless it is needed.
 - For mixed questions, separate only the requested points; do not add unrelated department details.
-- If the answer is uncertain or missing from the context, say so clearly.
-- For course codes, course descriptions, prerequisites, study plans, curriculum credits/year, and lecturer research interests, answer only when the provided context explicitly supports the exact detail.
-- For current or latest admission, TCAS, score, application round, and deadline questions, prefer official website search results in the context. If no current official result is available, say that the current information was not found in the available official sources.
+- If the context contains relevant information, answer the supported parts first. Do not say broadly that information was not found when some requested details are present.
+- If only part of the user's request is supported, provide the supported details and then briefly say which specific detail was not found in the available context.
+- For course codes, course descriptions, prerequisites, study plans, curriculum credits/year, and lecturer research interests, answer only the exact details that are explicitly supported by the provided context.
+- For current or latest admission, TCAS, score, application round, and deadline questions, prefer official website search results in the context. If no current official result is available, say only that the current admission detail was not found in the available official sources.
 - Do not invent facts.
 - Do not provide sensitive personal information beyond official public data.
 - When helpful, suggest the user contact the department.
@@ -1087,7 +1149,8 @@ Context:
 
 If context is available:
 - Ground the answer in that context.
-- Mention the source document or page briefly when helpful.
+- Mention the source document, page, or official website result briefly when helpful.
+- If the context includes a URL, include the relevant URL in a short "แหล่งอ้างอิง" / "Source" line.
 
 If context is not available:
 - Say that the information was not found in the available official sources.

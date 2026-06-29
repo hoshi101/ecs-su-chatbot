@@ -2,9 +2,12 @@ from langchain_core.messages import HumanMessage
 
 from src.backend.core import agent
 from src.backend.core.agent import (
+    build_answer_prompt,
     classify_query_precheck,
+    has_course_code,
     router_node,
     should_enhance_query,
+    should_prefer_local_rag,
     should_prefer_web_for_public_updates,
 )
 
@@ -97,6 +100,52 @@ def test_knowledge_inventory_question_shortcuts_to_capability():
         assert intent == "capability"
 
 
+def test_specific_information_inventory_question_uses_domain_flow():
+    intent, _ = classify_query_precheck("หลักสูตรปริญญาโทวิศวกรรมไฟฟ้าและคอมพิวเตอร์มีข้อมูลอะไรบ้าง")
+    assert intent == "domain_question"
+
+
+def test_course_code_information_question_uses_domain_flow():
+    intent, _ = classify_query_precheck("รหัสวิชา SU115 อาหารเพื่อสุขภาพ มีข้อมูลอะไรบ้าง")
+    assert intent == "domain_question"
+
+
+def test_numeric_course_code_information_question_uses_domain_flow():
+    intent, _ = classify_query_precheck("511 104 แคลคูลัสสำหรับวิศวกร 1 มีข้อมูลอะไรบ้าง")
+    assert intent == "domain_question"
+
+
+def test_course_code_detector_supports_common_formats():
+    assert has_course_code("รหัสวิชา SU115 อาหารเพื่อสุขภาพ")
+    assert has_course_code("511 104 แคลคูลัสสำหรับวิศวกร 1")
+    assert has_course_code("511-104 แคลคูลัสสำหรับวิศวกร 1")
+    assert has_course_code("รหัสวิชา 511104 แคลคูลัสสำหรับวิศวกร 1")
+    assert has_course_code("618362 คือวิชาอะไร")
+    assert has_course_code("618362 กี่หน่วยกิต")
+    assert not has_course_code("หลักสูตรปี 2565 รวม 147 หน่วยกิต")
+
+
+def test_course_code_queries_prefer_local_rag():
+    assert should_prefer_local_rag("รหัสวิชา SU115 อาหารเพื่อสุขภาพ")
+    assert should_prefer_local_rag("511 104 แคลคูลัสสำหรับวิศวกร 1")
+    assert should_prefer_local_rag("618362 คือวิชาอะไร")
+    assert should_prefer_local_rag("618362 กี่หน่วยกิต")
+
+
+def test_compact_numeric_course_code_questions_use_domain_flow():
+    for query in ("618362 คือวิชาอะไร", "618362 กี่หน่วยกิต"):
+        intent, _ = classify_query_precheck(query)
+        assert intent == "domain_question"
+
+
+def test_internship_hour_question_uses_domain_flow_and_local_rag():
+    query = "วิชา ฝึกงาน ต้องไม่น้อยกว่ากี่ชั่วโมง"
+    intent, _ = classify_query_precheck(query)
+
+    assert intent == "domain_question"
+    assert should_prefer_local_rag(query)
+
+
 def test_english_greeting_plus_real_question_does_not_shortcut():
     intent, _ = classify_query_precheck("Hello, what is the department phone number?")
     assert intent == "domain_question"
@@ -166,6 +215,39 @@ def test_stable_curriculum_queries_do_not_force_web_search():
         "ภาควิชามีหลักสูตรปริญญาตรีอะไรบ้าง",
     ):
         assert should_prefer_web_for_public_updates(query) is False
+
+
+def test_answer_prompt_requires_partial_answer_before_missing_notice():
+    prompt = build_answer_prompt(
+        {
+            "messages": [HumanMessage(content="หลักสูตร ECS มีข้อมูลอะไรบ้างและ prerequisite คืออะไร")],
+            "original_query": "หลักสูตร ECS มีข้อมูลอะไรบ้างและ prerequisite คืออะไร",
+            "enhanced_query": "หลักสูตร ECS prerequisite",
+            "response_language": "th",
+            "rag": "[Source 1: program_ecs.md]\nหลักสูตร ECS พ.ศ. 2565 รวม 147 หน่วยกิต",
+            "web": "",
+        }
+    )
+
+    assert "answer the supported parts first" in prompt
+    assert "which specific detail was not found" in prompt
+    assert "Do not say broadly that information was not found" in prompt
+
+
+def test_answer_prompt_mentions_source_url_when_context_has_url():
+    prompt = build_answer_prompt(
+        {
+            "messages": [HumanMessage(content="หลักสูตรไฟฟ้าสื่อสารกี่หน่วยกิต")],
+            "original_query": "หลักสูตรไฟฟ้าสื่อสารกี่หน่วยกิต",
+            "enhanced_query": "หลักสูตรไฟฟ้าสื่อสาร หน่วยกิต",
+            "response_language": "th",
+            "rag": "[Source 1: program_electrical_communications.md]\nSource URL: https://ee-eng.su.ac.th/Program.aspx?Course=ElectricalCommunicationsEngineering\nจำนวนไม่น้อยกว่า 146 หน่วยกิต",
+            "web": "",
+        }
+    )
+
+    assert "แหล่งอ้างอิง" in prompt
+    assert "URL" in prompt
 
 
 def test_contact_shortcut_does_not_call_llm(monkeypatch):
